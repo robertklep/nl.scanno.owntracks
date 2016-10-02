@@ -7,6 +7,29 @@ var logArray = [];
 // settings besides to have the client connection available globally.
 var connectedClient = null;
 
+var userArray = [];
+
+function getUser(userName) {
+   for (var i=0; i < userArray.length; i++) {
+      if (userArray[i].userName === userName) {
+         return userArray[i];
+      }
+   }
+   // User has not been found, so return null
+   return null
+}
+
+function setUser(userData) {
+   var entryArray = getUser(userData.userName);
+   if (entryArray !== null) {
+      entryArray = userData;
+      
+   } else {
+      // User has not been found, so assume this is a new user
+      userArray.push(userData);
+   }
+}
+
 function getDateTime() {
 
     var date = new Date();
@@ -43,6 +66,9 @@ function writelog(line) {
 
 function receiveMessage(topic, message, args, state) {
    var validJSON = true;
+   var topicArray = topic.split('/');
+   var currentUser = {};
+   
    writelog("received '" + message.toString() + "' on '" + topic + "'");
 
    // parse the JSON message and put it in an object that we can use
@@ -57,6 +83,19 @@ function receiveMessage(topic, message, args, state) {
    // differently. For now we only support the transition message. But prepare for more.
    // for more information see http://owntracks.org/booklet/tech/json/
    if (validJSON && jsonMsg._type !== undefined) {
+      // get the user this message is from. This can be found in the topic the message is published in
+      currentUser = getUser(topicArray[1]);
+      if (currentUser === null) {
+         currentUser = {};
+         currentUser.userName = topicArray[1];
+         currentUser.fence = "";
+      }
+      currentUser.lon = jsonMsg.lon;
+      currentUser.lat = jsonMsg.lat;
+//      currentUser.fence ="";
+      currentUser.adres = "";
+      currentUser.timestamp = jsonMsg.tst;
+      
       switch (jsonMsg._type) {
          case 'transition':
             // check the accuracy. If it is too low (i.e a high amount is meters) then perhaps we should skip the trigger
@@ -65,10 +104,12 @@ function receiveMessage(topic, message, args, state) {
                writelog("Accuracy is within limits")
                switch (jsonMsg.event) {
                   case 'enter':
+                     currentUser.fence = jsonMsg.desc;
                      Homey.manager('flow').trigger('enterGeofence', null, { triggerTopic: topic, triggerFence: jsonMsg.desc });
                      writelog("Trigger enter card for " + jsonMsg.desc);
                      break;
                   case 'leave':
+                     currentUser.fence = "";
                      Homey.manager('flow').trigger('leaveGeofence', null, { triggerTopic: topic, triggerFence: jsonMsg.desc });
                      writelog("Trigger leave card for " + jsonMsg.desc);
                      break;
@@ -94,6 +135,7 @@ function receiveMessage(topic, message, args, state) {
          default:
             break;
       }
+      setUser(currentUser);
    }
 }
 
@@ -387,8 +429,14 @@ function getLogLines(callback, args) {
    callback ( false, logArray);
 }
 
+function getUserArray(callback, args) {
+   writelog("getUserArray called");
+   callback ( false, userArray);
+}
 
 module.exports.testBroker = testBroker;
 module.exports.changedSettings = changedSettings;
 module.exports.getLogLines = getLogLines;
+module.exports.getUserArray = getUserArray;
+
 

@@ -25,7 +25,7 @@ module.exports = [{
    }
 },
 {
-   description:	'Show latst 10 loglines',
+   description:	'Show latst loglines',
    method:      'GET',
    path:        '/test/getloglines/',
    requires_authorization: true,
@@ -36,7 +36,19 @@ module.exports = [{
       Homey.app.getLogLines(callback, args);
       callback(callback, args);
    }
-
+},
+{
+   description:	'Get Array with user info',
+   method:      'GET',
+   path:        '/test/getUserArray/',
+   requires_authorization: true,
+   role: 'owner',
+   fn: function(callback, args) {
+      Homey.log("");
+      Homey.log("API: Incoming POST on /test/getUserArray/");
+      Homey.app.getUserArray(callback, args);
+      callback(callback, args);
+   }
 }]
 
 
