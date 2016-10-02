@@ -80,6 +80,9 @@
         </fieldset>
         </form>
 
+        <p data-i18n="settings.app.user.title"></p>
+        <div id="userdata"></div>
+
         <p data-i18n="settings.app.log.title"></p>
         <button class="right" id="button_getlog" onclick="showLogLines()" data-i18n="settings.app.button.getlogs">Get Logs</button>
         <div id="loglines"></div>
@@ -292,6 +295,7 @@
         }
 
         function showLogLines() {
+           showUserArray();
            Homey.api('GET', 'test/getloglines/', function(err, result) {
               if (!err) {
                  document.getElementById('loglines').innerHTML = '';
@@ -302,6 +306,22 @@
               };
            });
         }
+
+        function showUserArray() {
+           Homey.api('GET', 'test/getUserArray/', function(err, result) {
+              if (!err) {
+                 document.getElementById('userdata').innerHTML = '';
+                 for (var i=0; i < result.length; i++) {
+                    document.getElementById('userdata').innerHTML += "Name: " + result[i].userName;
+                    document.getElementById('userdata').innerHTML += "   Fence: " + result[i].fence;
+                    document.getElementById('userdata').innerHTML += "   Lon: " + result[i].lon;
+                    document.getElementById('userdata').innerHTML += "   Lat: " + result[i].lat;
+                    document.getElementById('userdata').innerHTML += "<br />";
+                 }
+              };
+           });
+        }
+
         </script>
 
     </body>
