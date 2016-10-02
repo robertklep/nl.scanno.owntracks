@@ -1,5 +1,7 @@
 "use strict";
 var mqtt      = require("mqtt");
+var geocoder = require('geocoder');
+
 var connectedTopics = [];
 var logArray = [];
 
@@ -21,9 +23,14 @@ function getUser(userName) {
 
 function setUser(userData) {
    var entryArray = getUser(userData.userName);
+   geocoder.reverseGeocode( userData.lat, userData.lon, function ( err, data ) {
+     // do something with data
+      writelog(data.results[0].formatted_address);
+      userData.address = data.results[0].formatted_address;
+   });
+
    if (entryArray !== null) {
       entryArray = userData;
-      
    } else {
       // User has not been found, so assume this is a new user
       userArray.push(userData);
@@ -89,11 +96,11 @@ function receiveMessage(topic, message, args, state) {
          currentUser = {};
          currentUser.userName = topicArray[1];
          currentUser.fence = "";
+         currentUser.address = "";
       }
       currentUser.lon = jsonMsg.lon;
       currentUser.lat = jsonMsg.lat;
 //      currentUser.fence ="";
-      currentUser.adres = "";
       currentUser.timestamp = jsonMsg.tst;
       
       switch (jsonMsg._type) {
