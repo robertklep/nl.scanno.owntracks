@@ -8,8 +8,8 @@
       "en": "Subscripe to Owntracks MQTT messages for presence detection",
       "nl": "Abonneer op MQTT berichten van Owntracks voor aanwezigheids detectie"
    },
-   "version": "0.3.7",
-   "compatibility": "0.x",
+   "version": "0.4.0",
+   "compatibility": "1.x",
    "category": [
       "internet"
    ],
@@ -35,6 +35,54 @@
    },
    "flow": {
       "triggers": [
+         {
+            "id": "eventDeviceData",
+            "title": {
+               "en": "Receive ownTracks device data",
+               "nl": "Ontvang ownTracks device gegevens"
+            },
+            "tokens": [
+               {
+                  "name": "battery",
+                  "title": {
+                     "en": "Device battery percentage.",
+                     "nl": "Accu percentage"
+                  }
+               },
+               {
+                  "name": "address",
+                  "title": {
+                     "en": "Adress of the device location",
+                     "nl": "Adres waar het apparaat zich bevind"
+                  }
+               },
+               {
+                  "name": "lon",
+                  "title": {
+                     "en": "Longitude of device",
+                     "nl": "Longitude van apparaat"
+                  }
+               },
+               {
+                  "name": "lat",
+                  "title": {
+                     "en": "Latitude of device",
+                     "nl": "Latitude van apparaat"
+                  }
+               }
+
+            ],
+            "args":[
+	       {
+	          "name": "mqttTopic",
+	          "type": "text",
+	          "placeholder": {
+	             "en": "Topic",
+	             "nl": "Topic"
+	           }
+	       }
+            ]
+         },
          {
             "id": "eventOwntracks",
             "title": {
@@ -119,7 +167,6 @@
 	       }
             ]
          }
-
       ],
       "actions": [
          {

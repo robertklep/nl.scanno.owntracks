@@ -23,12 +23,14 @@ function getUser(userName) {
 
 function setUser(userData) {
    var entryArray = getUser(userData.userName);
-   geocoder.reverseGeocode( userData.lat, userData.lon, function ( err, data ) {
+/*   geocoder.reverseGeocode( userData.lat, userData.lon, function ( err, data ) {
      // do something with data
-      writelog(data.results[0].formatted_address);
-      userData.address = data.results[0].formatted_address;
+      if (!err) {
+         writelog(data.results[0].formatted_address);
+         userData.address = data.results[0].formatted_address;
+      }
    });
-
+*/
    if (entryArray !== null) {
       entryArray = userData;
    } else {
@@ -98,9 +100,8 @@ function receiveMessage(topic, message, args, state) {
          currentUser.fence = "";
          currentUser.address = "";
       }
-      currentUser.lon = jsonMsg.lon;
-      currentUser.lat = jsonMsg.lat;
-//      currentUser.fence ="";
+//      currentUser.lon = jsonMsg.lon;
+//      currentUser.lat = jsonMsg.lat;
       currentUser.timestamp = jsonMsg.tst;
       
       switch (jsonMsg._type) {
@@ -130,6 +131,26 @@ function receiveMessage(topic, message, args, state) {
          case 'location':
             // This location object describes the location of the device that published it.
             writelog("We have received a location message");
+            writelog("lon: "+ jsonMsg.lon+" / "+currentUser.lon);
+            writelog("lat: "+ jsonMsg.lat+" / "+currentUser.lat);
+
+
+            // Only do a reverse geo lookup when the coordinates have changed
+//            if (currentUser.lon != jsonMsg.lon || currentUser.lat != jsonMsg.lat) {
+               geocoder.reverseGeocode( jsonMsg.lat, jsonMsg.lon, function ( err, data ) {
+                  // do something with data
+                  if (!err) {
+                     writelog(data.results[0].formatted_address);
+                     currentUser.address = data.results[0].formatted_address;
+                  }
+               });
+//            }
+
+            currentUser.battery = jsonMsg.batt;
+            currentUser.lon = jsonMsg.lon;
+            currentUser.lat = jsonMsg.lat;
+            Homey.manager('flow').trigger('eventDeviceData', {battery: currentUser.battery, address: currentUser.address, lon: currentUser.lon, lat: currentUser.lat}, 
+                                                             { triggerTopic: topic, triggerFence: jsonMsg.desc });
             break;
          case 'waypoint' :
             // Waypoints denote specific geographical locations that you want to keep track of. You define a waypoint on the OwnTracks device, 
@@ -282,7 +303,8 @@ function listenForMessage () {
    // Start listening for the events.
    Homey.manager('flow').on('trigger.eventOwntracks', processMessage)
    Homey.manager('flow').on('trigger.enterGeofence', processMessage)
-   Homey.manager('flow').on('trigger.leaveGeofence', processMessage)    
+   Homey.manager('flow').on('trigger.leaveGeofence', processMessage)
+   Homey.manager('flow').on('trigger.eventDeviceData', processMessage)
 }
 
 function getArgs () {
@@ -300,6 +322,12 @@ function getArgs () {
    });
 
    Homey.manager('flow').trigger('leaveGeofence', null, { triggerTopic: 'x', triggerFence: 'x' }, function(err, result) {
+      if( err ) {
+         return Homey.error(err)
+     }
+   });
+
+   Homey.manager('flow').trigger('eventDeviceData', null, { triggerTopic: 'x', triggerFence: 'x' }, function(err, result) {
       if( err ) {
          return Homey.error(err)
      }
@@ -335,6 +363,9 @@ exports.init = function() {
       clearInterval(myTim)
    });
    Homey.manager('flow').on('trigger.leaveGeofence', function( callback, args ){
+      clearInterval(myTim)
+   });
+   Homey.manager('flow').on('trigger.eventDeviceData', function( callback, args ){
       clearInterval(myTim)
    });
 
