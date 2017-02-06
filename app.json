@@ -1,12 +1,12 @@
 {
-   "id": "nl.scanno.owntracks",
+   "id": "nl.scanno.homey-mqtt",
    "name": {
-      "en": "Owntracks Client",
-      "nl": "Owntracks Client"
+      "en": "Homey MQTT Client",
+      "nl": "Homey MQTT Client"
    },
    "description": {
-      "en": "Subscripe to Owntracks MQTT messages for presence detection",
-      "nl": "Abonneer op MQTT berichten van Owntracks voor aanwezigheids detectie"
+      "en": "Subscripe to MQTT messages.",
+      "nl": "Abonneer op MQTT berichten."
    },
    "version": "0.4.0",
    "compatibility": "1.x",

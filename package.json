@@ -1,7 +1,7 @@
 {
-  "name": "nl.scanno.owntracks",
-  "version": "0.3.7",
-  "description": "Owntracks Client",
+  "name": "nl.scanno.homey-mqtt",
+  "version": "0.4.0",
+  "description": "Homey MQTT Client",
   "main": "app.js",
   "dependencies": {
     "mqtt": "^1.7.2"
