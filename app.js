@@ -91,6 +91,11 @@ function receiveMessage(topic, message, args, state) {
          case 'encrypted' :
             // This payload type contains a single data element with the original JSON object _type (e.g. location, beacon, etc.) encrypted payload in it.
             break;
+         case 'beacon' :
+            // This payload contains information about detected iBeacon
+            writelog("Beacon message detected:");
+            writelog("uuid: "+jsonMsg.uuid+"major: "+jsonMsg.major+" minor: "+jsonMsg.minor+" tst: "+jsonMsg.tst+" acc: "+jsonMsg.acc+" rssi: "+jsonMsg.rssi+" prox: "+jsonMsg.prox);
+            break;
          default:
             break;
       }
