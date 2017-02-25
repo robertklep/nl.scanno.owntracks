@@ -258,16 +258,23 @@ function getArgs () {
 }
 
 function listenForAction () {
-   Homey.manager('flow').on('action.pub_mqtt_message', function( callback, args ){
+   writelog("listenFirAction called")
+   Homey.manager('flow').on('action.publishOwntracks', function( callback, args ){
+      writelog("Send flow triggered");
       // Read the URL from the settings.
-      var connect_options = "[{ username: '" + Homey.manager('settings').get('user') + "', password: '" + Homey.manager('settings').get('password') + "' }]"
-      console.log("connect_options = " + connect_options) 
-      var client  = mqtt.connect('mqtt://' + Homey.manager('settings').get('url'), connect_options);
-      client.on('connect', function () {
-         client.publish(args.mqtt_topic, args.geofence_name, args.mqtt_message);
-         writelog("send " + args.mqtt_message + " on topic " + args.mqtt_topic);
-         client.end();
-      });
+      if (connectedClient == null) {
+         var client = mqtt.connect(getBrokerURL(), getConnectOptions());
+         client.on('connect', function () {
+            client.publish(args.mqttTopic, args.mqttMessage, function() {
+               writelog("send " + args.mqttMessage + " on topic " + args.mqttTopic);
+               client.end();
+            });
+         });
+      } else {
+         connectedClient.publish(args.mqttTopic, args.mqttMessage, function() {
+            writelog("send " + args.mqttMessage + " on topic " + args.mqttTopic);
+         });
+      }
       callback( null, true ); // we've fired successfully
    });
 }

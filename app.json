@@ -123,14 +123,14 @@
       ],
       "actions": [
          {
-	    "id": "pub_mqtt_message",
+	    "id": "publishOwntracks",
 	    "title": {
 	       "en": "Publish message",
 	       "nl": "Stuur bericht"
 	     },
              "args":[
 	        {
-	           "name": "mqtt_message",
+	           "name": "mqttMessage",
 	           "type": "text",
 	           "placeholder": {
 	              "en": "Message",
@@ -138,7 +138,7 @@
 	            }
 	        },
 	        {
-	           "name": "mqtt_topic",
+	           "name": "mqttTopic",
 	           "type": "text",
 	           "placeholder": {
 	              "en": "Topic",
