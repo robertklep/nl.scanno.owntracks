@@ -105,16 +105,16 @@ function receiveMessage(topic, message, args, state) {
                switch (jsonMsg.event) {
                   case 'enter':
                      currentUser.fence = jsonMsg.desc;
-                     Homey.manager('flow').trigger('enterGeofence', null, { triggerTopic: topic, triggerFence: jsonMsg.desc });
+                     Homey.manager('flow').trigger('enterGeofence', { user: currentUser.userName }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
                      writelog("Trigger enter card for " + jsonMsg.desc);
                      break;
                   case 'leave':
                      currentUser.fence = "";
-                     Homey.manager('flow').trigger('leaveGeofence', null, { triggerTopic: topic, triggerFence: jsonMsg.desc });
+                     Homey.manager('flow').trigger('leaveGeofence', { user: currentUser.userName }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
                      writelog("Trigger leave card for " + jsonMsg.desc);
                      break;
                }
-               Homey.manager('flow').trigger('eventOwntracks', { event: jsonMsg.event }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
+               Homey.manager('flow').trigger('eventOwntracks', { user: currentUser.userName, event: jsonMsg.event }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
                writelog("Trigger generic card for " + jsonMsg.desc);
             } else {
                writelog ("Accuracy is "+ jsonMsg.acc + " and needs to be below " + parseInt(Homey.manager('settings').get('accuracy')))
@@ -285,19 +285,19 @@ function listenForMessage () {
 
 function getArgs () {
    // Give all the triggers a kick to retrieve the arg(topic) defined on the trigger.
-   Homey.manager('flow').trigger('eventOwntracks', { event: 'Hallo homey' }, { triggerTopic: 'x', triggerFence: 'x' }, function(err, result) {
+   Homey.manager('flow').trigger('eventOwntracks', { user: '', event: 'Hallo homey' }, { triggerTopic: 'x', triggerFence: 'x' }, function(err, result) {
       if( err ) {
          return Homey.error(err)
      }
    });
 
-   Homey.manager('flow').trigger('enterGeofence', null, { triggerTopic: 'x', triggerFence: 'x' }, function(err, result) {
+   Homey.manager('flow').trigger('enterGeofence', null, { user: '' }, { triggerTopic: 'x', triggerFence: 'x' }, function(err, result) {
       if( err ) {
          return Homey.error(err)
      }
    });
 
-   Homey.manager('flow').trigger('leaveGeofence', null, { triggerTopic: 'x', triggerFence: 'x' }, function(err, result) {
+   Homey.manager('flow').trigger('leaveGeofence', null, { user: '' }, { triggerTopic: 'x', triggerFence: 'x' }, function(err, result) {
       if( err ) {
          return Homey.error(err)
      }

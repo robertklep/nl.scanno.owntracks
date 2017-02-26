@@ -48,6 +48,13 @@
                      "en": "Type of event (enter or leave)",
                      "nl": "Type gebeurtenis (enter / leave)"
                   }
+               },
+               {
+                  "name": "user",
+                  "title": {
+                     "en": "User that enters/leaves geofence",
+                     "nl": "Gebruiker welke de geofence binnenkomt of verlaat"
+                  }
                }
             ],
             "args":[
@@ -75,6 +82,15 @@
                "en": "Enter Geofence trigger",
                "nl": "Geofence binnen gegaan trigger"
             },
+            "tokens": [
+               {
+                  "name": "user",
+                  "title": {
+                     "en": "User that enters geofence",
+                     "nl": "Gebruiker welke de geofence binnenkomt"
+                  }
+               }
+            ],
             "args":[
 	       {
 	          "name": "mqttTopic",
@@ -100,6 +116,15 @@
                "en": "Leave Geofence trigger",
                "nl": "Geofence verlaten trigger"
             },
+            "tokens": [
+               {
+                  "name": "user",
+                  "title": {
+                     "en": "User that enters geofence",
+                     "nl": "Gebruiker welke de geofence binnenkomt"
+                  }
+               }
+            ],
             "args":[
 	       {
 	          "name": "mqttTopic",
