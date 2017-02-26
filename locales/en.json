@@ -28,6 +28,10 @@
                 "getlogs" : "Get logs"
             },
             
+             "user" : {
+                "title" : "Last known user data: "
+            },
+
              "log" : {
                 "title" : "Log lines:"
             },

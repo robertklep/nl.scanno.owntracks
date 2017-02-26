@@ -27,9 +27,13 @@
                 "test" : "Test",
                 "getlogs" : "Log ophalen"
             },
-            
+
+             "user" : {
+                "title" : "Laatst bekende gebruikers gegevens:"
+            },
+
              "log" : {
-                "title" : "Laatste log regels"
+                "title" : "Laatste log regels:"
             },
             
              "messages" : {
