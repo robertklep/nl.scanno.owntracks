@@ -305,7 +305,6 @@ function getArgs () {
 }
 
 function listenForAction () {
-   writelog("listenFirAction called")
    Homey.manager('flow').on('action.publishOwntracks', function( callback, args ){
       writelog("Send flow triggered");
       // Read the URL from the settings.
