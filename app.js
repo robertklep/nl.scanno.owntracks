@@ -291,13 +291,13 @@ function getArgs () {
      }
    });
 
-   Homey.manager('flow').trigger('enterGeofence', null, { user: '' }, { triggerTopic: 'x', triggerFence: 'x' }, function(err, result) {
+   Homey.manager('flow').trigger('enterGeofence', { user: '' }, { triggerTopic: 'x', triggerFence: 'x' }, function(err, result) {
       if( err ) {
          return Homey.error(err)
      }
    });
 
-   Homey.manager('flow').trigger('leaveGeofence', null, { user: '' }, { triggerTopic: 'x', triggerFence: 'x' }, function(err, result) {
+   Homey.manager('flow').trigger('leaveGeofence', { user: '' }, { triggerTopic: 'x', triggerFence: 'x' }, function(err, result) {
       if( err ) {
          return Homey.error(err)
      }
