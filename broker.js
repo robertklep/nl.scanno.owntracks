@@ -81,6 +81,9 @@ function connectToBroker(args, state) {
          logmodule.writelog("OnMessage called");
          handleMessage.receiveMessage(topic, message, args, state);
       });
+      // Since we are connecting here, we might as well subscribe to the generic
+      // Owmntracks topic
+      subscribeToTopic("owntracks/#");
    };
 }
 
