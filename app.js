@@ -1,11 +1,12 @@
 "use strict";
-var mqtt      = require("mqtt");
+//var mqtt      = require("mqtt");
 var globalVar = require("./global.js");
 var logmodule = require("./logmodule.js");
+var broker    = require("./broker.js");
 
 // At this time i do not have another idea on how to control the client connection when changing the
 // settings besides to have the client connection available globally.
-var connectedClient = null;
+//var connectedClient = null;
 
 
 function receiveMessage(topic, message, args, state) {
@@ -88,7 +89,7 @@ function receiveMessage(topic, message, args, state) {
    }
 }
 
-function getBrokerURL() {
+/*function getBrokerURL() {
    var urlBroker = []
     
    if (Homey.manager('settings').get('otbroker') == true) {
@@ -120,13 +121,16 @@ function getConnectOptions() {
       return connect_options
    };
 }
+*/
 
 function processMessage (callback, args, state) {
    var reconnectClient = false;
    // Make a connection to the broker. But only do this once. When the app is started, the connectedClient
    // variable is set to null, so there is no client connection yet to the broker. If so, then connect to the broker.
    // Otherwise, skip the connection.
-   if (connectedClient == null) {
+   broker.connectToBroker();
+
+/*   if (connectedClient == null) {
       logmodule.writelog("connectedClient == null");
       connectedClient = mqtt.connect(getBrokerURL(), getConnectOptions());
 
@@ -155,6 +159,7 @@ function processMessage (callback, args, state) {
          receiveMessage(topic, message, args, state);
       });
    };
+*/
    logmodule.writelog ("state.topic = " + state.triggerTopic + " topic = " + args.mqttTopic + " state.fence = " + state.triggerFence + " geofence = " + args.nameGeofence)
 
    // MQTT subscription topics can contain "wildcards", i.e a + sign. However the topic returned
@@ -198,6 +203,8 @@ function processMessage (callback, args, state) {
    else {
       // Add another check for the existence of the topic, just in case there is somehting falling through the 
       // previous checks...
+
+/*
       if ( globalVar.getTopicArray().indexOf(args.mqttTopic) == -1 ) {
 
          // Fill the array with known topics so I can check if I need to subscribe
@@ -216,6 +223,8 @@ function processMessage (callback, args, state) {
          logmodule.writelog("Fallback triggered");
          callback (null, false);
       };
+*/
+      broker.subscribeToTopic(args.mqttTopic);
    };
    callback (null, false);
 }
