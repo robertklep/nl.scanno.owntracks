@@ -8,159 +8,15 @@ var broker    = require("./broker.js");
 // settings besides to have the client connection available globally.
 //var connectedClient = null;
 
-/*
-function receiveMessage(topic, message, args, state) {
-   var validJSON = true;
-   var topicArray = topic.split('/');
-   var currentUser = {};
-   
-   logmodule.writelog("received '" + message.toString() + "' on '" + topic + "'");
-
-   // parse the JSON message and put it in an object that we can use
-   try {
-      var jsonMsg = JSON.parse(message.toString());
-   } catch(e) {
-      logmodule.writelog("Received message is not a valid JSON string");
-      validJSON = false;
-   };
-
-   // owntracks has several different mesages that can be retreived and that should be handeld 
-   // differently. For now we only support the transition message. But prepare for more.
-   // for more information see http://owntracks.org/booklet/tech/json/
-   if (validJSON && jsonMsg._type !== undefined) {
-      // get the user this message is from. This can be found in the topic the message is published in
-      currentUser = globalVar.getUser(topicArray[1]);
-      if (currentUser === null) {
-         currentUser = {};
-         currentUser.userName = topicArray[1];
-         currentUser.fence = "";
-      }
-      currentUser.lon = jsonMsg.lon;
-      currentUser.lat = jsonMsg.lat;
-//      currentUser.fence ="";
-      currentUser.adres = "";
-      currentUser.timestamp = jsonMsg.tst;
-      
-      switch (jsonMsg._type) {
-         case 'transition':
-            // check the accuracy. If it is too low (i.e a high amount is meters) then perhaps we should skip the trigger
-            if (jsonMsg.acc <= parseInt(Homey.manager('settings').get('accuracy'))) {
-               // The accuracy of location is lower then the treshold value, so the location change will be trggerd
-               logmodule.writelog("Accuracy is within limits")
-               switch (jsonMsg.event) {
-                  case 'enter':
-                     currentUser.fence = jsonMsg.desc;
-                     Homey.manager('flow').trigger('enterGeofence', { user: currentUser.userName }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
-                     logmodule.writelog("Trigger enter card for " + jsonMsg.desc);
-                     break;
-                  case 'leave':
-                     currentUser.fence = "";
-                     Homey.manager('flow').trigger('leaveGeofence', { user: currentUser.userName }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
-                     logmodule.writelog("Trigger leave card for " + jsonMsg.desc);
-                     break;
-               }
-               Homey.manager('flow').trigger('eventOwntracks', { user: currentUser.userName, event: jsonMsg.event }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
-               logmodule.writelog("Trigger generic card for " + jsonMsg.desc);
-            } else {
-               logmodule.writelog ("Accuracy is "+ jsonMsg.acc + " and needs to be below " + parseInt(Homey.manager('settings').get('accuracy')))
-            }
-            break;
-         case 'location':
-            // This location object describes the location of the device that published it.
-            logmodule.writelog("We have received a location message");
-            break;
-         case 'waypoint' :
-            // Waypoints denote specific geographical locations that you want to keep track of. You define a waypoint on the OwnTracks device, 
-            // and OwnTracks publishes this waypoint (if the waypoint is marked shared)
-            logmodule.writelog("We have received a waypoint message");
-            break;
-         case 'encrypted' :
-            // This payload type contains a single data element with the original JSON object _type (e.g. location, beacon, etc.) encrypted payload in it.
-            break;
-         case 'beacon' :
-            // This payload contains information about detected iBeacon
-            logmodule.writelog("Beacon message detected:");
-            logmodule.writelog("uuid: "+jsonMsg.uuid+"major: "+jsonMsg.major+" minor: "+jsonMsg.minor+" tst: "+jsonMsg.tst+" acc: "+jsonMsg.acc+" rssi: "+jsonMsg.rssi+" prox: "+jsonMsg.prox);
-            break;
-         default:
-            break;
-      }
-      globalVar.setUser(currentUser);
-   }
-}
-*/
-
-/*function getBrokerURL() {
-   var urlBroker = []
-    
-   if (Homey.manager('settings').get('otbroker') == true) {
-      urlBroker.push("mqtt://");
-      urlBroker.push("broker.hivemq.com:1883");
-   } else {
-      if (Homey.manager('settings').get('tls') == true) {
-        urlBroker.push("mqtts://");
-      } else {
-         urlBroker.push("mqtt://");
-      };
-      urlBroker.push(Homey.manager('settings').get('url'));
-      urlBroker.push(":"+Homey.manager('settings').get('ip_port'));
-   }
-   logmodule.writelog("Broker URL: "+ urlBroker.join(''));
-   return urlBroker.join('');
-}
-
-function getConnectOptions() {
-
-  if (Homey.manager('settings').get('otbroker') == true) {
-      return null;
-   } else {
-      var connect_options = {
-         keepalive: 10,
-         username: Homey.manager('settings').get('user'),
-         password: Homey.manager('settings').get('password')
-      };
-      return connect_options
-   };
-}
-*/
 
 function processMessage (callback, args, state) {
    var reconnectClient = false;
+
    // Make a connection to the broker. But only do this once. When the app is started, the connectedClient
    // variable is set to null, so there is no client connection yet to the broker. If so, then connect to the broker.
    // Otherwise, skip the connection.
    broker.connectToBroker(args, state);
 
-/*   if (connectedClient == null) {
-      logmodule.writelog("connectedClient == null");
-      connectedClient = mqtt.connect(getBrokerURL(), getConnectOptions());
-
-      connectedClient.on('reconnect', function() {
-         logmodule.writelog("MQTT Reconnect");
-         reconnectClient = true;
-       });
-
-      connectedClient.on('close', function() {
-         logmodule.writelog("MQTT Closed");
-         reconnectClient = true;
-       });
-
-      connectedClient.on('offline', function() {
-         logmodule.writelog("MQTT Offline");
-         reconnectClient = true;
-       });
-
-      connectedClient.on('error', function(error) {
-         logmodule.writelog("MQTT error occured: " + error);
-      });
-
-      connectedClient.on('message',function(topic, message, packet) {
-         // When a message is received, call receiveMessage for further processing
-         logmodule.writelog("OnMessage called");
-         receiveMessage(topic, message, args, state);
-      });
-   };
-*/
    logmodule.writelog ("state.topic = " + state.triggerTopic + " topic = " + args.mqttTopic + " state.fence = " + state.triggerFence + " geofence = " + args.nameGeofence)
 
    // MQTT subscription topics can contain "wildcards", i.e a + sign. However the topic returned
@@ -205,26 +61,6 @@ function processMessage (callback, args, state) {
       // Add another check for the existence of the topic, just in case there is somehting falling through the 
       // previous checks...
 
-/*
-      if ( globalVar.getTopicArray().indexOf(args.mqttTopic) == -1 ) {
-
-         // Fill the array with known topics so I can check if I need to subscribe
-         globalVar.getTopicArray().push(args.mqttTopic);
-
-         // On connection ...
-         connectedClient.on('connect', function (connack) {
-            logmodule.writelog("MQTT client connected");
-            logmodule.writelog("Connected Topics: " + globalVar.getTopicArray());
-            logmodule.writelog("reconnectedClient " + reconnectClient);
-
-            connectedClient.subscribe(args.mqttTopic)
-            logmodule.writelog("waiting "+ args.mqttTopic );
-         });
-      } else {
-         logmodule.writelog("Fallback triggered");
-         callback (null, false);
-      };
-*/
       broker.subscribeToTopic(args.mqttTopic);
    };
    callback (null, false);
@@ -262,6 +98,7 @@ function listenForAction () {
    Homey.manager('flow').on('action.publishOwntracks', function( callback, args ){
       logmodule.writelog("Send flow triggered");
       // Read the URL from the settings.
+/*
       if (connectedClient == null) {
          var client = mqtt.connect(getBrokerURL(), getConnectOptions());
          client.on('connect', function () {
@@ -275,6 +112,8 @@ function listenForAction () {
             logmodule.writelog("send " + args.mqttMessage + " on topic " + args.mqttTopic);
          });
       }
+*/
+      broker.sendMessageToTopic(args);
       callback( null, true ); // we've fired successfully
    });
 }

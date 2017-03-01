@@ -12,6 +12,9 @@ module.exports = {
    },
    subscribeToTopic: function(topicName) {
       subscribeToTopic(topicName);
+   },
+   sendMessageToTopic: function(args) {
+      sendMessageToTopic(args);
    }
 }
 
@@ -95,6 +98,25 @@ function subscribeToTopic(topicName) {
 
          connectedClient.subscribe(topicName)
          logmodule.writelog("waiting "+ topicName );
+      });
+   }
+}
+
+function sendMessageToTopic(args) {
+   // Check if there is already a connection to the broker
+   if (connectedClient == null) {
+      // There is no connection, so create a connection and send the message
+      var client = mqtt.connect(getBrokerURL(), getConnectOptions());
+      client.on('connect', function () {
+         client.publish(args.mqttTopic, args.mqttMessage, function() {
+            logmodule.writelog("send " + args.mqttMessage + " on topic " + args.mqttTopic);
+            client.end();
+         });
+      });
+   } else {
+      // There is already a connection, so the message can be send
+      connectedClient.publish(args.mqttTopic, args.mqttMessage, function() {
+         logmodule.writelog("send " + args.mqttMessage + " on topic " + args.mqttTopic);
       });
    }
 }
