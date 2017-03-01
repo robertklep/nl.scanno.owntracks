@@ -1,13 +1,14 @@
 var mqtt      = require("mqtt");
 var globalVar = require("./global.js");
 var logmodule = require("./logmodule.js");
+var handleMessage = require("./messagehandling.js");
 
 var connectedClient = null;
 var reconnectClient = false;
 
 module.exports = {
-   connectToBroker: function() {
-      connectToBroker();
+   connectToBroker: function(args, state) {
+      connectToBroker(args, state);
    },
    subscribeToTopic: function(topicName) {
       subscribeToTopic(topicName);
@@ -48,7 +49,7 @@ function getConnectOptions() {
    };
 }
 
-function connectToBroker() {
+function connectToBroker(args, state) {
    if (connectedClient == null) {
       logmodule.writelog("connectedClient == null");
       connectedClient = mqtt.connect(getBrokerURL(), getConnectOptions());
@@ -75,7 +76,7 @@ function connectToBroker() {
       connectedClient.on('message',function(topic, message, packet) {
          // When a message is received, call receiveMessage for further processing
          logmodule.writelog("OnMessage called");
-         receiveMessage(topic, message, args, state);
+         handleMessage.receiveMessage(topic, message, args, state);
       });
    };
 }

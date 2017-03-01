@@ -8,7 +8,7 @@ var broker    = require("./broker.js");
 // settings besides to have the client connection available globally.
 //var connectedClient = null;
 
-
+/*
 function receiveMessage(topic, message, args, state) {
    var validJSON = true;
    var topicArray = topic.split('/');
@@ -88,6 +88,7 @@ function receiveMessage(topic, message, args, state) {
       globalVar.setUser(currentUser);
    }
 }
+*/
 
 /*function getBrokerURL() {
    var urlBroker = []
@@ -128,7 +129,7 @@ function processMessage (callback, args, state) {
    // Make a connection to the broker. But only do this once. When the app is started, the connectedClient
    // variable is set to null, so there is no client connection yet to the broker. If so, then connect to the broker.
    // Otherwise, skip the connection.
-   broker.connectToBroker();
+   broker.connectToBroker(args, state);
 
 /*   if (connectedClient == null) {
       logmodule.writelog("connectedClient == null");
