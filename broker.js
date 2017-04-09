@@ -15,6 +15,12 @@ module.exports = {
    },
    sendMessageToTopic: function(args) {
       sendMessageToTopic(args);
+   },
+   getConnectedClient: function() {
+      return connectedClient;
+   },
+   clearConnectedClient: function() {
+      connectedClient = null;
    }
 }
 
@@ -123,6 +129,3 @@ function sendMessageToTopic(args) {
       });
    }
 }
-
-
-

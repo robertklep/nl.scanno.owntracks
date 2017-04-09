@@ -13,6 +13,32 @@
    "category": [
       "internet"
    ],
+   "permissions": [
+       "homey:manager:speech-input",
+       "homey:manager:speech-output"
+   ],
+   "speech": [
+    {
+        "id": "owntracks",
+        "importance": 1,
+        "triggers": {
+            "en": [ "location" ],
+            "nl": [ "locatie" ]
+        }
+    },
+    {
+        "id": "owntracks2",
+        "importance": 0.5,
+        "triggers": {
+            "en": [ "where" ],
+            "nl": [ "waar" ]
+        }
+    }
+   ],
+   "speechExamples": {
+       "en": [ "What is the location of Menno?" ],
+       "nl": [ "Wat is de locatie van Menno?" ]
+   },
    "author": {
       "name": "Menno van Grinsven",
       "email": "mgrinsven@gmail.com"
@@ -147,6 +173,23 @@
 
       ],
       "actions": [
+         {
+	    "id": "sayLocation",
+	    "title": {
+	       "en": "Tell the current location of a user",
+	       "nl": "Vertel de huidige locatie van een gebruiker"
+	     },
+             "args":[
+	        {
+	           "name": "user",
+	           "type": "text",
+	           "placeholder": {
+	              "en": "User",
+	              "nl": "Gebruiker"
+	            }
+	        }
+             ]
+         },
          {
 	    "id": "publishOwntracks",
 	    "title": {

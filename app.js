@@ -3,6 +3,7 @@
 var globalVar = require("./global.js");
 var logmodule = require("./logmodule.js");
 var broker    = require("./broker.js");
+var actions   = require("./actions.js");
 
 // At this time i do not have another idea on how to control the client connection when changing the
 // settings besides to have the client connection available globally.
@@ -94,30 +95,6 @@ function getArgs () {
    });
 }
 
-function listenForAction () {
-   Homey.manager('flow').on('action.publishOwntracks', function( callback, args ){
-      logmodule.writelog("Send flow triggered");
-      // Read the URL from the settings.
-/*
-      if (connectedClient == null) {
-         var client = mqtt.connect(getBrokerURL(), getConnectOptions());
-         client.on('connect', function () {
-            client.publish(args.mqttTopic, args.mqttMessage, function() {
-               logmodule.writelog("send " + args.mqttMessage + " on topic " + args.mqttTopic);
-               client.end();
-            });
-         });
-      } else {
-         connectedClient.publish(args.mqttTopic, args.mqttMessage, function() {
-            logmodule.writelog("send " + args.mqttMessage + " on topic " + args.mqttTopic);
-         });
-      }
-*/
-      broker.sendMessageToTopic(args);
-      callback( null, true ); // we've fired successfully
-   });
-}
-
 exports.init = function() {
    // get the arguments of any trigger. Once triggered, the interval will stop
    Homey.log("Owntracks client ready")
@@ -136,7 +113,8 @@ exports.init = function() {
    });
 
    listenForMessage()
-   listenForAction()
+   actions.registerActions();
+   actions.registerSpeech();
 }
 
 function testBroker(callback, args) {
@@ -214,16 +192,16 @@ function changedSettings(callback, args) {
       client.unsubscribe(connectedTopics);*
    });*/
    if (globalVar.getTopicArray().length > 0) {
-      connectedClient.unsubscribe(globalVar.getTopicArray());
+      broker.getConnectedClient().unsubscribe(globalVar.getTopicArray());
       globalVar.clearTopicArray();
    };
 
-   if (connectedClient !== null) {
-      connectedClient.end(true);
+   if (broker.getConnectedClient() !== null) {
+      broker.getConnectedClient().end(true);
    }
 
    logmodule.writelog("topics:" + globalVar.getTopicArray());
-   connectedClient = null;
+   broker.clearConnectedClient();
    getArgs();
    callback(false, null);
 }

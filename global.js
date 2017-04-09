@@ -25,6 +25,14 @@ module.exports = {
    },
    clearTopicArray: function() {
       clearTopicArray();
+   },
+   searchUsers: function(key) {
+//   searchUsers: function() {
+      return searchUsers(key);
+//      return userArray;
+   },
+   getUserFromString: function(key) {
+      return getUserFromString(key);
    }
 }
 
@@ -78,4 +86,39 @@ function setTopic(topicData) {
 function clearTopicArray() {
    topicArray = [];
 }
+
+function searchUsers(key) {
+   logmodule.writelog("searchUsers: "+ key);
+   var matchUsers = [];
+   var temp = [];
+   for (i=0; i < userArray.length; i++) {
+      if (String(userArray[i].userName).includes(key)) {
+        logmodule.writelog("key: " + key + "    userArray: " + userArray[i].userName);
+        temp.icon = '//';
+        temp.name = userArray[i].userName;
+        matchUsers.push(temp);
+      }
+   }
+   logmodule.writelog(matchUsers[0].name);
+   return matchUsers;
+}
+
+function getUserFromString(key) {
+   logmodule.writelog("Get the user from string: "+ key);
+   var userIndex = -1;
+   for (i=0; i < userArray.length; i++) {
+      if (String(key).includes(userArray[i].userName)) {
+        logmodule.writelog("key: " + key + "    userArray: " + userArray[i].userName);
+        userIndex = i;
+      }
+   }
+   if (userIndex == -1) {
+      logmodule.writelog("No users found");
+      return null;
+   } else {
+      logmodule.writelog(userArray[userIndex].userName);
+      return userArray[userIndex];
+   }
+}
+
 
