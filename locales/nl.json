@@ -1,4 +1,9 @@
 {
+    "location_known": "De locatie van __name__ is __location__",
+    "location_unkown": "De locatie van __name__ is onbekend",
+    "location_nodata": "Ik kan geen locatie gegevens vinden voor __name__ .",
+    "location_nouser": "Ik kan geen locatie gegevens vinden.",
+
     "settings" : {
         "app" : {
             "title" : "Owntracks client instellingen",

@@ -1,4 +1,9 @@
 {
+    "location_known": "The location of __name__ is __location__",
+    "location_unkown": "The location of __name__ is unkown",
+    "location_nodata": "I could not find any location data for __name__ .",
+    "location_nouser": "I could not find any location data.",
+
     "settings" : {
         "app" : {
             "title" : "Owntracks client settings",

@@ -62,17 +62,14 @@ function registerSpeech() {
        // loop all triggers
        speech.triggers.forEach(function(trigger) {
            var foundUser = [];
-           logmodule.writelog("Speech DETECTED??");
+           logmodule.writelog("Speech DETECTED");
            if( trigger.id == 'owntracks' || trigger.id == 'owntracks2' ) {
               logmodule.writelog(speech.transcript);
 
               // Search useraray to see if we can match the user in he transcript
               foundUser = globalVar.getUserFromString(speech.transcript);
               if (foundUser !== null) {
-                 logmodule.writelog("Found user: " + foundUser.userName);
-                 logmodule.writelog("GeoFence: " + foundUser.fence);
-                 logmodule.writelog("LocationString: " + getLocationString(foundUser.userName)); 
-
+                 logmodule.writelog("Found user: " + foundUser.userName + "   Fence: " + foundUser.fence);
                  speech.say( getLocationString(foundUser.userName) );
                  callback( null, true );
               } else {
@@ -81,15 +78,9 @@ function registerSpeech() {
               }
             }
        });
-
-       // to make Homey say something from within a speech event, always use the following to make the speech go to the input source:
-       speech.say( __("ok") );
-       // or: speech.confirm( __("are_you_sure"), function(){ ... } );
-
        // null, true when speech was meant for this app
        // true, null when speech wasn't meant for this app
        callback( true, null );
-
    });
 
 }
@@ -99,16 +90,16 @@ function getLocationString(userName) {
    logmodule.writelog("Create LocationString for user: " + userName);
    if ( userName !== null && globalVar.getUser(userName).fence !== null && globalVar.getUser(userName).fence !== undefined ) {
       if ( globalVar.getUser(userName).fence !== "" ) {
-         locationString = "De locatie van " + userName + " is "  + globalVar.getUser(userName).fence;
+         locationString = __("location_known", {"name": userName, "location": globalVar.getUser(userName).fence});
       } else {
-         locationString = "Locatie van " + userName + " is onbekend";
+         locationString = __("location_unkown", {"name": userName});
       }
       logmodule.writelog(locationString);
    } else {
       if (userName !== null) {
-         locationString = "Er zijn geen gegevens van " + userName + " bekend.";
+         locationString = __("location_nodata", {"name": userName});
       } else {
-         locationString = "Er zijn geen gegevens gevonden";
+         locationString= __("location_nouser");
       }
       logmodule.writelog(locationString);
    }
