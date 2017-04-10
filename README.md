@@ -1,7 +1,11 @@
 # Owntracks MQTT Client for Homey
 
-This app is based on the MQTT Client for Homey made by Johan Kuster.
+The Owntracks MQTT Client for Homey is a location app that receives messages from Owntracks apps running on
+your phone. This ways Homey knows when you enter or leave an area (GeoFence) you specified on your phone.
+A GeoFence can be your home or workplace (or any place that you spicify on your phone). With the use of trigger
+cards, you can trigger flows when you enter or leave a specific GeoFence.
 
+## What is Owntracks
 Owntracks is an open source location app for Android and iOS. It sends location information to a MQTT broker.
 This can be a private MQTT broker you are hosting yourself, or a public MQTT broker. The Owntracks app does not
 use a lot of battery.
@@ -34,6 +38,11 @@ This app supports the following trigger cards:
 - a card that will trigger on a enter / leave event on the specified geofence. This card provides a tag that contains 
   the event (i.e. the values can be enter or leave)
 
+This app supports the following activity cards:
+- a card that let Homey speak out the current location of the user specified.
+
+### Homey now supports speech. Ask Homey where a user is, and it will tell you the current name of the GeoFence the user is at.
+
 The settings page contains:
 - The option to use the HiveMQ public broker
 - IP adres or DNS name of the broker wehre to connect top
@@ -46,19 +55,8 @@ The settings page contains:
 
 *Ingmar made a very nice [tutorial](https://forum.athom.com/discussion/2804/setup-homey-with-mqtt-for-location-detection/p1) on the workings of this app.*
 
-Changes in version 0.5.0
-- Make sending a message to a topic more robust
-- Expose userid in the trigger card.
-- Add array to keep track of a user. This is just internal. No logic has been implemented yet so that it can be used. The values
-  can be seen when retrieving the loglines
-- Added beacon message type. This perhaps for future use.
 
-Changes in version 0.3.8
-- Set compatibility to support 1.x
+**If you like this app, then consider to buy me a beer :)**
 
-Changes in version 0.3.7:
-- Hopefully fixed crash when first time installed and change settings.
-
-Changes in version 0.3.6:
-- Added an option to view the last 20 loglines
+[![](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=6DGWFDWXNP2BQ&lc=NL&item_name=Homey%20MQTT%20%2f%20Owntracks%20App&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
 
