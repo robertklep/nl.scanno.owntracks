@@ -8,7 +8,7 @@
       "en": "Subscripe to Owntracks MQTT messages for presence detection",
       "nl": "Abonneer op MQTT berichten van Owntracks voor aanwezigheids detectie"
    },
-   "version": "0.5.1",
+   "version": "1.0.0-rc1",
    "compatibility": "1.x",
    "category": [
       "internet"
@@ -48,10 +48,6 @@
             {
                 "name": "Menno van Grinsven",
                 "email": "mgrinsven@gmail.com"
-            },
-            {
-                "name": "Johan Kuster",
-                "email": "j_kuster@hotmail.com"
             }
         ]
     },
