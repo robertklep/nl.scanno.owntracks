@@ -49,11 +49,17 @@ function getConnectOptions() {
   if (Homey.manager('settings').get('otbroker') == true) {
       return null;
    } else {
+      var rejectUnauth = "true";
+      if ( Homey.manager('settings').get('selfsigned') == true) {
+         rejectUnauth = "false";
+      }
       var connect_options = {
          keepalive: 10,
          username: Homey.manager('settings').get('user'),
-         password: Homey.manager('settings').get('password')
+         password: Homey.manager('settings').get('password'),
+         rejectUnauthorized: rejectUnauth
       };
+      logmodule.writelog("rejectUnauthorized: " + connect_options.rejectUnauthorized);
       return connect_options
    };
 }
