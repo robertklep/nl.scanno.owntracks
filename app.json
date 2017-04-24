@@ -8,10 +8,11 @@
       "en": "Subscripe to Owntracks MQTT messages for presence detection",
       "nl": "Abonneer op MQTT berichten van Owntracks voor aanwezigheids detectie"
    },
-   "version": "1.0.0-rc2",
+   "version": "1.0.0",
    "compatibility": "1.x",
    "category": [
-      "internet"
+      "internet",
+      "localization"
    ],
    "permissions": [
        "homey:manager:speech-input",
