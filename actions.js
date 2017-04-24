@@ -1,3 +1,4 @@
+var geocoder  = require("geocoder/node_modules/geocoder"); 
 var globalVar = require("./global.js");
 var logmodule = require("./logmodule.js");
 var broker    = require("./broker.js");
@@ -92,20 +93,49 @@ function getLocationString(userName) {
       if ( globalVar.getUser(userName).fence !== "" ) {
          locationString = __("location_known", {"name": userName, "location": globalVar.getUser(userName).fence});
       } else {
-         locationString = __("location_unkown", {"name": userName});
+         var foundAdress = null;
+//         geocoder.reverseGeocode( globalVar.getUser(userName).lat, globalVar.getUser(userName).lon, function ( err, data ) {
+            // do something with data
+//            logmodule.writelog(data.results[0].formatted_address);
+//            foundAdress = data.results[0].formatted_address;
+         getLocationAdress(userName, function(foundAdress) {
+            logmodule.writelog("getLocationAdress in getString enter");
+            if (foundAdress !== null && foundAdress !== false) {
+               logmodule.writelog("geoAdress gevonden: " + foundAdress);
+               locationString = __("location_known", {"name": userName, "location": foundAdress});
+            } else {
+               if (foundAdress !== false) {
+                  locationString = __("location_unkown", {"name": userName});
+               }
+            }
+            logmodule.writelog("getLocationAdress in getString quit");
+         });
       }
-      logmodule.writelog(locationString);
+      logmodule.writelog("Locaton string generated: " +locationString);
    } else {
       if (userName !== null) {
          locationString = __("location_nodata", {"name": userName});
       } else {
          locationString= __("location_nouser");
       }
-      logmodule.writelog(locationString);
+      logmodule.writelog("Locaton string generated: " + locationString);
    }
    return locationString;
 }
 
+
+function getLocationAdress(userName, callback) {
+   logmodule.writelog("getLocationAdress enter" );
+   var getAdress = null;
+   geocoder.reverseGeocode( globalVar.getUser(userName).lat, globalVar.getUser(userName).lon, function ( err, data ) {
+      // do something with data
+      logmodule.writelog(data.results[0].formatted_address);
+      getAdress = data.results[0].formatted_address;
+      callback(getAdress);
+   });
+   callback(false);
+   logmodule.writelog("getLocationAdress quit");
+}
 
 function homeySayLocation(args) {
    Homey.manager('speech-output').say( getLocationString(args.user), function (err, result ) {
