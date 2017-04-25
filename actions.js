@@ -165,9 +165,9 @@ function getLocationAdress(userName) {
 }
 
 function homeySayLocation(args) {
-   return getLocationString(foundUser.userName).then(function(speechline) {
+   return getLocationString(args.user).then(function(speechline) {
       logmodule.writelog("Speech output: " + speechline);
-      Homey.manager('speech-output').say( getLocationString(args.user), function (err, result ) {
+      Homey.manager('speech-output').say(speechline, function (err, result ) {
          logmodule.writelog(err);
          logmodule.writelog(result);
       });
