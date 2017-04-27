@@ -104,7 +104,7 @@ function getLocationString(userName) {
       // First lets see if the user is in a kown geoFence before we do an expensive trip to
       // the outside world. We also check if the user is not null. If the user is null, that
       // means that we have not found a user.
-      if ( userName !== null && globalVar.getUser(userName).fence !== null && globalVar.getUser(userName).fence !== undefined ) {
+      if ( userName !== null && globalVar.getUser(userName) !== null) {
          if ( globalVar.getUser(userName).fence !== "" ) {
             locationString = __("location_known", {"name": userName, "location": globalVar.getUser(userName).fence});
             // We have found a user and the user is inside a known geoFence, so fulfill te request
