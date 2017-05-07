@@ -88,32 +88,36 @@ function connectToBroker(args, state) {
          logmodule.writelog("MQTT error occured: " + error);
       });
 
-      connectedClient.on('message',function(topic, message, packet) {
-         // When a message is received, call receiveMessage for further processing
-         logmodule.writelog("OnMessage called");
-         handleMessage.receiveMessage(topic, message, args, state);
-      });
-      // Since we are connecting here, we might as well subscribe to the generic
-      // Owmntracks topic
-      subscribeToTopic("owntracks/#");
-   };
-}
-
-function subscribeToTopic(topicName) {
-   if ( globalVar.getTopicArray().indexOf(topicName) == -1 ) {
-
-      // Fill the array with known topics so I can check if I need to subscribe
-      globalVar.getTopicArray().push(topicName);
-
       // On connection ...
       connectedClient.on('connect', function (connack) {
          logmodule.writelog("MQTT client connected");
          logmodule.writelog("Connected Topics: " + globalVar.getTopicArray());
          logmodule.writelog("reconnectedClient " + reconnectClient);
 
-         connectedClient.subscribe(topicName)
-         logmodule.writelog("waiting "+ topicName );
       });
+
+      connectedClient.on('message',function(topic, message, packet) {
+         // When a message is received, call receiveMessage for further processing
+         logmodule.writelog("OnMessage called");
+         handleMessage.receiveMessage(topic, message, args, state);
+      });
+      // Since we are connecting here, we might as well subscribe to the generic
+      // Owmntracks topic.
+      // Since we subscribe to the generic owntracks topic, we do not have to subscribe to
+      // the individual topics. We will get them anyway.
+      subscribeToTopic("owntracks/#");
+      connectedClient.subscribe("owntracks/#")
+      logmodule.writelog("Subscribed to owntracks/#" );
+   };
+}
+
+function subscribeToTopic(topicName) {
+   if ( globalVar.getTopicArray().indexOf(topicName) == -1 ) {
+
+      // Fill the array with known topics.... We only fill the
+      // topic array because on connection, wel already subsribe
+      // to the generic owntracks topic
+      globalVar.getTopicArray().push(topicName);
    }
 }
 
