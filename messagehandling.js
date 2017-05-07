@@ -42,24 +42,39 @@ function receiveMessage(topic, message, args, state) {
       
       switch (jsonMsg._type) {
          case 'transition':
+            var validTransition = false;
             // check the accuracy. If it is too low (i.e a high amount is meters) then perhaps we should skip the trigger
             if (jsonMsg.acc <= parseInt(Homey.manager('settings').get('accuracy'))) {
                // The accuracy of location is lower then the treshold value, so the location change will be trggerd
                logmodule.writelog("Accuracy is within limits")
                switch (jsonMsg.event) {
                   case 'enter':
-                     currentUser.fence = jsonMsg.desc;
-                     Homey.manager('flow').trigger('enterGeofence', { user: currentUser.userName }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
-                     logmodule.writelog("Trigger enter card for " + jsonMsg.desc);
+                     if (currentUser.fence !== jsonMsg.desc) {
+                        validTransition = true;
+                        currentUser.fence = jsonMsg.desc;
+                        Homey.manager('flow').trigger('enterGeofence', { user: currentUser.userName }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
+                        logmodule.writelog("Trigger enter card for " + jsonMsg.desc);
+                     } else {
+                        logmodule.writelog("The user is already within the fence. No need to trigger again");
+                     }
                      break;
                   case 'leave':
-                     currentUser.fence = "";
-                     Homey.manager('flow').trigger('leaveGeofence', { user: currentUser.userName }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
-                     logmodule.writelog("Trigger leave card for " + jsonMsg.desc);
+                     if (currentUser.fence !== "") {
+                        validTransition = true;
+                        currentUser.fence = "";
+                        Homey.manager('flow').trigger('leaveGeofence', { user: currentUser.userName }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
+                        logmodule.writelog("Trigger leave card for " + jsonMsg.desc);
+                     } else {
+                        logmodule.writelog("The user is already outside the fence. No need to trigger again");
+                     }
                      break;
                }
-               Homey.manager('flow').trigger('eventOwntracks', { user: currentUser.userName, event: jsonMsg.event }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
-               logmodule.writelog("Trigger generic card for " + jsonMsg.desc);
+               if (validTransition === true) {
+                  Homey.manager('flow').trigger('eventOwntracks', { user: currentUser.userName, event: jsonMsg.event }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
+                  logmodule.writelog("Trigger generic card for " + jsonMsg.desc);
+               } else {
+                  logmodule.writelog("This trigger is not needed because the transition is not valid");
+               }
             } else {
                logmodule.writelog ("Accuracy is "+ jsonMsg.acc + " and needs to be below " + parseInt(Homey.manager('settings').get('accuracy')))
             }
