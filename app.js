@@ -183,36 +183,8 @@ function changedSettings(callback, args) {
    logmodule.writelog(args.body);
    logmodule.writelog("topics:" + globalVar.getTopicArray())
 
-/*   var urlBroker = []
-
-   if (args.body.otbroker == true) {
-      urlBroker.push("mqtt://");
-      urlBroker.push("broker.hivemq.com:1883");
-   } else {
-      if (args.body.tls == true) {
-        urlBroker.push("mqtts://");
-      } else {
-         urlBroker.push("mqtt://");
-      };
-      urlBroker.push(args.body.url);
-      urlBroker.push(":"+args.body.ip_port);
-   }
-   console.log("Broker URL: " + urlBroker.join(''));
-
-   var connect_options = "[{ username: '" + args.body.user + "', password: '" + args.body.password + "' }]"
-   if (args.body.otbroker == true) {
-      connect_options = "";
-   }
-
-   console.log("Connect options: " + connect_options);
-   var client  = mqtt.connect(urlBroker.join(''), connect_options)
-   client.on('connect', function () {
-      console.log(client);
-      // unsubscribe topics*
-      client.unsubscribe(connectedTopics);*
-   });*/
    if (globalVar.getTopicArray().length > 0) {
-      broker.getConnectedClient().unsubscribe(globalVar.getTopicArray());
+      broker.getConnectedClient().unsubscribe("owntracks/#");
       globalVar.clearTopicArray();
    };
 
@@ -222,7 +194,9 @@ function changedSettings(callback, args) {
 
    logmodule.writelog("topics:" + globalVar.getTopicArray());
    broker.clearConnectedClient();
-   getArgs();
+   getTriggerArgs().then(function() {
+      broker.connectToBroker();
+   });
    callback(false, null);
 }
 
