@@ -74,47 +74,67 @@ function listenForMessage () {
    Homey.manager('flow').on('trigger.leaveGeofence', processMessage)    
 }
 
-function getArgs () {
-   // Give all the triggers a kick to retrieve the arg(topic) defined on the trigger.
-   Homey.manager('flow').trigger('eventOwntracks', { user: '', event: 'Hallo homey' }, { triggerTopic: 'x', triggerFence: 'x' }, function(err, result) {
-      if( err ) {
-         return Homey.error(err)
-     }
+function getTriggerArgs() {
+   return new Promise(function (fulfill, reject) {
+      if (globalVar.getTopicArray().length > 0) {
+        globalVar.clearTopicArray();
+      };
+      logmodule.writelog("Registered topics:" + globalVar.getTopicArray());
+      return getEventOwntracksArgs().then(function() {
+         return getEnterGeofenceArgs().then(function() {
+            return getLeaveGeofenceArgs().then(function() {
+               logmodule.writelog("Registered topics:" + globalVar.getTopicArray());
+               fulfill(true);
+            });
+         });
+      });
    });
+}
 
-   Homey.manager('flow').trigger('enterGeofence', { user: '' }, { triggerTopic: 'x', triggerFence: 'x' }, function(err, result) {
-      if( err ) {
-         return Homey.error(err)
-     }
+function getEventOwntracksArgs() {
+   return new Promise(function (fulfill, reject) {
+      Homey.manager('flow').getTriggerArgs('eventOwntracks', function( err, args ) {
+         args.forEach(function(element) {
+            logmodule.writelog("Trigger Arguments for eventOwntracks: " + element.mqttTopic);
+            broker.subscribeToTopic(element.mqttTopic);
+         });
+         fulfill(true);
+      });
    });
+}
 
-   Homey.manager('flow').trigger('leaveGeofence', { user: '' }, { triggerTopic: 'x', triggerFence: 'x' }, function(err, result) {
-      if( err ) {
-         return Homey.error(err)
-     }
+function getEnterGeofenceArgs() {
+   return new Promise(function (fulfill, reject) {
+      Homey.manager('flow').getTriggerArgs('enterGeofence', function( err, args ) {
+         args.forEach(function(element) {
+            logmodule.writelog("Trigger Arguments for enterGeofence: " + element.mqttTopic);
+            broker.subscribeToTopic(element.mqttTopic);
+         });
+         fulfill(true);
+      });
+   });
+}
+
+function getLeaveGeofenceArgs() {
+   return new Promise(function (fulfill, reject) {
+      Homey.manager('flow').getTriggerArgs('leaveGeofence', function( err, args ) {
+         args.forEach(function(element) {
+            logmodule.writelog("Trigger Arguments for leaveGeofence: " + element.mqttTopic);
+            broker.subscribeToTopic(element.mqttTopic);
+         });
+         fulfill(true);
+      });
    });
 }
 
 exports.init = function() {
-   // get the arguments of any trigger. Once triggered, the interval will stop
-   Homey.log("Owntracks client ready")
-   var myTim = setInterval(timer, 5000)
-   function timer() {
-      getArgs()
-   }
-   Homey.manager('flow').on('trigger.eventOwntracks', function( callback, args ){
-      clearInterval(myTim)
+   
+   getTriggerArgs().then(function() {
+      broker.connectToBroker();
+      listenForMessage()
+      actions.registerActions();
+      actions.registerSpeech();
    });
-   Homey.manager('flow').on('trigger.enterGeofence', function( callback, args ){
-      clearInterval(myTim)
-   });
-   Homey.manager('flow').on('trigger.leaveGeofence', function( callback, args ){
-      clearInterval(myTim)
-   });
-
-   listenForMessage()
-   actions.registerActions();
-   actions.registerSpeech();
 }
 
 function testBroker(callback, args) {
