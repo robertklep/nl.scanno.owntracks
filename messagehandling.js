@@ -52,7 +52,7 @@ function receiveMessage(topic, message, args, state) {
                      if (currentUser.fence !== jsonMsg.desc) {
                         validTransition = true;
                         currentUser.fence = jsonMsg.desc;
-                        Homey.manager('flow').trigger('enterGeofence', { user: currentUser.userName }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
+                        Homey.manager('flow').trigger('enterGeofence', { user: currentUser.userName, fence: jsonMsg.desc }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
                         logmodule.writelog("Trigger enter card for " + jsonMsg.desc);
                      } else {
                         logmodule.writelog("The user is already within the fence. No need to trigger again");
@@ -62,7 +62,7 @@ function receiveMessage(topic, message, args, state) {
                      if (currentUser.fence !== "") {
                         validTransition = true;
                         currentUser.fence = "";
-                        Homey.manager('flow').trigger('leaveGeofence', { user: currentUser.userName }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
+                        Homey.manager('flow').trigger('leaveGeofence', { user: currentUser.userName, fence: jsonMsg.desc }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
                         logmodule.writelog("Trigger leave card for " + jsonMsg.desc);
                      } else {
                         logmodule.writelog("The user is already outside the fence. No need to trigger again");
@@ -70,7 +70,7 @@ function receiveMessage(topic, message, args, state) {
                      break;
                }
                if (validTransition === true) {
-                  Homey.manager('flow').trigger('eventOwntracks', { user: currentUser.userName, event: jsonMsg.event }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
+                  Homey.manager('flow').trigger('eventOwntracks', { user: currentUser.userName, event: jsonMsg.event, fence: jsonMsg.desc }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
                   logmodule.writelog("Trigger generic card for " + jsonMsg.desc);
                } else {
                   logmodule.writelog("This trigger is not needed because the transition is not valid");

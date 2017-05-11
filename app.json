@@ -78,6 +78,13 @@
                      "en": "User that enters/leaves geofence",
                      "nl": "Gebruiker welke de geofence binnenkomt of verlaat"
                   }
+               },
+               {
+                  "name": "fence",
+                  "title": {
+                     "en": "Name of geofence",
+                     "nl": "Naam van de geofence"
+                  }
                }
             ],
             "args":[
@@ -112,7 +119,15 @@
                      "en": "User that enters geofence",
                      "nl": "Gebruiker welke de geofence binnenkomt"
                   }
+               },
+               {
+                  "name": "fence",
+                  "title": {
+                     "en": "Name of geofence",
+                     "nl": "Naam van de geofence"
+                  }
                }
+
             ],
             "args":[
 	       {
@@ -145,6 +160,13 @@
                   "title": {
                      "en": "User that enters geofence",
                      "nl": "Gebruiker welke de geofence binnenkomt"
+                  }
+               },
+               {
+                  "name": "fence",
+                  "title": {
+                     "en": "Name of geofence",
+                     "nl": "Naam van de geofence"
                   }
                }
             ],

@@ -106,7 +106,7 @@ function processMessage (callback, args, state) {
       console.log ("triggerTopic = equal" )
       // The topic is equal, but we also need the geofence to be equal as well, if not then the 
       // callback should be false
-      if ( state.triggerFence == args.nameGeofence) {
+      if ( state.triggerFence == args.nameGeofence || args.nameGeofence == "*" ) {
          logmodule.writelog ("triggerFence = equal")
          callback ( null, true);
       } else {
