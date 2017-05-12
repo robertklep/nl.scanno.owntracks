@@ -13,10 +13,40 @@ module.exports = {
 
 
 function listenForMessage () {
+   Homey.manager('flow').on('trigger.eventBattery', function( callback, args, state ) {
+      logmodule.writelog("trigger.eventBattery called");
+      if ( processMessage(args, state, 'eventBattery')) {
+         callback(null, true);
+      } else {
+         callback(null, false);
+      }
+   });
    // Start listening for the events.
-   Homey.manager('flow').on('trigger.eventOwntracks', processMessage)
-   Homey.manager('flow').on('trigger.enterGeofence', processMessage)
-   Homey.manager('flow').on('trigger.leaveGeofence', processMessage)    
+   Homey.manager('flow').on('trigger.eventOwntracks', function( callback, args, state ) {
+      logmodule.writelog("trigger.eventOwntracks called");
+      if ( processMessage(args, state, 'eventOwntracks')) {
+         callback(null, true);
+      } else {
+         callback(null, false);
+      }
+   });
+   Homey.manager('flow').on('trigger.enterGeofence', function( callback, args, state ) {
+      logmodule.writelog("trigger.enterGeofence called");
+      if ( processMessage(args, state, 'enterGeofence')) {
+         callback(null, true);
+      } else {
+         callback(null, false);
+      }
+   });
+
+   Homey.manager('flow').on('trigger.leaveGeofence', function( callback, args, state ) {
+      logmodule.wtitelog("trigger.leaveGeofence called");
+      if ( processMessage(args, state, 'leaveGeofence')) {
+         callback(null, true);
+      } else {
+         callback(null, false);
+      }
+   });
 }
 
 
@@ -29,8 +59,10 @@ function getTriggerArgs() {
       return getEventOwntracksArgs().then(function() {
          return getEnterGeofenceArgs().then(function() {
             return getLeaveGeofenceArgs().then(function() {
-               logmodule.writelog("Registered topics:" + globalVar.getTopicArray());
-               fulfill(true);
+               return getBatteryEventArgs().then(function() {
+                  logmodule.writelog("Registered topics:" + globalVar.getTopicArray());
+                  fulfill(true);
+               });
             });
          });
       });
@@ -73,7 +105,19 @@ function getLeaveGeofenceArgs() {
    });
 }
 
-function processMessage (callback, args, state) {
+function getBatteryEventArgs() {
+   return new Promise(function (fulfill, reject) {
+      Homey.manager('flow').getTriggerArgs('eventBattery', function( err, args ) {
+         args.forEach(function(element) {
+            logmodule.writelog("Trigger Arguments for eventBattery: " + element.mqttTopic);
+            broker.subscribeToTopic(element.mqttTopic);
+         });
+         fulfill(true);
+      });
+   });
+}
+//function processMessage (callback, args, state) {
+function processMessage(args, state, triggerType) {
    var reconnectClient = false;
 
    // Make a connection to the broker. But only do this once. When the app is started, the connectedClient
@@ -106,18 +150,32 @@ function processMessage (callback, args, state) {
       console.log ("triggerTopic = equal" )
       // The topic is equal, but we also need the geofence to be equal as well, if not then the 
       // callback should be false
-      if ( state.triggerFence == args.nameGeofence || args.nameGeofence == "*" ) {
-         logmodule.writelog ("triggerFence = equal")
-         callback ( null, true);
-      } else {
-         callback ( null, false);
+      switch(triggerType) {
+         case 'eventOwntracks':
+         case 'enterGeofence':
+         case 'leaveGeofence':
+            if ( state.triggerFence == args.nameGeofence || args.nameGeofence == "*" ) {
+               logmodule.writelog ("triggerFence = equal")
+               return true;
+            } else {
+               return false;
+            }
+            break;
+         case 'eventBattery':
+            if ( state.battery < args.percBattery ) {
+               logmodule.writelog ("battery percenatge ("+ state.battery +"%) is below trigger percentage of "+ args.percBattery +"%");
+               return true;
+            } else {
+               return false;
+            }
+            break;
       }
-      callback( null, true )
    }
    // This is not the topic I was waiting for and it is a known topic
    else if (state.triggerTopic !== args.mqttTopic & globalVar.getTopicArray().indexOf(args.mqttTopic) !== -1) {
       logmodule.writelog("We are not waiting for this topic");
-      callback( null, false )
+//      callback( null, false )
+      return false;
    }
    // this is (still) an unknown topic. We arrive her only 1 time for every topic. The next time the if and else if will
    // trigger first.
@@ -127,9 +185,6 @@ function processMessage (callback, args, state) {
 
       broker.subscribeToTopic(args.mqttTopic);
    };
-   callback (null, false);
+//   callback (null, false);
+   return false
 }
-
-
-
-

@@ -33,12 +33,8 @@ function receiveMessage(topic, message, args, state) {
          currentUser = {};
          currentUser.userName = topicArray[1];
          currentUser.fence = "";
+         currentUser.battery = 0;
       }
-      currentUser.lon = jsonMsg.lon;
-      currentUser.lat = jsonMsg.lat;
-//      currentUser.fence ="";
-      currentUser.adres = "";
-      currentUser.timestamp = jsonMsg.tst;
       
       switch (jsonMsg._type) {
          case 'transition':
@@ -47,6 +43,11 @@ function receiveMessage(topic, message, args, state) {
             if (jsonMsg.acc <= parseInt(Homey.manager('settings').get('accuracy'))) {
                // The accuracy of location is lower then the treshold value, so the location change will be trggerd
                logmodule.writelog("Accuracy is within limits")
+
+               currentUser.lon = jsonMsg.lon;
+               currentUser.lat = jsonMsg.lat;
+               currentUser.timestamp = jsonMsg.tst;
+            
                switch (jsonMsg.event) {
                   case 'enter':
                      if (currentUser.fence !== jsonMsg.desc) {
@@ -82,6 +83,14 @@ function receiveMessage(topic, message, args, state) {
          case 'location':
             // This location object describes the location of the device that published it.
             logmodule.writelog("We have received a location message");
+            currentUser.lon = jsonMsg.lon;
+            currentUser.lat = jsonMsg.lat;
+            currentUser.timestamp = jsonMsg.tst;
+            if (jsonMsg.batt !== undefined) {
+               currentUser.battery = jsonMsg.batt;
+               logmodule.writelog("Set battery percentage for "+ currentUser.userName +" to "+ currentUser.battery+ "%");
+               Homey.manager('flow').trigger('eventBattery', { user: currentUser.userName, battery: currentUser.battery }, { triggerTopic: topic, battery: currentUser.battery });
+            }
             break;
          case 'waypoint' :
             // Waypoints denote specific geographical locations that you want to keep track of. You define a waypoint on the OwnTracks device, 
