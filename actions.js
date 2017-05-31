@@ -36,7 +36,7 @@ function createAutocompleteActions() {
 function registerActions() {
    logmodule.writelog("registerActions called");
 
-   createAutocompleteActions();		
+  // createAutocompleteActions();		
 
    // Put all the action trigger here for registering them and executing the action
    
