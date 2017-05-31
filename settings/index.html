@@ -74,14 +74,18 @@
                 <input class="form_input" id="accuracy" type="text" value="100" /> <br>
             </div>
             
-<!--            <p data-i18n="settings.app.client.topic_explanation"></p>
+            <p data-i18n="settings.app.client.doublevent_explanation"></p>
            
-            <div class="field row">
-                <label class="form_label" for="topic" data-i18n="settings.app.client.topic"></label>
-                <br>
-                <input class="form_input" id="topic" type="text" value="owntracks/+/+/event" /> <br>
+            <div class="field">
+                <input class="checkbox" id="double_enter" type="checkbox" />
+                <label class="form_label" for="double_enter" data-i18n="settings.app.client.double_enter"></label>
             </div>
--->            
+
+            <div class="field">
+                <input class="checkbox" id="double_leave" type="checkbox" />
+                <label class="form_label" for="double_leave" data-i18n="settings.app.client.double_leave"></label>
+            </div>
+            
         </fieldset>
         </form>
 
@@ -144,7 +148,7 @@
                   } else {
                     document.getElementById('selfsigned').value = tls;
                   }
-                  if (typeof selfsigned == 'undefined' || tls == null) tls = false;
+                  if (typeof selfsigned == 'undefined' || selfsigned == null) selfsigned = false;
                   document.getElementById('selfsigned').checked = selfsigned;
                   currentValues.selfsigned = selfsigned;
            })
@@ -173,15 +177,27 @@
                     currentValues.accuracy = accuracy;
                   }
            })
-/*           Homey.get('topic', function(err, topic) {
+           Homey.get('double_enter', function(err, double_enter) {
                   if (err) {
                     console.error(err)
                   } else {
-                    document.getElementById('topic').value = topic;
-                    currentValues.topic = topic;
+                    document.getElementById('double_enter').value = double_enter;
                   }
+                  if (typeof double_enter == 'undefined' || double_enter == null) double_enter = false;
+                  document.getElementById('double_enter').checked = double_enter;
+                  currentValues.double_enter = double_enter;
            })
-*/
+           Homey.get('double_leave', function(err, double_leave) {
+                  if (err) {
+                    console.error(err)
+                  } else {
+                    document.getElementById('double_leave').value = double_leave;
+                  }
+                  if (typeof double_leave == 'undefined' || double_leave == null) double_leave = false;
+                  document.getElementById('double_leave').checked = double_leave;
+                  currentValues.double_leave = double_leave;
+           })
+
            Homey.ready();
         }
 
@@ -246,13 +262,20 @@
                 currentValues.accuracy = accuracy;
             }
 
-/*            if (currentValues.topic !=  document.getElementById('topic').value) {
-                console.log("topic has been changed");
-                Homey.set('topic', document.getElementById('topic').value);
+            if (currentValues.double_enter != document.getElementById('double_enter').checked) {
+                console.log("double_enter has been changed");
+                Homey.set('double_enter', document.getElementById('double_enter').checked);
                 valuesHaveBeenChanged = true;
-                currentValues.topic = document.getElementById('topic').value;
+                currentValues.double_enter = document.getElementById('double_enter').checked;
             }
-*/
+
+            if (currentValues.double_leave != document.getElementById('double_leave').checked) {
+                console.log("double_leave has been changed");
+                Homey.set('double_leave', document.getElementById('double_leave').checked);
+                valuesHaveBeenChanged = true;
+                currentValues.double_leave = document.getElementById('double_leave').checked;
+            }
+
             if (valuesHaveBeenChanged == true) {
                 notifySettings(oldValues);
                 Homey.alert(__('settings.app.messages.settings_saved'));

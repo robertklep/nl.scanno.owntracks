@@ -13,6 +13,10 @@ module.exports = {
 
 
 function listenForMessage () {
+   // Start listening for the events.
+
+   logmodule.writelog("listenForMessage called");
+
    Homey.manager('flow').on('trigger.eventBattery', function( callback, args, state ) {
       logmodule.writelog("trigger.eventBattery called");
       if ( processMessage(args, state, 'eventBattery')) {
@@ -21,7 +25,6 @@ function listenForMessage () {
          callback(null, false);
       }
    });
-   // Start listening for the events.
    Homey.manager('flow').on('trigger.eventOwntracks', function( callback, args, state ) {
       logmodule.writelog("trigger.eventOwntracks called");
       if ( processMessage(args, state, 'eventOwntracks')) {
@@ -40,7 +43,7 @@ function listenForMessage () {
    });
 
    Homey.manager('flow').on('trigger.leaveGeofence', function( callback, args, state ) {
-      logmodule.wtitelog("trigger.leaveGeofence called");
+      logmodule.writelog("trigger.leaveGeofence called");
       if ( processMessage(args, state, 'leaveGeofence')) {
          callback(null, true);
       } else {
@@ -123,7 +126,7 @@ function processMessage(args, state, triggerType) {
    // Make a connection to the broker. But only do this once. When the app is started, the connectedClient
    // variable is set to null, so there is no client connection yet to the broker. If so, then connect to the broker.
    // Otherwise, skip the connection.
-   broker.connectToBroker(args, state);
+//   broker.connectToBroker(args, state);
 
    logmodule.writelog ("state.topic = " + state.triggerTopic + " topic = " + args.mqttTopic + " state.fence = " + state.triggerFence + " geofence = " + args.nameGeofence)
 

@@ -38,7 +38,7 @@ function receiveMessage(topic, message, args, state) {
       
       switch (jsonMsg._type) {
          case 'transition':
-            var validTransition = false;
+            var validTransition = true;
             // check the accuracy. If it is too low (i.e a high amount is meters) then perhaps we should skip the trigger
             if (jsonMsg.acc <= parseInt(Homey.manager('settings').get('accuracy'))) {
                // The accuracy of location is lower then the treshold value, so the location change will be trggerd
@@ -47,21 +47,35 @@ function receiveMessage(topic, message, args, state) {
                currentUser.lon = jsonMsg.lon;
                currentUser.lat = jsonMsg.lat;
                currentUser.timestamp = jsonMsg.tst;
-            
+
                switch (jsonMsg.event) {
                   case 'enter':
-                     if (currentUser.fence !== jsonMsg.desc) {
-                        validTransition = true;
-                        currentUser.fence = jsonMsg.desc;
-                        Homey.manager('flow').trigger('enterGeofence', { user: currentUser.userName, fence: jsonMsg.desc }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
-                        logmodule.writelog("Trigger enter card for " + jsonMsg.desc);
+                     if (Homey.manager('settings').get('double_enter') == true) {
+                        logmodule.writelog("Double enter event check enabled");
+                        if (currentUser.fence !== jsonMsg.desc)  {
+                           validTransition = true;
+                        } else {
+                           validTransition = false;
+                        }
+                     }
+                     if (validTransition == true) {
+                          currentUser.fence = jsonMsg.desc;
+                          Homey.manager('flow').trigger('enterGeofence', { user: currentUser.userName, fence: jsonMsg.desc }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
+                          logmodule.writelog("Trigger enter card for " + jsonMsg.desc);
                      } else {
                         logmodule.writelog("The user is already within the fence. No need to trigger again");
                      }
                      break;
                   case 'leave':
-                     if (currentUser.fence !== "") {
-                        validTransition = true;
+                     if (Homey.manager('settings').get('double_leave') == true) {
+                        logmodule.writelog("Double leave event check enabled");
+                        if (currentUser.fence !== "")  {
+                           validTransition = true;
+                        } else {
+                           validTransition = false;
+                        }
+                     }
+                     if (validTransition == true) {
                         currentUser.fence = "";
                         Homey.manager('flow').trigger('leaveGeofence', { user: currentUser.userName, fence: jsonMsg.desc }, { triggerTopic: topic, triggerFence: jsonMsg.desc });
                         logmodule.writelog("Trigger leave card for " + jsonMsg.desc);
