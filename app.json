@@ -105,25 +105,31 @@
                      "en": "Name of geofence",
                      "nl": "Naam van de geofence"
                   }
+               },               {
+                  "name": "battery",
+                  "title": {
+                     "en": "Battery percentage",
+                     "nl": "Accu percentage"
+                  }
                }
             ],
             "args": [
-	              {
-	                 "name": "mqttTopic",
-	                 "type": "text",
-	                 "placeholder": {
-	                    "en": "Topic",
-	                    "nl": "Topic"
-	                 }
-	              },
-	              {
-	                 "name": "nameGeofence",
-	                 "type": "text",
-	                 "placeholder": {
-	                    "en": "Geofence name",
-	                    "nl": "Naam Geofence"
-	                 }
-	              }
+               {
+                  "name": "mqttTopic",
+                  "type": "text",
+                  "placeholder": {
+                     "en": "Topic",
+                     "nl": "Topic"
+                  }
+               },
+               {
+                  "name": "nameGeofence",
+                  "type": "text",
+                  "placeholder": {
+                     "en": "Geofence name",
+                     "nl": "Naam Geofence"
+                  }
+               }
             ]
          },
          {
@@ -146,25 +152,32 @@
                      "en": "Name of geofence",
                      "nl": "Naam van de geofence"
                   }
+               },
+               {
+                  "name": "battery",
+                  "title": {
+                     "en": "Battery percentage",
+                     "nl": "Accu percentage"
+                  }
                }
             ],
             "args": [
-	              {
-	                 "name": "mqttTopic",
-	                 "type": "text",
-	                 "placeholder": {
-	                    "en": "Topic",
-	                    "nl": "Topic"
-	                 }
-	              },
-	              {
-	                 "name": "nameGeofence",
-	                 "type": "text",
-	                 "placeholder": {
-	                    "en": "Geofence name",
-	                    "nl": "Naam Geofence"
-	                 }
-	              }
+	        {
+                 "name": "mqttTopic",
+                 "type": "text",
+                 "placeholder": {
+                    "en": "Topic",
+                    "nl": "Topic"
+                 }
+              },
+              {
+                 "name": "nameGeofence",
+                 "type": "text",
+                 "placeholder": {
+                    "en": "Geofence name",
+                    "nl": "Naam Geofence"
+                 }
+              }
             ]
          },
          {
@@ -187,112 +200,78 @@
                      "en": "Name of geofence",
                      "nl": "Naam van de geofence"
                   }
-               }
-            ],
-            "args": [
-	              {
-	                 "name": "mqttTopic",
-	                 "type": "text",
-	                 "placeholder": {
-	                    "en": "Topic",
-	                    "nl": "Topic"
-	                 }
-	              },
-	              {
-	                 "name": "nameGeofence",
-	                 "type": "text",
-	                 "placeholder": {
-	                    "en": "Geofence name",
-	                    "nl": "Naam Geofence"
-	                 }
-	              }
-            ]
-         },
-         {
-            "id": "eventBattery",
-            "title": {
-               "en": "Trigger when battery is below a certain percentage",
-               "nl": "Trigger zodra accu lager dan een bepaald percentage is"
-            },
-            "tokens": [
-               {
-                  "name": "user",
-                  "title": {
-                     "en": "User of the device",
-                     "nl": "Gebruiker van de telefoon."
-                  }
                },
                {
                   "name": "battery",
                   "title": {
                      "en": "Battery percentage",
-                     "nl": "Percentage van de accu"
+                     "nl": "Accu percentage"
                   }
                }
             ],
             "args": [
-	             {
-	                "name": "mqttTopic",
-	                "type": "text",
-	                "placeholder": {
-	                   "en": "Topic",
-	                   "nl": "Topic"
-   	              }
-	             },
- 	             {
-                  "name": "percBattery",
-	                 "type": "number",
-	                 "placeholder": {
-	                    "en": "Trigger percentage",
-	                    "nl": "Percentage accu voor trigger"
-	                 }
-	             }
+                {
+                   "name": "mqttTopic",
+                   "type": "text",
+                   "placeholder": {
+                      "en": "Topic",
+                      "nl": "Topic"
+                   }
+                },
+                {
+                   "name": "nameGeofence",
+                   "type": "text",
+                   "placeholder": {
+                      "en": "Geofence name",
+                      "nl": "Naam Geofence"
+                   }
+                }
             ]
          }
       ],
       "actions": [
          {
-	           "id": "sayLocation",
-	           "title": {
-	              "en": "Tell the current location of a user",
-	              "nl": "Vertel de huidige locatie van een gebruiker"
-	            },
+            "id": "sayLocation",
+            "title": {
+               "en": "Tell the current location of a user",
+               "nl": "Vertel de huidige locatie van een gebruiker"
+             },
              "args": [
-	               {
-	                  "name": "user",
-	                  "type": "text",
-	                  "placeholder": {
-	                     "en": "User",
-	                     "nl": "Gebruiker"
-	                   }
-	               }
+                {
+                   "name": "user",
+                   "type": "text",
+                   "placeholder": {
+                      "en": "User",
+                      "nl": "Gebruiker"
+                    }
+                }
              ]
          },
          {
-	           "id": "publishOwntracks",
-	           "title": {
-	              "en": "Publish message",
-	              "nl": "Stuur bericht"
-	           },
+            "id": "publishOwntracks",
+            "title": {
+               "en": "Publish message",
+               "nl": "Stuur bericht"
+            },
             "args": [
-	              {
-	                 "name": "mqttMessage",
-	                 "type": "text",
-	                 "placeholder": {
-	                    "en": "Message",
-	                    "nl": "Bericht"
-	                 }
-	              },
-	              {
-	                 "name": "mqttTopic",
-	                 "type": "text",
-	                 "placeholder": {
-	                    "en": "Topic",
-	                    "nl": "Topic"
-	                 }
-	              }
+               {
+                  "name": "mqttMessage",
+                  "type": "text",
+                  "placeholder": {
+                     "en": "Message",
+                     "nl": "Bericht"
+                  }
+               },
+               {
+                  "name": "mqttTopic",
+                  "type": "text",
+                  "placeholder": {
+                     "en": "Topic",
+                     "nl": "Topic"
+                  }
+               }
             ]
-	        }
+         }
       ]
    }
 }

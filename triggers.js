@@ -11,12 +11,15 @@ module.exports = {
    }
 }
 
-
+/*
+   The function listenForMessage registers all the trigger events. As soon as an event is
+   triggered it calls one of the triggers in this function.
+*/
 function listenForMessage () {
    // Start listening for the events.
 
    logmodule.writelog("listenForMessage called");
-
+/*
    Homey.manager('flow').on('trigger.eventBattery', function( callback, args, state ) {
       logmodule.writelog("trigger.eventBattery called");
       if ( processMessage(args, state, 'eventBattery')) {
@@ -25,6 +28,7 @@ function listenForMessage () {
          callback(null, false);
       }
    });
+*/
    Homey.manager('flow').on('trigger.eventOwntracks', function( callback, args, state ) {
       logmodule.writelog("trigger.eventOwntracks called");
       if ( processMessage(args, state, 'eventOwntracks')) {
@@ -53,6 +57,12 @@ function listenForMessage () {
 }
 
 
+/*
+   The function getTriggerArgs() retreives all the arguments of the triggers that are defined
+   by the user in the flows. As each trigger card can contain different trigger arguments, we
+   need to walk through them. This is especially needed for getting the topics, so we know what
+   topics we are waiting for.
+*/
 function getTriggerArgs() {
    return new Promise(function (fulfill, reject) {
       if (globalVar.getTopicArray().length > 0) {
@@ -62,16 +72,17 @@ function getTriggerArgs() {
       return getEventOwntracksArgs().then(function() {
          return getEnterGeofenceArgs().then(function() {
             return getLeaveGeofenceArgs().then(function() {
-               return getBatteryEventArgs().then(function() {
-                  logmodule.writelog("Registered topics:" + globalVar.getTopicArray());
-                  fulfill(true);
-               });
+               logmodule.writelog("Registered topics:" + globalVar.getTopicArray());
+               fulfill(true);
             });
          });
       });
    });
 }
 
+/*
+   Get the arguments for the generic enter/leave trigger card(s)
+*/
 function getEventOwntracksArgs() {
    return new Promise(function (fulfill, reject) {
       Homey.manager('flow').getTriggerArgs('eventOwntracks', function( err, args ) {
@@ -84,6 +95,9 @@ function getEventOwntracksArgs() {
    });
 }
 
+/*
+   Get the arguments for the enter geoFence trigger card(s)
+*/
 function getEnterGeofenceArgs() {
    return new Promise(function (fulfill, reject) {
       Homey.manager('flow').getTriggerArgs('enterGeofence', function( err, args ) {
@@ -96,6 +110,9 @@ function getEnterGeofenceArgs() {
    });
 }
 
+/*
+   Get the arguments for the leave geoFence trigger card(s)
+*/
 function getLeaveGeofenceArgs() {
    return new Promise(function (fulfill, reject) {
       Homey.manager('flow').getTriggerArgs('leaveGeofence', function( err, args ) {
@@ -108,6 +125,10 @@ function getLeaveGeofenceArgs() {
    });
 }
 
+/*
+   Get the arguments for the battery percentage warning trigger card(s)
+*/
+/*
 function getBatteryEventArgs() {
    return new Promise(function (fulfill, reject) {
       Homey.manager('flow').getTriggerArgs('eventBattery', function( err, args ) {
@@ -119,14 +140,14 @@ function getBatteryEventArgs() {
       });
    });
 }
-//function processMessage (callback, args, state) {
+*/
+
 function processMessage(args, state, triggerType) {
    var reconnectClient = false;
 
    // Make a connection to the broker. But only do this once. When the app is started, the connectedClient
    // variable is set to null, so there is no client connection yet to the broker. If so, then connect to the broker.
    // Otherwise, skip the connection.
-//   broker.connectToBroker(args, state);
 
    logmodule.writelog ("state.topic = " + state.triggerTopic + " topic = " + args.mqttTopic + " state.fence = " + state.triggerFence + " geofence = " + args.nameGeofence)
 
@@ -164,7 +185,7 @@ function processMessage(args, state, triggerType) {
                return false;
             }
             break;
-         case 'eventBattery':
+/*         case 'eventBattery':
             if ( state.battery < args.percBattery ) {
                logmodule.writelog ("battery percenatge ("+ state.battery +"%) is below trigger percentage of "+ args.percBattery +"%");
                return true;
@@ -172,12 +193,12 @@ function processMessage(args, state, triggerType) {
                return false;
             }
             break;
+*/
       }
    }
    // This is not the topic I was waiting for and it is a known topic
    else if (state.triggerTopic !== args.mqttTopic & globalVar.getTopicArray().indexOf(args.mqttTopic) !== -1) {
       logmodule.writelog("We are not waiting for this topic");
-//      callback( null, false )
       return false;
    }
    // this is (still) an unknown topic. We arrive her only 1 time for every topic. The next time the if and else if will
@@ -187,7 +208,7 @@ function processMessage(args, state, triggerType) {
       // previous checks...
 
       broker.subscribeToTopic(args.mqttTopic);
-   };
-//   callback (null, false);
-   return false
+   }
+   return false;
 }
+
