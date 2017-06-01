@@ -57,6 +57,26 @@
       "small":"./assets/images/small.png"
    },
    "flow": {
+      "conditions": [
+         {
+            "id": "inGeofence",
+            "title": {
+               "en": "Someone present in",
+               "nl": "Persoon aanwezig in"
+            },
+            "args": [
+               {
+                  "name": "geoFence",
+                  "type": "text",
+                  "placeholder": {
+                     "en": "Name of geoFence",
+                     "nl": "Naam van de geoFence"
+                  }
+               }
+            ]
+         }
+      ],
+
       "triggers": [
          {
             "id": "eventOwntracks",
@@ -88,22 +108,22 @@
                }
             ],
             "args": [
-	       {
-	          "name": "mqttTopic",
-	          "type": "text",
-	          "placeholder": {
-	             "en": "Topic",
-	             "nl": "Topic"
-	           }
-	       },
-	       {
-	           "name": "nameGeofence",
-	           "type": "text",
-	           "placeholder": {
-	              "en": "Geofence name",
-	              "nl": "Naam Geofence"
-	           }
-	       }
+	              {
+	                 "name": "mqttTopic",
+	                 "type": "text",
+	                 "placeholder": {
+	                    "en": "Topic",
+	                    "nl": "Topic"
+	                 }
+	              },
+	              {
+	                 "name": "nameGeofence",
+	                 "type": "text",
+	                 "placeholder": {
+	                    "en": "Geofence name",
+	                    "nl": "Naam Geofence"
+	                 }
+	              }
             ]
          },
          {
@@ -129,22 +149,22 @@
                }
             ],
             "args": [
-	       {
-	          "name": "mqttTopic",
-	          "type": "text",
-	          "placeholder": {
-	             "en": "Topic",
-	             "nl": "Topic"
-	           }
-	       },
-	       {
-	           "name": "nameGeofence",
-	           "type": "text",
-	           "placeholder": {
-	              "en": "Geofence name",
-	              "nl": "Naam Geofence"
-	           }
-	       }
+	              {
+	                 "name": "mqttTopic",
+	                 "type": "text",
+	                 "placeholder": {
+	                    "en": "Topic",
+	                    "nl": "Topic"
+	                 }
+	              },
+	              {
+	                 "name": "nameGeofence",
+	                 "type": "text",
+	                 "placeholder": {
+	                    "en": "Geofence name",
+	                    "nl": "Naam Geofence"
+	                 }
+	              }
             ]
          },
          {
@@ -170,22 +190,22 @@
                }
             ],
             "args": [
-	       {
-	          "name": "mqttTopic",
-	          "type": "text",
-	          "placeholder": {
-	             "en": "Topic",
-	             "nl": "Topic"
-	           }
-	       },
-	       {
-	           "name": "nameGeofence",
-	           "type": "text",
-	           "placeholder": {
-	              "en": "Geofence name",
-	              "nl": "Naam Geofence"
-	           }
-	       }
+	              {
+	                 "name": "mqttTopic",
+	                 "type": "text",
+	                 "placeholder": {
+	                    "en": "Topic",
+	                    "nl": "Topic"
+	                 }
+	              },
+	              {
+	                 "name": "nameGeofence",
+	                 "type": "text",
+	                 "placeholder": {
+	                    "en": "Geofence name",
+	                    "nl": "Naam Geofence"
+	                 }
+	              }
             ]
          },
          {
@@ -211,68 +231,68 @@
                }
             ],
             "args": [
-	       {
-	          "name": "mqttTopic",
-	          "type": "text",
-	          "placeholder": {
-	                "en": "Topic",
-	                "nl": "Topic"
-   	           }
-	       },
- 	       {
+	             {
+	                "name": "mqttTopic",
+	                "type": "text",
+	                "placeholder": {
+	                   "en": "Topic",
+	                   "nl": "Topic"
+   	              }
+	             },
+ 	             {
                   "name": "percBattery",
-	          "type": "number",
-	          "placeholder": {
-	             "en": "Trigger percentage",
-	             "nl": "Percentage accu voor trigger"
-	          }
-	       }
+	                 "type": "number",
+	                 "placeholder": {
+	                    "en": "Trigger percentage",
+	                    "nl": "Percentage accu voor trigger"
+	                 }
+	             }
             ]
          }
       ],
       "actions": [
          {
-	    "id": "sayLocation",
-	    "title": {
-	       "en": "Tell the current location of a user",
-	       "nl": "Vertel de huidige locatie van een gebruiker"
-	     },
+	           "id": "sayLocation",
+	           "title": {
+	              "en": "Tell the current location of a user",
+	              "nl": "Vertel de huidige locatie van een gebruiker"
+	            },
              "args": [
-	        {
-	           "name": "user",
-	           "type": "text",
-	           "placeholder": {
-	              "en": "User",
-	              "nl": "Gebruiker"
-	            }
-	        }
+	               {
+	                  "name": "user",
+	                  "type": "text",
+	                  "placeholder": {
+	                     "en": "User",
+	                     "nl": "Gebruiker"
+	                   }
+	               }
              ]
          },
          {
-	    "id": "publishOwntracks",
-	    "title": {
-	       "en": "Publish message",
-	       "nl": "Stuur bericht"
-	     },
-             "args": [
-	        {
-	           "name": "mqttMessage",
-	           "type": "text",
-	           "placeholder": {
-	              "en": "Message",
-	              "nl": "Bericht"
-	            }
-	        },
-	        {
-	           "name": "mqttTopic",
-	           "type": "text",
-	           "placeholder": {
-	              "en": "Topic",
-	              "nl": "Topic"
-	           }
+	           "id": "publishOwntracks",
+	           "title": {
+	              "en": "Publish message",
+	              "nl": "Stuur bericht"
+	           },
+            "args": [
+	              {
+	                 "name": "mqttMessage",
+	                 "type": "text",
+	                 "placeholder": {
+	                    "en": "Message",
+	                    "nl": "Bericht"
+	                 }
+	              },
+	              {
+	                 "name": "mqttTopic",
+	                 "type": "text",
+	                 "placeholder": {
+	                    "en": "Topic",
+	                    "nl": "Topic"
+	                 }
+	              }
+            ]
 	        }
-             ]
-	  }
       ]
    }
 }

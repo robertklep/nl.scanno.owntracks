@@ -33,6 +33,9 @@ module.exports = {
    },
    getUserFromString: function(key) {
       return getUserFromString(key);
+   },
+   searchGeoFence: function(geoFence) {
+      return searchGeoFence(geoFence);
    }
 }
 
@@ -119,6 +122,19 @@ function getUserFromString(key) {
       logmodule.writelog(userArray[userIndex].userName);
       return userArray[userIndex];
    }
+}
+
+function searchGeoFence(geoFence) {
+   logmodule.writelog("searchGeoFence: "+ geoFence);
+   var matchFence = 0;
+   for (i=0; i < userArray.length; i++) {
+      if (String(userArray[i].fence).includes(geoFence)) {
+        logmodule.writelog("key: " + geoFence + "    userArray: " + userArray[i].fence);
+        matchFence++;
+      }
+   }
+   logmodule.writelog("Number of matches: "+ matchFence);
+   return matchFence;
 }
 
 

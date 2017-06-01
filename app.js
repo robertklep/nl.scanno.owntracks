@@ -5,6 +5,7 @@ var logmodule = require("./logmodule.js");
 var broker    = require("./broker.js");
 var actions   = require("./actions.js");
 var triggers  = require("./triggers.js");
+var condition = require("./conditions.js");
 
 // At this time i do not have another idea on how to control the client connection when changing the
 // settings besides to have the client connection available globally.
@@ -17,6 +18,7 @@ exports.init = function() {
       triggers.listenForMessage()
       actions.registerActions();
       actions.registerSpeech();
+      condition.registerConditions();
    });
 }
 
