@@ -19,7 +19,7 @@ function listenForMessage () {
    // Start listening for the events.
 
    logmodule.writelog("listenForMessage called");
-/*
+
    Homey.manager('flow').on('trigger.eventBattery', function( callback, args, state ) {
       logmodule.writelog("trigger.eventBattery called");
       if ( processMessage(args, state, 'eventBattery')) {
@@ -28,7 +28,7 @@ function listenForMessage () {
          callback(null, false);
       }
    });
-*/
+
    Homey.manager('flow').on('trigger.eventOwntracks', function( callback, args, state ) {
       logmodule.writelog("trigger.eventOwntracks called");
       if ( processMessage(args, state, 'eventOwntracks')) {
@@ -56,7 +56,6 @@ function listenForMessage () {
    });
 }
 
-
 /*
    The function getTriggerArgs() retreives all the arguments of the triggers that are defined
    by the user in the flows. As each trigger card can contain different trigger arguments, we
@@ -72,8 +71,10 @@ function getTriggerArgs() {
       return getEventOwntracksArgs().then(function() {
          return getEnterGeofenceArgs().then(function() {
             return getLeaveGeofenceArgs().then(function() {
-               logmodule.writelog("Registered topics:" + globalVar.getTopicArray());
-               fulfill(true);
+               return getBatteryEventArgs().then(function() {
+                  logmodule.writelog("Registered topics:" + globalVar.getTopicArray());
+                  fulfill(true);
+               });
             });
          });
       });
@@ -128,7 +129,7 @@ function getLeaveGeofenceArgs() {
 /*
    Get the arguments for the battery percentage warning trigger card(s)
 */
-/*
+
 function getBatteryEventArgs() {
    return new Promise(function (fulfill, reject) {
       Homey.manager('flow').getTriggerArgs('eventBattery', function( err, args ) {
@@ -140,7 +141,6 @@ function getBatteryEventArgs() {
       });
    });
 }
-*/
 
 function processMessage(args, state, triggerType) {
    var reconnectClient = false;
@@ -185,15 +185,30 @@ function processMessage(args, state, triggerType) {
                return false;
             }
             break;
-/*         case 'eventBattery':
-            if ( state.battery < args.percBattery ) {
-               logmodule.writelog ("battery percenatge ("+ state.battery +"%) is below trigger percentage of "+ args.percBattery +"%");
-               return true;
-            } else {
-               return false;
+         case 'eventBattery':
+            var currentUser = globalVar.getUser(state.user);
+            // Check if the battery percentage is below the trigger percentage
+            if ( state.percBattery < args.percBattery ) {
+               // Check if the trigger has already fired. If so, do not fire again
+               if (currentUser.battTriggered == false) {
+                  logmodule.writelog ("battery percentage ("+ state.percBattery +"%) of "+ state.user+" is below trigger percentage of "+ args.percBattery +"%");
+                  currentUser.battTriggered = true;
+                  globalVar.setUser(currentUser);
+                  return true;
+               } else {
+                  logmodule.writelog ("battery trigger already triggered for "+ state.user);
+                  return false;
+               }
             }
+            // Check if the battery percentage if above the trigger percentage. If this is the case
+            // set the state.Triggered to false in case the phone was been charged again
+            if (state.percBattery >= args.percBattery && currentUser.battTriggered !== false) {
+               logmodule.writelog ("Reset battery triggered state for "+ state.user);
+               currentUser.battTriggered = false;
+               globalVar.setUser(currentUser);
+            }
+            return false;
             break;
-*/
       }
    }
    // This is not the topic I was waiting for and it is a known topic

@@ -19,26 +19,26 @@
        "homey:manager:speech-output"
    ],
    "speech": [
-      {
+       {
           "id": "owntracks",
-          "importance": 1,
+           "importance": 1,
+           "triggers": {
+              "en": [ "location" ],
+              "nl": [ "locatie" ]
+           }
+       },
+       {
+          "id": "owntracks2",
+          "importance": 0.5,
           "triggers": {
-             "en": [ "location" ],
-             "nl": [ "locatie" ]
-          }
-      },
-      {
-         "id": "owntracks2",
-         "importance": 0.5,
-         "triggers": {
-            "en": [ "where" ],
-            "nl": [ "waar" ]
-         }
-      }
+             "en": [ "where" ],
+             "nl": [ "waar" ]
+           }
+       }
    ],
    "speechExamples": {
-      "en": [ "What is the location of Menno?" ],
-      "nl": [ "Wat is de locatie van Menno?" ]
+       "en": [ "What is the location of Menno?" ],
+       "nl": [ "Wat is de locatie van Menno?" ]
    },
    "author": {
       "name": "Menno van Grinsven",
@@ -46,10 +46,10 @@
    },
    "contributors": {
       "developers": [
-         {
-            "name": "Menno van Grinsven",
-            "email": "mgrinsven@gmail.com"
-         }
+          {
+             "name": "Menno van Grinsven",
+             "email": "mgrinsven@gmail.com"
+          }
       ]
    },
    "images": {
@@ -76,7 +76,6 @@
             ]
          }
       ],
-
       "triggers": [
          {
             "id": "eventOwntracks",
@@ -105,17 +104,18 @@
                      "en": "Name of geofence",
                      "nl": "Naam van de geofence"
                   }
-               },               {
-                  "name": "battery",
+               },
+               {
+                  "name": "percBattery",
                   "title": {
-                     "en": "Battery percentage",
-                     "nl": "Accu percentage"
+                     "en": "Current battery percentage",
+                     "nl": "Huidige accu percentage"
                   }
                }
             ],
-            "args": [
-               {
-                  "name": "mqttTopic",
+            "args":[
+	       {
+                 "name": "mqttTopic",
                   "type": "text",
                   "placeholder": {
                      "en": "Topic",
@@ -154,30 +154,30 @@
                   }
                },
                {
-                  "name": "battery",
+                  "name": "percBattery",
                   "title": {
-                     "en": "Battery percentage",
-                     "nl": "Accu percentage"
+                     "en": "Current battery percentage",
+                     "nl": "Huidige accu percentage"
                   }
                }
             ],
-            "args": [
-	        {
-                 "name": "mqttTopic",
-                 "type": "text",
-                 "placeholder": {
-                    "en": "Topic",
-                    "nl": "Topic"
-                 }
-              },
-              {
-                 "name": "nameGeofence",
-                 "type": "text",
-                 "placeholder": {
-                    "en": "Geofence name",
-                    "nl": "Naam Geofence"
-                 }
-              }
+            "args":[
+               {
+                  "name": "mqttTopic",
+                  "type": "text",
+                  "placeholder": {
+                     "en": "Topic",
+                     "nl": "Topic"
+                  }
+               },
+               {
+                  "name": "nameGeofence",
+                  "type": "text",
+                  "placeholder": {
+                     "en": "Geofence name",
+                     "nl": "Naam Geofence"
+                  }
+               }
             ]
          },
          {
@@ -202,30 +202,71 @@
                   }
                },
                {
-                  "name": "battery",
+                  "name": "percBattery",
                   "title": {
-                     "en": "Battery percentage",
-                     "nl": "Accu percentage"
+                     "en": "Current battery percentage",
+                     "nl": "Huidige accu percentage"
                   }
                }
             ],
-            "args": [
-                {
-                   "name": "mqttTopic",
-                   "type": "text",
-                   "placeholder": {
-                      "en": "Topic",
-                      "nl": "Topic"
-                   }
-                },
-                {
+            "args":[
+               {
+                  "name": "mqttTopic",
+                  "type": "text",
+                  "placeholder": {
+                     "en": "Topic",
+                     "nl": "Topic"
+                  }
+               },
+               {
                    "name": "nameGeofence",
                    "type": "text",
                    "placeholder": {
                       "en": "Geofence name",
                       "nl": "Naam Geofence"
                    }
-                }
+               }
+            ]
+         },
+         {
+            "id": "eventBattery",
+            "title": {
+               "en": "Trigger when battery percentage is below a certain percentage",
+               "nl": "Trigger wanneer accu percentage lager dan een bepaald percentage komt"
+            },
+            "tokens": [
+               {
+                  "name": "user",
+                  "title": {
+                     "en": "User of the phone",
+                     "nl": "Gebruiker van de telefoon"
+                  }
+               },
+               {
+                  "name": "percBattery",
+                  "title": {
+                     "en": "Current battery percentage",
+                     "nl": "Huidige accu percentage"
+                  }
+               }
+            ],
+            "args":[
+               {
+                  "name": "mqttTopic",
+                  "type": "text",
+                  "placeholder": {
+                     "en": "Topic",
+                     "nl": "Topic"
+                  }
+               },
+               {
+                   "name": "percBattery",
+                   "type": "number",
+                   "placeholder": {
+                      "en": "Battery percentage",
+                      "nl": "Accu percentage"
+                   }
+               }
             ]
          }
       ],
@@ -236,14 +277,14 @@
                "en": "Tell the current location of a user",
                "nl": "Vertel de huidige locatie van een gebruiker"
              },
-             "args": [
+             "args":[
                 {
                    "name": "user",
                    "type": "text",
                    "placeholder": {
                       "en": "User",
                       "nl": "Gebruiker"
-                    }
+                   }
                 }
              ]
          },
@@ -252,27 +293,26 @@
             "title": {
                "en": "Publish message",
                "nl": "Stuur bericht"
-            },
-            "args": [
-               {
-                  "name": "mqttMessage",
-                  "type": "text",
-                  "placeholder": {
-                     "en": "Message",
-                     "nl": "Bericht"
-                  }
-               },
-               {
-                  "name": "mqttTopic",
-                  "type": "text",
-                  "placeholder": {
-                     "en": "Topic",
-                     "nl": "Topic"
-                  }
-               }
-            ]
-         }
+             },
+             "args":[
+                {
+                   "name": "mqttMessage",
+                   "type": "text",
+                   "placeholder": {
+                      "en": "Message",
+                      "nl": "Bericht"
+                    }
+                },
+                {
+                   "name": "mqttTopic",
+                   "type": "text",
+                   "placeholder": {
+                      "en": "Topic",
+                      "nl": "Topic"
+                   }
+                }
+             ]
+          }
       ]
    }
 }
-

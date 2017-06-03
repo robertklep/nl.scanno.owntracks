@@ -34,6 +34,7 @@ function receiveMessage(topic, message, args, state) {
          currentUser.userName = topicArray[1];
          currentUser.fence = "";
          currentUser.battery = 0;
+         currentUser.battTriggered = false;
       }
       
       switch (jsonMsg._type) {
@@ -60,7 +61,7 @@ function receiveMessage(topic, message, args, state) {
                      }
                      if (validTransition == true) {
                           currentUser.fence = jsonMsg.desc;
-                          Homey.manager('flow').trigger('enterGeofence', { user: currentUser.userName, fence: jsonMsg.desc, battery: currentUser.battery }, 
+                          Homey.manager('flow').trigger('enterGeofence', { user: currentUser.userName, fence: jsonMsg.desc, percBattery: currentUser.battery.toString() }, 
                                                                          { triggerTopic: topic, triggerFence: jsonMsg.desc });
                           logmodule.writelog("Trigger enter card for " + jsonMsg.desc);
                      } else {
@@ -78,7 +79,7 @@ function receiveMessage(topic, message, args, state) {
                      }
                      if (validTransition == true) {
                         currentUser.fence = "";
-                        Homey.manager('flow').trigger('leaveGeofence', { user: currentUser.userName, fence: jsonMsg.desc, battery: currentUser.battery }, 
+                        Homey.manager('flow').trigger('leaveGeofence', { user: currentUser.userName, fence: jsonMsg.desc, percBattery: currentUser.battery.toString() }, 
                                                                        { triggerTopic: topic, triggerFence: jsonMsg.desc });
                         logmodule.writelog("Trigger leave card for " + jsonMsg.desc);
                      } else {
@@ -87,7 +88,7 @@ function receiveMessage(topic, message, args, state) {
                      break;
                }
                if (validTransition === true) {
-                  Homey.manager('flow').trigger('eventOwntracks', { user: currentUser.userName, event: jsonMsg.event, fence: jsonMsg.desc, battery: currentUser.battery }, 
+                  Homey.manager('flow').trigger('eventOwntracks', { user: currentUser.userName, event: jsonMsg.event, fence: jsonMsg.desc, percBattery: currentUser.battery.toString() }, 
                                                                   { triggerTopic: topic, triggerFence: jsonMsg.desc });
                   logmodule.writelog("Trigger generic card for " + jsonMsg.desc);
                } else {
@@ -106,6 +107,8 @@ function receiveMessage(topic, message, args, state) {
             if (jsonMsg.batt !== undefined) {
                currentUser.battery = jsonMsg.batt;
                logmodule.writelog("Set battery percentage for "+ currentUser.userName +" to "+ currentUser.battery+ "%");
+               Homey.manager('flow').trigger('eventBattery', { user: currentUser.userName, percBattery: currentUser.battery.toString() }, 
+                                                             { triggerTopic: topic, percBattery: currentUser.battery, user: currentUser.userName });
             }
             break;
          case 'waypoint' :
