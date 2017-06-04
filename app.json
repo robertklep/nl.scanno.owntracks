@@ -107,6 +107,7 @@
                },
                {
                   "name": "percBattery",
+                  "type": "number",
                   "title": {
                      "en": "Current battery percentage",
                      "nl": "Huidige accu percentage"
@@ -155,6 +156,7 @@
                },
                {
                   "name": "percBattery",
+                  "type": "number",
                   "title": {
                      "en": "Current battery percentage",
                      "nl": "Huidige accu percentage"
@@ -203,6 +205,7 @@
                },
                {
                   "name": "percBattery",
+                  "type": "number",
                   "title": {
                      "en": "Current battery percentage",
                      "nl": "Huidige accu percentage"
@@ -244,6 +247,7 @@
                },
                {
                   "name": "percBattery",
+                  "type": "number",
                   "title": {
                      "en": "Current battery percentage",
                      "nl": "Huidige accu percentage"
