@@ -13,6 +13,7 @@ var condition = require("./conditions.js");
 
 exports.init = function() {
    
+   globalVar.initVars();
    triggers.getTriggerArgs().then(function() {
       broker.connectToBroker();
       triggers.listenForMessage()

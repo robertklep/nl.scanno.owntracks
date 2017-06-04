@@ -10,7 +10,7 @@ module.exports = {
 function registerConditions() {
    logmodule.writelog("registerConditions called");
    Homey.manager('flow').on('condition.inGeofence', function( callback, args ){
-       var result = checkForPresenceInFence( args.geoFence );
+       var result = checkForPresenceInFence( args.geoFence.name );
        callback( null, result );
    });
 }

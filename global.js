@@ -1,15 +1,22 @@
 
 var topicArray = [];
 var userArray = [];
+var fenceArray = [];
 
 var logmodule = require("./logmodule.js");
 
 module.exports = {
+   initVars: function() {
+      initVars();
+   },
    setUser: function(userData) {
       setUser(userData);
    },
    getUser: function(userName) {
       return getUser(userName);
+   },
+   setFence: function(fenceData) {
+      setFence(fenceData);
    },
    getUserArray: function(callback, args) {
       getUserArray(callback, args);
@@ -26,10 +33,11 @@ module.exports = {
    clearTopicArray: function() {
       clearTopicArray();
    },
-   searchUsers: function(key) {
-//   searchUsers: function() {
-      return searchUsers(key);
-//      return userArray;
+   searchUsersAutocomplete: function(key) {
+      return searchUsersAutocomplete(key);
+   },
+   searchFenceAutocomplete: function(key) {
+      return searchFenceAutocomplete(key);
    },
    getUserFromString: function(key) {
       return getUserFromString(key);
@@ -37,6 +45,73 @@ module.exports = {
    searchGeoFence: function(geoFence) {
       return searchGeoFence(geoFence);
    }
+}
+
+/*
+   initVars() is called as soon as the owntracks app is loaded and it will
+   initialise the unload event that will persist the userArray and fenceArray
+   It also loads the userArray and fenceArray from file and puts them in the 
+   array.
+*/
+function initVars() {
+   saveOnCloseEvent();
+
+//   deletePresistancyFiles();
+
+   logmodule.writelog("initVars called");
+
+   require('fs').readFile('/userdata/owntracks.json', 'utf8', function (err, data) {
+      if (err) {
+         logmodule.writelog("Retreiving userArray failed: "+ err);
+      } else {
+         userArray = JSON.parse(data);
+      }
+   });
+   require('fs').readFile('/userdata/owntracks_fences.json', 'utf8', function (err, data) {
+      if (err) {
+         logmodule.writelog("Retreiving fenceArray failed: "+ err);
+      } else {
+         fenceArray = JSON.parse(data);
+      }
+   });
+}
+
+/*
+   saveOnCloseEvent() is called during init and registeres the unload event. The unload
+   event is called just before the app is being closes (for instance when the app is updated,
+   homey is shutting down, and the current data in userArray and fenceArray are written to
+   files on the filesystem.
+*/
+function saveOnCloseEvent() {
+   Homey.on('unload', function(){
+      logmodule.writelog("unload called");
+      require('fs').writeFile("/userdata/owntracks.json",  JSON.stringify(userArray), function (err) {
+         if (err) {
+            logmodule.writelog("Persisting userArray failed: "+ err);
+         }
+      });
+      require('fs').writeFile("/userdata/owntracks_fences.json",  JSON.stringify(fenceArray), function (err) {
+         if (err) {
+            logmodule.writelog("Persisting fenceArray failed: "+ err);
+         }
+      });
+   });
+}
+
+/*
+   deletePersistancyFiles() deletes the saved arrays from the filesystem. This
+   can be used when the persistency files were borked.
+*/
+function deletePresistancyFiles() {
+   require('fs').unlink('/userdata/owntracks.json',function(err){
+      if(err) return logmodule.writelog(err);
+      logmodule.writelog('/userdata/owntracks.json deleted successfully');
+   });  
+
+   require('fs').unlink('/userdata/owntracks_fences.json',function(err){
+      if(err) return logmodule.writelog(err);
+      logmodule.writelog('/userdata/owntracks_fences.json deleted successfully');
+   });  
 }
 
 function getUser(userName) {
@@ -57,6 +132,29 @@ function setUser(userData) {
    } else {
       // User has not been found, so assume this is a new user
       userArray.push(userData);
+   }
+}
+
+
+function getFence(fenceName) {
+   for (var i=0; i < fenceArray.length; i++) {
+      if (fenceArray[i].fenceName === fenceName) {
+         return fenceArray[i];
+      }
+   }
+   // Fence has not been found, so return null
+   return null
+}
+
+function setFence(fenceData) {
+   var entryArray = getFence(fenceData.fenceName);
+   if (entryArray !== null) {
+      entryArray = fenceData;
+      logmodule.writelog("Fence: " + fenceData.fenceName+" changed");   
+   } else {
+      // Fence has not been found, so assume this is a new fence
+      logmodule.writelog("Fence: " + fenceData.fenceName+" Added");
+      fenceArray.push(fenceData);
    }
 }
 
@@ -90,20 +188,36 @@ function clearTopicArray() {
    topicArray = [];
 }
 
-function searchUsers(key) {
-   logmodule.writelog("searchUsers: "+ key);
+function searchUsersAutocomplete(key) {
+//   logmodule.writelog("searchUsers: "+ key);
    var matchUsers = [];
    var temp = [];
    for (i=0; i < userArray.length; i++) {
-      if (String(userArray[i].userName).includes(key)) {
-        logmodule.writelog("key: " + key + "    userArray: " + userArray[i].userName);
+      if (String(userArray[i].userName.toLowerCase()).includes(key.toLowerCase())) {
+//        logmodule.writelog("key: " + key + "    userArray: " + userArray[i].userName);
         temp.icon = '//';
         temp.name = userArray[i].userName;
-        matchUsers.push(temp);
+        matchUsers.push({icon: temp.icon, name: temp.name});
       }
    }
-   logmodule.writelog(matchUsers[0].name);
    return matchUsers;
+}
+
+function searchFenceAutocomplete(key) {
+//   logmodule.writelog("searchFence: "+ key);
+   var matchFence = [];
+   var temp = [];
+   for (i=0; i < fenceArray.length; i++) {
+      if (String(fenceArray[i].fenceName.toLowerCase()).includes(key.toLowerCase())) {
+         if (fenceArray[i].fenceName !== '') {
+//            logmodule.writelog("key: " + key + "    fenceArray: " + fenceArray[i].fenceName);
+            temp.icon = '//';
+            temp.name = fenceArray[i].fenceName;
+            matchFence.push({icon: temp.icon, name: temp.name});
+         }
+      }
+   }
+   return matchFence;
 }
 
 function getUserFromString(key) {
@@ -129,7 +243,7 @@ function searchGeoFence(geoFence) {
    var matchFence = 0;
    for (i=0; i < userArray.length; i++) {
       if (String(userArray[i].fence).includes(geoFence)) {
-        logmodule.writelog("key: " + geoFence + "    userArray: " + userArray[i].fence);
+//        logmodule.writelog("key: " + geoFence + "    userArray: " + userArray[i].fence);
         matchFence++;
       }
    }

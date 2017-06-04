@@ -67,7 +67,7 @@
             "args": [
                {
                   "name": "geoFence",
-                  "type": "text",
+                  "type": "autocomplete",
                   "placeholder": {
                      "en": "Name of geoFence",
                      "nl": "Naam van de geoFence"
@@ -280,7 +280,7 @@
              "args":[
                 {
                    "name": "user",
-                   "type": "text",
+                   "type": "autocomplete",
                    "placeholder": {
                       "en": "User",
                       "nl": "Gebruiker"

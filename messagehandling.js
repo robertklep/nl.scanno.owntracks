@@ -39,6 +39,7 @@ function receiveMessage(topic, message, args, state) {
       
       switch (jsonMsg._type) {
          case 'transition':
+            var fenceData = {};
             var validTransition = true;
             // check the accuracy. If it is too low (i.e a high amount is meters) then perhaps we should skip the trigger
             if (jsonMsg.acc <= parseInt(Homey.manager('settings').get('accuracy'))) {
@@ -48,6 +49,12 @@ function receiveMessage(topic, message, args, state) {
                currentUser.lon = jsonMsg.lon;
                currentUser.lat = jsonMsg.lat;
                currentUser.timestamp = jsonMsg.tst;
+
+               // Set fenceData. This is done to update or add new
+               // fences so they can be selected in an autocomplete box
+               fenceData.fenceName = jsonMsg.desc;
+               fenceData.timestamp = jsonMsg.tst;
+               globalVar.setFence(fenceData);
 
                switch (jsonMsg.event) {
                   case 'enter':

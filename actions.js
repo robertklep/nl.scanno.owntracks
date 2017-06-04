@@ -23,20 +23,20 @@ function createAutocompleteActions() {
 
    Homey.manager('flow').on('action.sayLocation.user.autocomplete', function (callback, args) {
       logmodule.writelog("autocomplete called");
-//      var myItems=globalVar.searchUsers();
-      // filter items to match the search query
-       myItems = myItems.filter(function(item){
-          return ( item.userName.toLowerCase().indexOf( args.query.toLowerCase() ) > -1 )
-      });
-//      callback(null, globalVar.searchUsers(args.query));
-      callback( null, myItems );
+      callback(null, globalVar.searchUsersAutocomplete(args.query));
    });
+
+   Homey.manager('flow').on('condition.inGeofence.geoFence.autocomplete', function (callback, args) {
+      logmodule.writelog("autocomplete called");
+      callback(null, globalVar.searchFenceAutocomplete(args.query));
+   });
+
 }
 
 function registerActions() {
    logmodule.writelog("registerActions called");
 
-  // createAutocompleteActions();		
+   createAutocompleteActions();		
 
    // Put all the action trigger here for registering them and executing the action
    
@@ -165,7 +165,7 @@ function getLocationAdress(userName) {
 }
 
 function homeySayLocation(args) {
-   return getLocationString(args.user).then(function(speechline) {
+   return getLocationString(args.user.name).then(function(speechline) {
       logmodule.writelog("Speech output: " + speechline);
       Homey.manager('speech-output').say(speechline, function (err, result ) {
          logmodule.writelog(err);
