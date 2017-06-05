@@ -217,7 +217,7 @@ function searchFenceAutocomplete(key, wildcards) {
 
    // If the wildcards argument is set to true, Add an option to select all fences
    if (wildcards == true) {
-     matchFence.push({icon: '//', name: __("ac_all_fences"), fence: '*' });
+     matchFence.push({icon: '//', name: __("ac_all_fences"), description: 'Wildcard', fence: '*' });
    }
 
    for (i=0; i < fenceArray.length; i++) {
@@ -227,7 +227,7 @@ function searchFenceAutocomplete(key, wildcards) {
             temp.icon = '//';
             temp.name = fenceArray[i].fenceName;
             temp.fence = fenceArray[i].fenceName;
-            matchFence.push({icon: temp.icon, name: temp.name, fence: temp.name});
+            matchFence.push({icon: temp.icon, name: temp.name, description: __("desc_all_fences"), fence: temp.name});
          }
       }
    }

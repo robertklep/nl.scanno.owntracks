@@ -6,6 +6,7 @@
     "ac_all_users": "Alle gebruikers",
     "desc_all_users": "Normale gebruiker",
     "ac_all_fences": "Alle geofences",
+    "desc_all_fences": "Normale geofence",
 
     "settings" : {
         "app" : {
