@@ -3,6 +3,9 @@
     "location_unkown": "The location of __name__ is unkown",
     "location_nodata": "I could not find any location data for __name__ .",
     "location_nouser": "I could not find any location data.",
+    "ac_all_users": "All users",
+    "desc_all_users": "Normal user",
+    "ac_all_fences": "All geofences",
 
     "settings" : {
         "app" : {

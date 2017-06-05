@@ -23,12 +23,12 @@ function createAutocompleteActions() {
 
    Homey.manager('flow').on('action.sayLocation.user.autocomplete', function (callback, args) {
       logmodule.writelog("autocomplete called");
-      callback(null, globalVar.searchUsersAutocomplete(args.query));
+      callback(null, globalVar.searchUsersAutocomplete(args.query, true));
    });
 
    Homey.manager('flow').on('condition.inGeofence.geoFence.autocomplete', function (callback, args) {
       logmodule.writelog("autocomplete called");
-      callback(null, globalVar.searchFenceAutocomplete(args.query));
+      callback(null, globalVar.searchFenceAutocomplete(args.query, false));
    });
 
 }

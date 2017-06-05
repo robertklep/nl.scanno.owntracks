@@ -78,6 +78,161 @@
       ],
       "triggers": [
          {
+            "id": "eventOwntracks_AC",
+            "title": {
+               "en": "Receive Geofence triggers",
+               "nl": "Ontvang Geofence triggers"
+            },
+            "tokens": [
+               {
+                  "name": "event",
+                  "title": {
+                     "en": "Type of event (enter or leave)",
+                     "nl": "Type gebeurtenis (enter / leave)"
+                  }
+               },
+               {
+                  "name": "user",
+                  "title": {
+                     "en": "User that enters/leaves geofence",
+                     "nl": "Gebruiker welke de geofence binnenkomt of verlaat"
+                  }
+               },
+               {
+                  "name": "fence",
+                  "title": {
+                     "en": "Name of geofence",
+                     "nl": "Naam van de geofence"
+                  }
+               },
+               {
+                  "name": "percBattery",
+                  "type": "number",
+                  "title": {
+                     "en": "Current battery percentage",
+                     "nl": "Huidige accu percentage"
+                  }
+               }
+            ],
+            "args":[
+	       {
+                 "name": "nameUser",
+                  "type": "autocomplete",
+                  "placeholder": {
+                     "en": "Username",
+                     "nl": "Naam gebruiker"
+                  }
+               },
+               {
+                  "name": "nameGeofence",
+                  "type": "autocomplete",
+                  "placeholder": {
+                     "en": "Geofence name",
+                     "nl": "Naam Geofence"
+                  }
+               }
+            ]
+         },
+         {
+            "id": "enterGeofence_AC",
+            "title": {
+               "en": "Enter Geofence trigger",
+               "nl": "Geofence binnen gegaan trigger"
+            },
+            "tokens": [
+               {
+                  "name": "user",
+                  "title": {
+                     "en": "User that enters geofence",
+                     "nl": "Gebruiker welke de geofence binnenkomt"
+                  }
+               },
+               {
+                  "name": "fence",
+                  "title": {
+                     "en": "Name of geofence",
+                     "nl": "Naam van de geofence"
+                  }
+               },
+               {
+                  "name": "percBattery",
+                  "type": "number",
+                  "title": {
+                     "en": "Current battery percentage",
+                     "nl": "Huidige accu percentage"
+                  }
+               }
+            ],
+            "args":[
+               {
+                  "name": "nameUser",
+                  "type": "autocomplete",
+                  "placeholder": {
+                     "en": "Username",
+                     "nl": "Naam gebruiker"
+                  }
+               },
+               {
+                  "name": "nameGeofence",
+                  "type": "autocomplete",
+                  "placeholder": {
+                     "en": "Geofence name",
+                     "nl": "Naam Geofence"
+                  }
+               }
+            ]
+         },
+         {
+            "id": "leaveGeofence_AC",
+            "title": {
+               "en": "Leave Geofence trigger",
+               "nl": "Geofence verlaten trigger"
+            },
+            "tokens": [
+               {
+                  "name": "user",
+                  "title": {
+                     "en": "User that enters geofence",
+                     "nl": "Gebruiker welke de geofence binnenkomt"
+                  }
+               },
+               {
+                  "name": "fence",
+                  "title": {
+                     "en": "Name of geofence",
+                     "nl": "Naam van de geofence"
+                  }
+               },
+               {
+                  "name": "percBattery",
+                  "type": "number",
+                  "title": {
+                     "en": "Current battery percentage",
+                     "nl": "Huidige accu percentage"
+                  }
+               }
+            ],
+            "args":[
+               {
+                  "name": "nameUser",
+                  "type": "autocomplete",
+                  "placeholder": {
+                     "en": "Username",
+                     "nl": "Naam gebruiker"
+                  }
+               },
+               {
+                   "name": "nameGeofence",
+                   "type": "autocomplete",
+                   "placeholder": {
+                      "en": "Geofence name",
+                      "nl": "Naam Geofence"
+                   }
+               }
+            ]
+         },
+
+         {
             "id": "eventOwntracks",
             "title": {
                "en": "Receive Geofence triggers",
@@ -256,11 +411,11 @@
             ],
             "args":[
                {
-                  "name": "mqttTopic",
-                  "type": "text",
+                  "name": "nameUser",
+                  "type": "autocomplete",
                   "placeholder": {
-                     "en": "Topic",
-                     "nl": "Topic"
+                     "en": "Username",
+                     "nl": "Naam gebruiker"
                   }
                },
                {

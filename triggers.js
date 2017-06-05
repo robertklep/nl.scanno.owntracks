@@ -16,6 +16,8 @@ module.exports = {
    triggered it calls one of the triggers in this function.
 */
 function listenForMessage () {
+
+   createAutocompleteActions()
    // Start listening for the events.
 
    logmodule.writelog("listenForMessage called");
@@ -28,6 +30,33 @@ function listenForMessage () {
          callback(null, false);
       }
    });
+
+   Homey.manager('flow').on('trigger.eventOwntracks_AC', function( callback, args, state ) {
+      logmodule.writelog("trigger.eventOwntracks_AC called");
+      if ( processMessage(args, state, 'eventOwntracks_ac')) {
+         callback(null, true);
+      } else {
+         callback(null, false);
+      }
+   });
+   Homey.manager('flow').on('trigger.enterGeofence_AC', function( callback, args, state ) {
+      logmodule.writelog("trigger.enterGeofence_AC called");
+      if ( processMessage(args, state, 'enterGeofence_ac')) {
+         callback(null, true);
+      } else {
+         callback(null, false);
+      }
+   });
+
+   Homey.manager('flow').on('trigger.leaveGeofence_AC', function( callback, args, state ) {
+      logmodule.writelog("trigger.leaveGeofence_AC called");
+      if ( processMessage(args, state, 'leaveGeofence_ac')) {
+         callback(null, true);
+      } else {
+         callback(null, false);
+      }
+   });
+
 
    Homey.manager('flow').on('trigger.eventOwntracks', function( callback, args, state ) {
       logmodule.writelog("trigger.eventOwntracks called");
@@ -54,6 +83,48 @@ function listenForMessage () {
          callback(null, false);
       }
    });
+}
+
+function createAutocompleteActions() {
+   logmodule.writelog("createAutocompleteActions called");
+   // Put all the autocomplte actions here. 
+
+   Homey.manager('flow').on('trigger.eventOwntracks_AC.nameUser.autocomplete', function (callback, args) {
+      logmodule.writelog("autocomplete called");
+      callback(null, globalVar.searchUsersAutocomplete(args.query, true));
+   });
+
+   Homey.manager('flow').on('trigger.eventOwntracks_AC.nameGeofence.autocomplete', function (callback, args) {
+      logmodule.writelog("autocomplete called");
+      callback(null, globalVar.searchFenceAutocomplete(args.query, true));
+   });
+
+
+   Homey.manager('flow').on('trigger.enterGeofence_AC.nameUser.autocomplete', function (callback, args) {
+      logmodule.writelog("autocomplete called");
+      callback(null, globalVar.searchUsersAutocomplete(args.query, true));
+   });
+
+   Homey.manager('flow').on('trigger.enterGeofence_AC.nameGeofence.autocomplete', function (callback, args) {
+      logmodule.writelog("autocomplete called");
+      callback(null, globalVar.searchFenceAutocomplete(args.query, true));
+   });
+
+   Homey.manager('flow').on('trigger.leaveGeofence_AC.nameUser.autocomplete', function (callback, args) {
+      logmodule.writelog("autocomplete called");
+      callback(null, globalVar.searchUsersAutocomplete(args.query, true));
+   });
+
+   Homey.manager('flow').on('trigger.leaveGeofence_AC.nameGeofence.autocomplete', function (callback, args) {
+      logmodule.writelog("autocomplete called");
+      callback(null, globalVar.searchFenceAutocomplete(args.query, true));
+   });
+
+   Homey.manager('flow').on('trigger.eventBattery.nameUser.autocomplete', function (callback, args) {
+      logmodule.writelog("autocomplete called");
+      callback(null, globalVar.searchUsersAutocomplete(args.query, true));
+   });
+
 }
 
 /*
@@ -145,29 +216,50 @@ function getBatteryEventArgs() {
 function processMessage(args, state, triggerType) {
    var reconnectClient = false;
 
-   // Make a connection to the broker. But only do this once. When the app is started, the connectedClient
-   // variable is set to null, so there is no client connection yet to the broker. If so, then connect to the broker.
-   // Otherwise, skip the connection.
-
-   logmodule.writelog ("state.topic = " + state.triggerTopic + " topic = " + args.mqttTopic + " state.fence = " + state.triggerFence + " geofence = " + args.nameGeofence)
+   logmodule.writelog ("state.topic = " + state.triggerTopic + " topic = " + args.mqttTopic );
 
    // MQTT subscription topics can contain "wildcards", i.e a + sign. However the topic returned
    // by MQTT brokers contain the topic where the message is posted on. In that topic, the wildcard
    // is replaced by the actual value. So we will have to take into account any wildcards when matching the topics.
 
    var arrTriggerTopic = state.triggerTopic.split('/');
-   var arrMQTTTopic = args.mqttTopic.split('/');
    var matchTopic = true;
 
-   for (var value in arrTriggerTopic) {
-      if ((arrTriggerTopic[value] !== arrMQTTTopic[value]) && (arrMQTTTopic[value] !== '+')) {
-         // This is a bit dirty because it would allow events to be delivered also to topics that do not have
-         // the trailing event. In de future, when allowing the other message types, this would cause problems
-         if (arrMQTTTopic[value] !== undefined) {
+   switch (triggerType) {
+      case 'eventOwntracks':
+      case 'enterGeofence':
+      case 'leaveGeofence':
+//      case 'eventBattery':
+         var arrMQTTTopic = args.mqttTopic.split('/');
+         for (var value in arrTriggerTopic) {
+            if ((arrTriggerTopic[value] !== arrMQTTTopic[value]) && (arrMQTTTopic[value] !== '+')) {
+               // This is a bit dirty because it would allow events to be delivered also to topics that do not have
+               // the trailing event. In de future, when allowing the other message types, this would cause problems
+               if (arrMQTTTopic[value] !== undefined) {
+                  matchTopic = false;
+               }
+            }
+         };
+         break;
+      case 'eventBattery':
+      case 'eventOwntracks_ac':
+      case 'enterGeofence_ac':
+      case 'leaveGeofence_ac':
+         if (args.nameUser !== undefined ) {
+            logmodule.writelog("received user "+arrTriggerTopic[1]+"  trigger user: "+args.nameUser.user);
+            if (arrTriggerTopic[1] === args.nameUser.user || args.nameUser.user == '*') {
+               matchTopic = true;
+            } else {
+               matchTopic = false;
+            }
+         } else {
             matchTopic = false;
          }
-      }
-   };
+         break;
+      default:
+         matchTopic = false;
+         break;
+   }
 
    // If the topic that triggered me the topic I was waiting for?
    if (matchTopic == true) {
@@ -184,6 +276,18 @@ function processMessage(args, state, triggerType) {
             } else {
                return false;
             }
+            break;
+         case 'eventOwntracks_ac':
+         case 'enterGeofence_ac':
+         case 'leaveGeofence_ac':
+            logmodule.writelog ("Received Fence = "+state.triggerFence+"  trigger fenve = "+args.nameGeofence.fence)
+            if ( state.triggerFence == args.nameGeofence.fence || args.nameGeofence.fence == "*" ) {
+               logmodule.writelog ("triggerFence = equal")
+               return true;
+            } else {
+               return false;
+            }
+
             break;
          case 'eventBattery':
             var currentUser = globalVar.getUser(state.user);
@@ -207,6 +311,9 @@ function processMessage(args, state, triggerType) {
                currentUser.battTriggered = false;
                globalVar.setUser(currentUser);
             }
+            return false;
+            break;
+         default:
             return false;
             break;
       }

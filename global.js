@@ -33,11 +33,11 @@ module.exports = {
    clearTopicArray: function() {
       clearTopicArray();
    },
-   searchUsersAutocomplete: function(key) {
-      return searchUsersAutocomplete(key);
+   searchUsersAutocomplete: function(key, wildcards) {
+      return searchUsersAutocomplete(key, wildcards);
    },
-   searchFenceAutocomplete: function(key) {
-      return searchFenceAutocomplete(key);
+   searchFenceAutocomplete: function(key, wildcards) {
+      return searchFenceAutocomplete(key, wildcards);
    },
    getUserFromString: function(key) {
       return getUserFromString(key);
@@ -188,32 +188,46 @@ function clearTopicArray() {
    topicArray = [];
 }
 
-function searchUsersAutocomplete(key) {
+function searchUsersAutocomplete(key, wildcards) {
 //   logmodule.writelog("searchUsers: "+ key);
    var matchUsers = [];
    var temp = [];
+
+   // If the wildcards argument is set to true, Add an option to select all fences
+   if (wildcards == true) {
+     matchUsers.push({icon: '//', name: __("ac_all_users"), description: 'Wildcard', user: '*' });
+   }
+
    for (i=0; i < userArray.length; i++) {
       if (String(userArray[i].userName.toLowerCase()).includes(key.toLowerCase())) {
 //        logmodule.writelog("key: " + key + "    userArray: " + userArray[i].userName);
         temp.icon = '//';
         temp.name = userArray[i].userName;
-        matchUsers.push({icon: temp.icon, name: temp.name});
+        temp.user = userArray[i].userName;
+        matchUsers.push({icon: temp.icon, name: temp.name, description: __("desc_all_users"), user: temp.name});
       }
    }
    return matchUsers;
 }
 
-function searchFenceAutocomplete(key) {
+function searchFenceAutocomplete(key, wildcards) {
 //   logmodule.writelog("searchFence: "+ key);
    var matchFence = [];
    var temp = [];
+
+   // If the wildcards argument is set to true, Add an option to select all fences
+   if (wildcards == true) {
+     matchFence.push({icon: '//', name: __("ac_all_fences"), fence: '*' });
+   }
+
    for (i=0; i < fenceArray.length; i++) {
       if (String(fenceArray[i].fenceName.toLowerCase()).includes(key.toLowerCase())) {
          if (fenceArray[i].fenceName !== '') {
 //            logmodule.writelog("key: " + key + "    fenceArray: " + fenceArray[i].fenceName);
             temp.icon = '//';
             temp.name = fenceArray[i].fenceName;
-            matchFence.push({icon: temp.icon, name: temp.name});
+            temp.fence = fenceArray[i].fenceName;
+            matchFence.push({icon: temp.icon, name: temp.name, fence: temp.name});
          }
       }
    }

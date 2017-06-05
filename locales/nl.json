@@ -3,6 +3,9 @@
     "location_unkown": "De locatie van __name__ is onbekend",
     "location_nodata": "Ik kan geen locatie gegevens vinden voor __name__ .",
     "location_nouser": "Ik kan geen locatie gegevens vinden.",
+    "ac_all_users": "Alle gebruikers",
+    "desc_all_users": "Normale gebruiker",
+    "ac_all_fences": "Alle geofences",
 
     "settings" : {
         "app" : {
