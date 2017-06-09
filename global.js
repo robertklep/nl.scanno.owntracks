@@ -21,6 +21,9 @@ module.exports = {
    getUserArray: function(callback, args) {
       getUserArray(callback, args);
    },
+   purgeUserData: function(callback, args) {
+      purgeUserData(callback, args);
+   },
    getTopic: function(topicName) {
       return getTopic(topicName);
    },
@@ -103,15 +106,23 @@ function saveOnCloseEvent() {
    can be used when the persistency files were borked.
 */
 function deletePresistancyFiles() {
-   require('fs').unlink('/userdata/owntracks.json',function(err){
-      if(err) return logmodule.writelog(err);
-      logmodule.writelog('/userdata/owntracks.json deleted successfully');
-   });  
+   var returnValue = false;
 
-   require('fs').unlink('/userdata/owntracks_fences.json',function(err){
-      if(err) return logmodule.writelog(err);
-      logmodule.writelog('/userdata/owntracks_fences.json deleted successfully');
-   });  
+   try {
+      require('fs').unlinkSync('/userdata/owntracks.json');
+   } catch(err) {
+         logmodule.writelog(err);
+         returnValue = true;
+   }
+
+   try {
+      require('fs').unlinkSync('/userdata/owntracks_fences.json');
+   } catch(err) {
+         logmodule.writelog(err);
+         returnValue = true;
+   }
+
+   return returnValue; 
 }
 
 function getUser(userName) {
@@ -132,6 +143,13 @@ function setUser(userData) {
    } else {
       // User has not been found, so assume this is a new user
       userArray.push(userData);
+      
+      Homey.manager('notifications').createNotification({
+         excerpt: __("notifications.user_added", {"name": userData.userName})
+      }, function( err, notification ) {
+         if( err ) return console.error( err );
+            console.log( 'Notification added' );
+      });
    }
 }
 
@@ -154,13 +172,32 @@ function setFence(fenceData) {
    } else {
       // Fence has not been found, so assume this is a new fence
       logmodule.writelog("Fence: " + fenceData.fenceName+" Added");
+      
       fenceArray.push(fenceData);
+      
+      Homey.manager('notifications').createNotification({
+         excerpt: __("notifications.user_added", {"name": fenceData.fenceName})
+      }, function( err, notification ) {
+         if( err ) return console.error( err );
+            console.log( 'Notification added' );
+      });
+
    }
 }
 
 function getUserArray(callback, args) {
    logmodule.writelog("getUserArray called");
    callback ( false, userArray);
+}
+
+function purgeUserData(callback, args) {
+   logmodule.writelog("purgeUserData called");
+
+   var returnValue = deletePresistancyFiles();
+   logmodule.writelog("Return value: "+returnValue);
+   fenceArray = [];
+   userArray = [];
+   callback ( false, returnValue);
 }
 
 function getTopic(topicName) {

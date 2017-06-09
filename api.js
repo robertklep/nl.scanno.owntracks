@@ -50,6 +50,19 @@ module.exports = [{
       Homey.app.getUserArray(callback, args);
       callback(callback, args);
    }
+},
+{
+   description:	'Purge userdata',
+   method:      'GET',
+   path:        '/test/purgeUserData/',
+   requires_authorization: true,
+   role: 'owner',
+   fn: function(callback, args) {
+      Homey.log("");
+      Homey.log("API: Incoming POST on /test/purgeUserData/");
+      Homey.app.purgeUserData(callback, args);
+      callback(callback, args);
+   }
 }]
 
 

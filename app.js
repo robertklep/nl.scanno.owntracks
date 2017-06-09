@@ -91,5 +91,6 @@ module.exports.testBroker = testBroker;
 module.exports.changedSettings = changedSettings;
 module.exports.getLogLines = logmodule.getLogLines;
 module.exports.getUserArray = globalVar.getUserArray;
+module.exports.purgeUserData = globalVar.purgeUserData;
 
 

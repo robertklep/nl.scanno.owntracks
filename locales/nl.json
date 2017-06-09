@@ -8,6 +8,11 @@
     "ac_all_fences": "Alle geofences",
     "desc_all_fences": "Normale geofence",
 
+    "notifications": {
+       "user_added": "De gebruiker __name__ is aan de gebruikers gegevens toegevoegd",
+       "fence_added": "De geofence __name__ is aan de gebruikers gegevens toegevoegd"
+    },
+
     "settings" : {
         "app" : {
             "title" : "Owntracks client instellingen",
@@ -32,11 +37,18 @@
                 "double_leave" : "Controleer op dubbele leave events",
                 "doublevent_explanation" : "Het kan voorkomen dat er dubbele enter/leave events binnenkomen. Dit komt voor als door GPS onnauwkeurigheid de telefoon denkt dat deze de geofence verlaten heeft. Als daarna de nauwkeurigheid binnen de opgegeven waarde komt en dan kan het voorkomen dat het aparaat een event verstuurd."
             },
+
+            "data": {
+               "data_settings": "Gebruikers gegevens",
+               "data_explanation": "Deze app slaat gegevens op die gebruikt worden in de verschillende trigger, action en condition kaarten. Dit betreft namen en geofence namen die in de owntracks apps zijn aangemaakt. Gebruik de Verwijder gegevens knop om alle verzamelde gegevens te verwijderen.",
+               "data_purge_confirm": "Weet u zeker dat u de gebruikersgegevens wilt verwijderen?"
+            },
                         
             "button" : {
                 "save" : "Opslaan",
                 "test" : "Test",
-                "getlogs" : "Log ophalen"
+                "getlogs" : "Log ophalen",
+                "purgedata": "Verwijder gegevens"
             },
 
              "user" : {
@@ -48,13 +60,10 @@
             },
             
              "messages" : {
-                 "testing" : "Testen, even geduld...",
-                 "unable_set_settings" : "Er is een fout opgetreden tijden het opslaan van de instellingen.",
-                 "error_connect_broker" : "Kan geen verbinding maken met de broker. Controleer de broker instellingen.",
-                 "settings_success_tested" : "De instelingen zijn succesvol getest. Gebruik de Opslaan knop om de instellingen te bewaren.",
                  "settings_saved" : "Instellingen opgeslagen",
                  "settings_noSettingsChanged" : "Er zijn geen instellingen aangepast.",
-                 "settings_unexpectedError" : "Er is een onverwachte fout opgetreden, probeer het nog eens."
+                 "data_purged": "De gebruikersgegevens zijn verwijderd",
+                 "data_purged_failed": "Er is een fout opgetreden bij het verwijderen van de gebruikers gegevens"
              }
         }
     }

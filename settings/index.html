@@ -87,6 +87,18 @@
             </div>
             
         </fieldset>
+
+        <fieldset id="data_settings">
+            <legend>
+                <label data-i18n="settings.app.data.data_settings"></label>
+            </legend>
+            
+            <p data-i18n="settings.app.data.data_explanation"></p>
+
+            <button type="button" id="button_purge" onclick="purgeUserData()" data-i18n="settings.app.button.purgedata">Purge Data</button>           
+
+        </fieldset>
+
         </form>
 
         <button class="right" id="button_getlog" onclick="showLogLines()" data-i18n="settings.app.button.getlogs">Get Logs</button>
@@ -282,50 +294,6 @@
             }
         }
 
-/*        function test() {
-            console.log("Test function entered");
-            document.getElementById('testresult').innerHTML = __('settings.app.messages.testing');
-            var button_test = document.getElementById('button_test');
-            var button_save = document.getElementById('button_save');
-            button_test.disabled = true;
-            button_save.disabled = true;
-        
-            var otbroker = document.getElementById('otbroker').checked;
-            var tls = document.getElementById('tls').checked
-            var url = document.getElementById('url').value;
-            var ip_port = document.getElementById('ip_port').value;
-            var user = document.getElementById('user').value;
-            var password = document.getElementById('password').value;
-            console.log("Testing settings");
-
-            Homey.api('POST', '/test/broker/', {
-                 "otbroker" : otbroker, 
-                 "url" : url,
-                 "ip_port" : ip_port,
-                 "tls" : tls,
-                 "selfsigned" : selfsigned,
-                 "user" : user,
-                 "password" : password
-                 }, function(err, result) {
-                if (!err) {
-                    console.log("Connetion succesfull");
-                    if (!result) {
-                        document.getElementById('testresult').innerHTML = __('settings.app.messages.settings_success_tested')
-                    } else {
-                        document.getElementById('testresult').innerHTML = __('settings.app.messages.settings_success_tested')
-                        button_save.disabled = true;
-                    }
-                } else {
-                    // Oeps, something went wrong here
-                    Homey.alert(__('settings.app.messages.unable_get_location'));
-                    document.getElementById('testresult').innerHTML = __('settings.app.messages.unable_get_location');
-                    button_test.disabled = false;
-                    button_save.disabled = true;
-                }
-                
-            });
-        }
-*/        
         function notifySettings(values) {
              Homey.api('POST', 'test/settingschange/', values, function(err, result) {
                 if (!err) {
@@ -336,6 +304,31 @@
                 }
                 
             });
+        }
+
+        function purgeUserData() {
+           var resultConfirm = confirm(__('settings.app.data.data_purge_confirm'));
+           console.log(resultConfirm);
+           if (resultConfirm == true) {
+              Homey.api('GET', 'test/purgeUserData/', function(err, result) {
+                 console.log("err: " + err);
+                 console.log("result: "+result);
+                 if (!err) {
+                    if (!result) {
+                       console.log("Data has been purged");
+                       Homey.alert(__('settings.app.messages.data_purged'));
+                    } else {
+                       console.log("Purging failed");
+                       Homey.alert(__('settings.app.messages.data_purged_failed'));
+                    }
+                 } else {
+                    console.log("Purging failed");
+                    Homey.alert(__('settings.app.messages.data_purged_failed'));
+                 }
+                 console.log("End of purge GET");
+              });
+           }
+           console.log("End of purgeUserData");
         }
 
         function showLogLines() {

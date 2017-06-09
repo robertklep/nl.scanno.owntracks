@@ -8,6 +8,11 @@
     "ac_all_fences": "All geofences",
     "desc_all_fences": "Normal geofence",
 
+    "notifications": {
+       "user_added": "User __name__ has been added to the user data",
+       "fence_added": "Geofence __name__ has been added to the user data"
+    },
+
     "settings" : {
         "app" : {
             "title" : "Owntracks client settings",
@@ -32,11 +37,18 @@
                 "double_leave" : "Check for double leave events",
                 "doublevent_explanation" : "If the accuracy of a device is too low, the device can move out of the geofence (but the app does not process this). If the accuracy is within limits, it can occur that the device re-enters a geofence and as such triggers an enter/leave event. This option aims to prevent this from happening."
             },
+
+            "data": {
+               "data_settings": "User data",
+               "data_explanation": "This app collects data from users, such as usernames and geofences. This data is used to fill menu's from where you can select a user and a geofence. Use the Delete data button to purge alle the user data.",
+               "data_purge_confirm": "Are you sure you want to purge the user data?"
+            },
                         
             "button" : {
                 "save" : "Save",
                 "test" : "Test",
-                "getlogs" : "Get logs"
+                "getlogs" : "Get logs",
+                "purgedata": "Delete data"
             },
             
              "user" : {
@@ -48,13 +60,10 @@
             },
             
              "messages" : {
-                 "testing" : "Testing, please wait...",
-                 "unable_set_settings" : "There was an error trying to apply the settings.",
-                 "error_connect_broker" : "Unable to connect to the broker, please check the broker settings.",
-                 "settings_success_tested" : "Settings succesfully tested. Please use the save button to save your settings",
                  "settings_saved" : "Settings saved",
                  "settings_noSettingsChanged" : "No setting has been changed",
-                 "settings_unexpectedError" : "Unexpected error occured. Please try again"
+                 "data_purged": "The user data has been removed",
+                 "data_purged_failed": "An error occured during the removal of the user data"
              }
         }
     }
