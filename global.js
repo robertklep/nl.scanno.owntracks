@@ -176,7 +176,7 @@ function setFence(fenceData) {
       fenceArray.push(fenceData);
       
       Homey.manager('notifications').createNotification({
-         excerpt: __("notifications.user_added", {"name": fenceData.fenceName})
+         excerpt: __("notifications.fence_added", {"name": fenceData.fenceName})
       }, function( err, notification ) {
          if( err ) return console.error( err );
             console.log( 'Notification added' );
