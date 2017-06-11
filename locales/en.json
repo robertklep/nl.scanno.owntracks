@@ -48,7 +48,9 @@
                 "save" : "Save",
                 "test" : "Test",
                 "getlogs" : "Get logs",
-                "purgedata": "Delete data"
+                "purgedata": "Delete data",
+                "userArray": "Edit users",
+                "fenceArray": "Edit geofences"
             },
             
              "user" : {

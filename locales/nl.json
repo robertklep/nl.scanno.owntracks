@@ -48,7 +48,9 @@
                 "save" : "Opslaan",
                 "test" : "Test",
                 "getlogs" : "Log ophalen",
-                "purgedata": "Verwijder gegevens"
+                "purgedata": "Verwijder gegevens",
+                "userArray": "Wijzig gebruikers",
+                "fenceArray": "Wijzig geofences"
             },
 
              "user" : {

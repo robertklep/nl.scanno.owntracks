@@ -91,6 +91,10 @@ module.exports.testBroker = testBroker;
 module.exports.changedSettings = changedSettings;
 module.exports.getLogLines = logmodule.getLogLines;
 module.exports.getUserArray = globalVar.getUserArray;
+module.exports.getFenceArray = globalVar.getFenceArray;
 module.exports.purgeUserData = globalVar.purgeUserData;
-
+module.exports.addNewUser = globalVar.addNewUser;
+module.exports.deleteUser = globalVar.deleteUser;
+module.exports.addNewFence = globalVar.addNewFence;
+module.exports.deleteFence = globalVar.deleteFence;
 

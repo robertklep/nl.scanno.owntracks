@@ -15,11 +15,26 @@ module.exports = {
    getUser: function(userName) {
       return getUser(userName);
    },
+   addNewUser: function(callback, args) {
+      return addNewUser(callback, args);
+   },
+   deleteUser: function(callback, args) {
+      return deleteUser(callback, args);
+   },
    setFence: function(fenceData) {
       setFence(fenceData);
    },
+   addNewFence: function(callback, args) {
+      return addNewFence(callback, args);
+   },
+   deleteFence: function(callback, args) {
+      return deleteFence(callback, args);
+   },
    getUserArray: function(callback, args) {
       getUserArray(callback, args);
+   },
+   getFenceArray: function(callback, args) {
+      getFenceArray(callback, args);
    },
    purgeUserData: function(callback, args) {
       purgeUserData(callback, args);
@@ -153,6 +168,35 @@ function setUser(userData) {
    }
 }
 
+function addNewUser(callback, args) {
+   logmodule.writelog("New user called: "+ args.body.userName);
+   if (args.body.userName !== null && args.body.userName !== undefined && args.body.userName !== "" ) { 
+      if (getUser(args.body.userName) == null) {
+         var newUser = {};
+         newUser.userName = args.body.userName;
+         newUser.fence = "";
+         newUser.battery = 0;
+         newUser.battTriggered = false;
+         userArray.push(newUser);
+         logmodule.writelog("New user added: "+ newUser.userName);
+         callback(false, true);
+      }
+   }
+   callback(false, false);
+}
+
+function deleteUser(callback, args) {
+   logmodule.writelog("Delete user called: "+ args.body.userName);
+   var result = false;
+   for (var i=0; i < userArray.length; i++) {
+      if (userArray[i].userName === args.body.userName) {
+         var deletedUser = userArray.splice(i, 1);
+         logmodule.writelog("Deleted user: " + deletedUser.userName);
+         result = true;
+      }
+   }
+   callback(false, result);
+}
 
 function getFence(fenceName) {
    for (var i=0; i < fenceArray.length; i++) {
@@ -185,9 +229,42 @@ function setFence(fenceData) {
    }
 }
 
+function addNewFence(callback, args) {
+   logmodule.writelog("New fence called: "+ args.body.fenceName);
+   if (args.body.fenceName !== null && args.body.fenceName !== undefined && args.body.fenceName !== "" ) { 
+      if (getFence(args.body.fenceName) == null) {
+         var newFence = {};
+         newFence.fenceName = args.body.fenceName;
+         newFence.timestamp = 0;
+         fenceArray.push(newFence);
+         logmodule.writelog("New fence added: "+ newFence.fenceName);
+         callback(false, true);
+      }
+   }
+   callback(false, false);
+}
+
+function deleteFence(callback, args) {
+   logmodule.writelog("Delete fence called: "+ args.body.fenceName);
+   var result = false;
+   for (var i=0; i < fenceArray.length; i++) {
+      if (fenceArray[i].fenceName === args.body.fenceName) {
+         var deletedFence = fenceArray.splice(i, 1);
+         logmodule.writelog("Deleted fence: " + deletedFence.fenceName);
+         result = true;
+      }
+   }
+   callback(false, result);
+}
+
 function getUserArray(callback, args) {
    logmodule.writelog("getUserArray called");
    callback ( false, userArray);
+}
+
+function getFenceArray(callback, args) {
+   logmodule.writelog("getFenceArray called");
+   callback ( false, fenceArray);
 }
 
 function purgeUserData(callback, args) {

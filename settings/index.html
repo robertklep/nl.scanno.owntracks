@@ -95,14 +95,28 @@
             
             <p data-i18n="settings.app.data.data_explanation"></p>
 
+            <div>
+               <button type="button" id="button_userTable" onclick="createUserTable()" data-i18n="settings.app.button.userArray">Edit Userdata</button> 
+               <button type="button" id="button_fenceTable" onclick="createFenceTable()" data-i18n="settings.app.button.fenceArray">Edit geofences</button> 
+            </div>
+
+            <fieldset id="edit_data">
+               <table id="userTable"/>
+               </table>
+
+               <div id="data_addRow"></div>
+            </fieldset>
+
             <button type="button" id="button_purge" onclick="purgeUserData()" data-i18n="settings.app.button.purgedata">Purge Data</button>           
 
         </fieldset>
 
         </form>
 
-        <button class="right" id="button_getlog" onclick="showLogLines()" data-i18n="settings.app.button.getlogs">Get Logs</button>
-        <button class="right" id="button_save" onclick="save()" data-i18n="settings.app.button.save">Save</button>
+        <div>
+        <button type="button" class="right" id="button_getlog" onclick="showLogLines()" data-i18n="settings.app.button.getlogs">Get Logs</button>
+        <button type="button" class="right" id="button_save" onclick="save()" data-i18n="settings.app.button.save">Save</button>
+        </div>
 
         <p data-i18n="settings.app.user.title"></p>
         <div id="userdata"></div> <br>
@@ -359,6 +373,113 @@
            });
         }
 
+        function createUserTable() {
+           var table = document.getElementById("userTable");
+           var nRows = table.rows.length;
+           if (nRows > 0) {
+              for (var i=0; i < nRows; i++) {
+                 table.deleteRow(-1);
+              }
+           }
+           Homey.api('GET', 'test/getUserArray/', function(err, result) {
+              if (!err) {
+                 console.log("UserArray data ok");
+                 for (var i=0; i < result.length; i++) {
+                    console.log("Create row for " + result[i].userName);
+                    var row = table.insertRow(i);
+                    var cell1 = row.insertCell(0);
+                    var cell2 = row.insertCell(1);
+                    cell1.innerHTML = result[i].userName;
+                    cell2.innerHTML = '<button type="button" value="button" onclick="deleteUserRow(this)">-</button>'
+                 }
+              };
+           });
+           var row = table.insertRow(-1);
+           var cell1 = row.insertCell(0);
+           var cell2 = row.insertCell(1);
+           cell1.innerHTML = '<input class="form_input" id="addUser" type="text" value="" />';
+           cell2.innerHTML = '<button type="button" value="button" onclick="saveUserRow()">+</button>';
+        }
+
+        function deleteUserRow(element) {
+           var row = element.parentNode.parentNode.rowIndex;
+           var table = document.getElementById("userTable");
+           var userName = table.rows[row].cells[0].innerHTML;
+           console.log("Delete user: "+userName);
+           if (userName !== null && userName !== undefined) {
+              Homey.api('POST', 'test/deleteUser/', {"userName": userName}, function(err, result) {
+                 console.log("Data posted");
+                 createUserTable();
+              });
+           }
+
+        }
+
+        function saveUserRow() {
+           console.log("addRow called");
+           var userName = document.getElementById('addUser').value;
+           console.log("User to add: " + userName);
+           if (userName !== null && userName !== undefined && userName !== "") {
+              Homey.api('POST', 'test/addNewUser/', {"userName": userName}, function(err, result) {
+                 console.log("Data posted");
+                 createUserTable();
+              });
+           }
+        }
+
+        function createFenceTable() {
+           var table = document.getElementById("userTable");
+           var nRows = table.rows.length;
+           if (nRows > 0) {
+              for (var i=0; i < nRows; i++) {
+                 table.deleteRow(-1);
+              }
+           }
+           Homey.api('GET', 'test/getFenceArray/', function(err, result) {
+              if (!err) {
+                 console.log("FenceArray data ok");
+                 for (var i=0; i < result.length; i++) {
+                    console.log("Create row for " + result[i].fenceName);
+                    var row = table.insertRow(i);
+                    var cell1 = row.insertCell(0);
+                    var cell2 = row.insertCell(1);
+                    cell1.innerHTML = result[i].fenceName;
+                    cell2.innerHTML = '<button type="button" value="button" onclick="deleteFenceRow(this)">-</button>'
+                 }
+              };
+           });
+           var row = table.insertRow(-1);
+           var cell1 = row.insertCell(0);
+           var cell2 = row.insertCell(1);
+           cell1.innerHTML = '<input class="form_input" id="addFence" type="text" value="" />';
+           cell2.innerHTML = '<button type="button" value="button" onclick="saveFenceRow()">+</button>';
+        }
+
+        function deleteFenceRow(element) {
+           var row = element.parentNode.parentNode.rowIndex;
+           var table = document.getElementById("userTable");
+           var fenceName = table.rows[row].cells[0].innerHTML;
+           console.log("Delete fence: "+fenceName);
+           if (fenceName !== null && fenceName !== undefined) {
+              Homey.api('POST', 'test/deleteFence/', {"fenceName": fenceName}, function(err, result) {
+                 console.log("Data posted");
+                 createFenceTable();
+              });
+           }
+
+        }
+
+        function saveFenceRow() {
+           console.log("addFenceRow called");
+           var fenceName = document.getElementById('addFence').value;
+           console.log("Fence to add: " + fenceName);
+           if (fenceName !== null && fenceName !== undefined && fenceName !== "") {
+              Homey.api('POST', 'test/addNewFence/', {"fenceName": fenceName}, function(err, result) {
+                 console.log("Data posted");
+                 createFenceTable();
+              });
+           }
+        }
         </script>
 
     </body>

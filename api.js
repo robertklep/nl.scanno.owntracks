@@ -52,6 +52,19 @@ module.exports = [{
    }
 },
 {
+   description:	'Get Array with fence info',
+   method:      'GET',
+   path:        '/test/getFenceArray/',
+   requires_authorization: true,
+   role: 'owner',
+   fn: function(callback, args) {
+      Homey.log("");
+      Homey.log("API: Incoming POST on /test/getFenceArray/");
+      Homey.app.getFenceArray(callback, args);
+      callback(callback, args);
+   }
+},
+{
    description:	'Purge userdata',
    method:      'GET',
    path:        '/test/purgeUserData/',
@@ -63,7 +76,61 @@ module.exports = [{
       Homey.app.purgeUserData(callback, args);
       callback(callback, args);
    }
-}]
+},
+{
+   description:	'Add new User',
+   method:      'POST',
+   path:        '/test/addNewUser/',
+   requires_authorization: true,
+   role: 'owner',
+   fn: function(callback, args) {
+      Homey.log("");
+      Homey.log("API: Incoming POST on /test/addNewUser/");
+      Homey.app.addNewUser(callback, args);
+      callback(callback, args);
+   }
+},
+{
+   description:	'Delete User',
+   method:      'POST',
+   path:        '/test/deleteUser/',
+   requires_authorization: true,
+   role: 'owner',
+   fn: function(callback, args) {
+      Homey.log("");
+      Homey.log("API: Incoming POST on /test/deleteUser/");
+      Homey.app.deleteUser(callback, args);
+      callback(callback, args);
+   }
+},
+{
+   description:	'Add new Fence',
+   method:      'POST',
+   path:        '/test/addNewFence/',
+   requires_authorization: true,
+   role: 'owner',
+   fn: function(callback, args) {
+      Homey.log("");
+      Homey.log("API: Incoming POST on /test/addNewFence/");
+      Homey.app.addNewFence(callback, args);
+      callback(callback, args);
+   }
+},
+{
+   description:	'Delete Fence',
+   method:      'POST',
+   path:        '/test/deleteFence/',
+   requires_authorization: true,
+   role: 'owner',
+   fn: function(callback, args) {
+      Homey.log("");
+      Homey.log("API: Incoming POST on /test/deleteFence/");
+      Homey.app.deleteFence(callback, args);
+      callback(callback, args);
+   }
+}
+
+]
 
 
 
