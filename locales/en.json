@@ -50,7 +50,8 @@
                 "getlogs" : "Get logs",
                 "purgedata": "Delete data",
                 "userArray": "Edit users",
-                "fenceArray": "Edit geofences"
+                "fenceArray": "Edit geofences",
+                "userStatus": "Current data"
             },
             
              "user" : {

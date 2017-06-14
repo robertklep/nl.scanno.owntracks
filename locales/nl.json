@@ -50,7 +50,8 @@
                 "getlogs" : "Log ophalen",
                 "purgedata": "Verwijder gegevens",
                 "userArray": "Wijzig gebruikers",
-                "fenceArray": "Wijzig geofences"
+                "fenceArray": "Wijzig geofences",
+                "userStatus": "Huidige gegevens"
             },
 
              "user" : {
