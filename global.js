@@ -82,14 +82,25 @@ function initVars() {
       if (err) {
          logmodule.writelog("Retreiving userArray failed: "+ err);
       } else {
-         userArray = JSON.parse(data);
+         try { 
+             userArray = JSON.parse(data);
+         } catch (e) {
+            logmodule.writelog("Parsing userArray failed: "+ e);
+            userArray = [];
+         }
+
       }
    });
    require('fs').readFile('/userdata/owntracks_fences.json', 'utf8', function (err, data) {
       if (err) {
          logmodule.writelog("Retreiving fenceArray failed: "+ err);
       } else {
-         fenceArray = JSON.parse(data);
+         try {
+            fenceArray = JSON.parse(data);
+         } catch(e) {
+            logmodule.writelog("Parsing fenceArray failed: "+ e);
+            fenceArray = [];
+         }
       }
    });
 }
