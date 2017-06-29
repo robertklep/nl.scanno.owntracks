@@ -324,12 +324,16 @@ function searchUsersAutocomplete(key, wildcards) {
    }
 
    for (i=0; i < userArray.length; i++) {
-      if (String(userArray[i].userName.toLowerCase()).includes(key.toLowerCase())) {
-//        logmodule.writelog("key: " + key + "    userArray: " + userArray[i].userName);
-        temp.icon = '//';
-        temp.name = userArray[i].userName;
-        temp.user = userArray[i].userName;
-        matchUsers.push({icon: temp.icon, name: temp.name, description: __("desc_all_users"), user: temp.name});
+      try {
+         if (String(userArray[i].userName.toLowerCase()).includes(key.toLowerCase())) {
+//           logmodule.writelog("key: " + key + "    userArray: " + userArray[i].userName);
+           temp.icon = '//';
+           temp.name = userArray[i].userName;
+           temp.user = userArray[i].userName;
+           matchUsers.push({icon: temp.icon, name: temp.name, description: __("desc_all_users"), user: temp.name});
+         }
+      } catch(e) {
+          logmodule.writelog("Fill user autocomplete failed: "+ e);
       }
    }
    return matchUsers;
@@ -346,14 +350,18 @@ function searchFenceAutocomplete(key, wildcards) {
    }
 
    for (i=0; i < fenceArray.length; i++) {
-      if (String(fenceArray[i].fenceName.toLowerCase()).includes(key.toLowerCase())) {
-         if (fenceArray[i].fenceName !== '') {
-//            logmodule.writelog("key: " + key + "    fenceArray: " + fenceArray[i].fenceName);
-            temp.icon = '//';
-            temp.name = fenceArray[i].fenceName;
-            temp.fence = fenceArray[i].fenceName;
-            matchFence.push({icon: temp.icon, name: temp.name, description: __("desc_all_fences"), fence: temp.name});
+      try {
+         if (String(fenceArray[i].fenceName.toLowerCase()).includes(key.toLowerCase())) {
+            if (fenceArray[i].fenceName !== '') {
+//               logmodule.writelog("key: " + key + "    fenceArray: " + fenceArray[i].fenceName);
+               temp.icon = '//';
+               temp.name = fenceArray[i].fenceName;
+               temp.fence = fenceArray[i].fenceName;
+               matchFence.push({icon: temp.icon, name: temp.name, description: __("desc_all_fences"), fence: temp.name});
+            }
          }
+      } catch(e) {
+         logmodule.writelog("Fill fence autocomplete failed: "+ e);
       }
    }
    return matchFence;
