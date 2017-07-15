@@ -3,6 +3,8 @@ var topicArray = [];
 var userArray = [];
 var fenceArray = [];
 
+var DEBUG = false;
+
 var logmodule = require("./logmodule.js");
 
 module.exports = {
@@ -82,7 +84,7 @@ function initVars() {
 
 //   deletePresistancyFiles();
 
-   logmodule.writelog("initVars called");
+   if (DEBUG) logmodule.writelog("initVars called");
 
    require('fs').readFile('/userdata/owntracks.json', 'utf8', function (err, data) {
       if (err) {
@@ -94,7 +96,6 @@ function initVars() {
             logmodule.writelog("Parsing userArray failed: "+ e);
             userArray = [];
          }
-
       }
    });
    require('fs').readFile('/userdata/owntracks_fences.json', 'utf8', function (err, data) {
@@ -221,7 +222,7 @@ function createEmptyUser(userName) {
    or when the token needs to be refreshed.
 */
 function addNewUser(callback, args) {
-   logmodule.writelog("New user called: "+ args.body.userName);
+   if (DEBUG) logmodule.writelog("New user called: "+ args.body.userName);
    if (args.body.userName !== null && args.body.userName !== undefined && args.body.userName !== "" ) {
       var currentUser = getUser(args.body.userName);
       if (currentUser == null) {
@@ -237,7 +238,7 @@ function addNewUser(callback, args) {
 }
 
 function deleteUser(callback, args) {
-   logmodule.writelog("Delete user called: "+ args.body.userName);
+   if (DEBUG) logmodule.writelog("Delete user called: "+ args.body.userName);
    var result = false;
    for (var i=0; i < userArray.length; i++) {
       if (userArray[i].userName === args.body.userName) {
@@ -281,7 +282,7 @@ function setFence(fenceData) {
 }
 
 function addNewFence(callback, args) {
-   logmodule.writelog("New fence called: "+ args.body.fenceName);
+   if (DEBUG) logmodule.writelog("New fence called: "+ args.body.fenceName);
    if (args.body.fenceName !== null && args.body.fenceName !== undefined && args.body.fenceName !== "" ) { 
       if (getFence(args.body.fenceName) == null) {
          var newFence = {};
@@ -296,7 +297,7 @@ function addNewFence(callback, args) {
 }
 
 function deleteFence(callback, args) {
-   logmodule.writelog("Delete fence called: "+ args.body.fenceName);
+   if (DEBUG) logmodule.writelog("Delete fence called: "+ args.body.fenceName);
    var result = false;
    for (var i=0; i < fenceArray.length; i++) {
       if (fenceArray[i].fenceName === args.body.fenceName) {
@@ -309,12 +310,12 @@ function deleteFence(callback, args) {
 }
 
 function getUserArray(callback, args) {
-   logmodule.writelog("getUserArray called");
+   if (DEBUG) logmodule.writelog("getUserArray called");
    callback ( false, userArray);
 }
 
 function getFenceArray(callback, args) {
-   logmodule.writelog("getFenceArray called");
+   if (DEBUG) logmodule.writelog("getFenceArray called");
    callback ( false, fenceArray);
 }
 
@@ -354,7 +355,7 @@ function clearTopicArray() {
 }
 
 function searchUsersAutocomplete(key, wildcards) {
-//   logmodule.writelog("searchUsers: "+ key);
+   if (DEBUG) logmodule.writelog("searchUsers: "+ key);
    var matchUsers = [];
    var temp = [];
 
@@ -366,7 +367,7 @@ function searchUsersAutocomplete(key, wildcards) {
    for (i=0; i < userArray.length; i++) {
       try {
          if (String(userArray[i].userName.toLowerCase()).includes(key.toLowerCase())) {
-//           logmodule.writelog("key: " + key + "    userArray: " + userArray[i].userName);
+           if (DEBUG) logmodule.writelog("key: " + key + "    userArray: " + userArray[i].userName);
            temp.icon = '//';
            temp.name = userArray[i].userName;
            temp.user = userArray[i].userName;
@@ -380,7 +381,7 @@ function searchUsersAutocomplete(key, wildcards) {
 }
 
 function searchFenceAutocomplete(key, wildcards) {
-//   logmodule.writelog("searchFence: "+ key);
+   if (DEBUG) logmodule.writelog("searchFence: "+ key);
    var matchFence = [];
    var temp = [];
 
@@ -393,7 +394,7 @@ function searchFenceAutocomplete(key, wildcards) {
       try {
          if (String(fenceArray[i].fenceName.toLowerCase()).includes(key.toLowerCase())) {
             if (fenceArray[i].fenceName !== '') {
-//               logmodule.writelog("key: " + key + "    fenceArray: " + fenceArray[i].fenceName);
+               if (DEBUG) logmodule.writelog("key: " + key + "    fenceArray: " + fenceArray[i].fenceName);
                temp.icon = '//';
                temp.name = fenceArray[i].fenceName;
                temp.fence = fenceArray[i].fenceName;
@@ -408,11 +409,11 @@ function searchFenceAutocomplete(key, wildcards) {
 }
 
 function getUserFromString(key) {
-   logmodule.writelog("Get the user from string: "+ key);
+   if (DEBUG) logmodule.writelog("Get the user from string: "+ key);
    var userIndex = -1;
    for (i=0; i < userArray.length; i++) {
       if (String(key).includes(userArray[i].userName)) {
-        logmodule.writelog("key: " + key + "    userArray: " + userArray[i].userName);
+        if (DEBUG) logmodule.writelog("key: " + key + "    userArray: " + userArray[i].userName);
         userIndex = i;
       }
    }
@@ -426,11 +427,11 @@ function getUserFromString(key) {
 }
 
 function searchGeoFence(geoFence) {
-   logmodule.writelog("searchGeoFence: "+ geoFence);
+   if (DEBUG) logmodule.writelog("searchGeoFence: "+ geoFence);
    var matchFence = 0;
    for (i=0; i < userArray.length; i++) {
       if (String(userArray[i].fence).includes(geoFence)) {
-//        logmodule.writelog("key: " + geoFence + "    userArray: " + userArray[i].fence);
+        if (DEBUG) logmodule.writelog("key: " + geoFence + "    userArray: " + userArray[i].fence);
         matchFence++;
       }
    }

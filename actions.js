@@ -5,6 +5,8 @@ var broker    = require("./broker.js");
 
 var myItems = [];
 
+var DEBUG = false;
+
 module.exports = {
    createAutocompleteActions: function() {
       createAutoComplteActions();
@@ -22,43 +24,42 @@ function createAutocompleteActions() {
    // Put all the autocomplte actions here. 
 
    Homey.manager('flow').on('action.sayLocation.user.autocomplete', function (callback, args) {
-      logmodule.writelog("autocomplete called");
+      if (DEBUG) logmodule.writelog("autocomplete called");
       callback(null, globalVar.searchUsersAutocomplete(args.query, true));
    });
 
    Homey.manager('flow').on('condition.inGeofence.geoFence.autocomplete', function (callback, args) {
-      logmodule.writelog("autocomplete called");
+      if (DEBUG) logmodule.writelog("autocomplete called");
       callback(null, globalVar.searchFenceAutocomplete(args.query, false));
    });
 
 }
 
 function registerActions() {
-   logmodule.writelog("registerActions called");
+   if (DEBUG) logmodule.writelog("registerActions called");
 
    createAutocompleteActions();		
 
    // Put all the action trigger here for registering them and executing the action
-   
    // Action for sending a message to the broker on the specified topic
    Homey.manager('flow').on('action.publishOwntracks', function( callback, args ){
-      logmodule.writelog("Send flow triggered");
+      if (DEBUG) logmodule.writelog("Send flow triggered");
       broker.sendMessageToTopic(args);
       callback( null, true ); // we've fired successfully
    });
    
    // Action for speaking out the location of the specified user
    Homey.manager('flow').on('action.sayLocation', function( callback, args ){
-      logmodule.writelog("Say Locaton flow triggered");
+      if (DEBUG) logmodule.writelog("Say Locaton flow triggered");
       homeySayLocation(args);
       callback( null, true ); // we've fired successfully
    });   
 }
 
 function registerSpeech() {
-   logmodule.writelog("registerSpeech");
+   if (DEBUG) logmodule.writelog("registerSpeech");
    Homey.manager('speech-input').on('speech', function( speech, callback ) {
-      logmodule.writelog("Speech input");
+      if (DEBUG) logmodule.writelog("Speech input");
 
        // loop all triggers
        speech.triggers.forEach(function(trigger) {
@@ -70,14 +71,14 @@ function registerSpeech() {
               // Search useraray to see if we can match the user in he transcript
               foundUser = globalVar.getUserFromString(speech.transcript);
               if (foundUser !== null) {
-                 logmodule.writelog("Found user: " + foundUser.userName + "   Fence: " + foundUser.fence);
+                 if (DEBUG) logmodule.writelog("Found user: " + foundUser.userName + "   Fence: " + foundUser.fence);
                  return getLocationString(foundUser.userName).then(function(speechline) {
                     logmodule.writelog("Speech output: " + speechline);
                     speech.say( speechline );
                     callback( null, true );
                  });
               } else {
-                 logmodule.writelog("No user found");
+                 if (DEBUG) logmodule.writelog("No user found");
                  return getLocationString(null).then(function(speechline) {
                     logmodule.writelog("Speech output: " + speechline);
                     speech.say( speechline );
@@ -114,10 +115,10 @@ function getLocationString(userName) {
             // going to see if we can find an address based on the known coordinates of 
             // the user.
             return getLocationAdress(userName).then(function (foundAddress) {
-               logmodule.writelog("getLocationAdress in getString enter");
+               if (DEBUG) logmodule.writelog("getLocationAdress in getString enter");
                if (foundAddress !== null) {
                   // We hebben een address ontvangen the async call
-                  logmodule.writelog("foundAddress !== null");
+                  if (DEBUG) logmodule.writelog("foundAddress !== null");
                   logmodule.writelog("geoAdress gevonden: " + foundAddress);
                   locationString = __("location_known", {"name": userName, "location": foundAddress});
                   fulfill(locationString);
@@ -126,7 +127,7 @@ function getLocationString(userName) {
                   locationString = __("location_unkown", {"name": userName});
                   fulfill(locationString);
                }
-               logmodule.writelog("getLocationAdress in getString quit");
+               if (DEBUG) logmodule.writelog("getLocationAdress in getString quit");
             });
          }
       } else {
@@ -152,16 +153,16 @@ function getLocationAdress(userName) {
    // speech command is given.
    return new Promise(function (fulfill, reject){
       var getAddress = null;
-      logmodule.writelog("getLocationAdress promise enter" );
+      if (DEBUG) logmodule.writelog("getLocationAdress promise enter" );
       geocoder.reverseGeocode( globalVar.getUser(userName).lat, globalVar.getUser(userName).lon, function ( err, data ) {
          // do something with data
          logmodule.writelog("Address data retreived: " + data.results[0].formatted_address);
          getAddress = data.results[0].formatted_address;
          fulfill(getAddress);
       });
-      logmodule.writelog("getLocationAdress promise quit" );
+      if (DEBUG) logmodule.writelog("getLocationAdress promise quit" );
    });
-   logmodule.writelog("getLocationAdress quit");
+   if (DEBUG) logmodule.writelog("getLocationAdress quit");
 }
 
 function homeySayLocation(args) {

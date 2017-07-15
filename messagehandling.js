@@ -1,6 +1,8 @@
 var globalVar = require("./global.js");
 var logmodule = require("./logmodule.js");
 
+var DEBUG = false;
+
 module.exports = {
    receiveMessage: function(topic, message, args, state) {
       receiveMessage(topic, message, args, state);

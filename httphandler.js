@@ -2,6 +2,8 @@ var globalVar = require("./global.js");
 var logmodule = require("./logmodule.js");
 var handleMessage = require("./messagehandling.js");
 
+var DEBUG = true;
+
 module.exports = {
    handleOwntracksEvents: function(callback, args) {
       handleOwntracksEvents(callback, args);
@@ -9,8 +11,9 @@ module.exports = {
 }
 
 function handleOwntracksEvents(callback, args) {
-   logmodule.writelog("handleOwntracksEvents called");
-   logmodule.writelog(JSON.stringify(args.query));
+   if (DEBUG) logmodule.writelog("handleOwntracksEvents called");
+   if (DEBUG) logmodule.writelog(JSON.stringify(args.query));
+   if (DEBUG) logmodule.writelog(JSON.stringify(args.body));
 
    var currentUser = globalVar.getUserByToken(args.query.token);
    if (currentUser == null) {
