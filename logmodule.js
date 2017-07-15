@@ -38,7 +38,7 @@ function writelog(line) {
    var logLine = getDateTime() + "   " + line;
    console.log( logLine );
 
-   if (logArray.length >= 20) {
+   if (logArray.length >= 50) {
       logArray.shift();
    }
    logArray.push(logLine);
