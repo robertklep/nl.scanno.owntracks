@@ -3,6 +3,7 @@
 var globalVar = require("./global.js");
 var logmodule = require("./logmodule.js");
 var broker    = require("./broker.js");
+var httpHandler = require("./httphandler.js");
 var actions   = require("./actions.js");
 var triggers  = require("./triggers.js");
 var condition = require("./conditions.js");
@@ -69,7 +70,7 @@ function changedSettings(callback, args) {
    logmodule.writelog(args.body);
    logmodule.writelog("topics:" + globalVar.getTopicArray())
 
-   if (globalVar.getTopicArray().length > 0) {
+   if ((globalVar.getTopicArray().length > 0) && (broker.getConnectedClient() !== null)) {
       broker.getConnectedClient().unsubscribe("owntracks/#");
       globalVar.clearTopicArray();
    };
@@ -86,7 +87,6 @@ function changedSettings(callback, args) {
    callback(false, null);
 }
 
-
 module.exports.testBroker = testBroker;
 module.exports.changedSettings = changedSettings;
 module.exports.getLogLines = logmodule.getLogLines;
@@ -97,4 +97,5 @@ module.exports.addNewUser = globalVar.addNewUser;
 module.exports.deleteUser = globalVar.deleteUser;
 module.exports.addNewFence = globalVar.addNewFence;
 module.exports.deleteFence = globalVar.deleteFence;
+module.exports.handleOwntracksEvents = httpHandler.handleOwntracksEvents;
 

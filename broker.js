@@ -27,88 +27,78 @@ module.exports = {
 
 function getBrokerURL() {
    var urlBroker = []
-    
-   if (Homey.manager('settings').get('otbroker') == true) {
-      urlBroker.push("mqtt://");
-      urlBroker.push("broker.hivemq.com:1883");
+   if (Homey.manager('settings').get('tls') == true) {
+      urlBroker.push("mqtts://");
    } else {
-      if (Homey.manager('settings').get('tls') == true) {
-        urlBroker.push("mqtts://");
-      } else {
-         urlBroker.push("mqtt://");
-      };
-      urlBroker.push(Homey.manager('settings').get('url'));
-      urlBroker.push(":"+Homey.manager('settings').get('ip_port'));
-   }
+      urlBroker.push("mqtt://");
+   };
+   urlBroker.push(Homey.manager('settings').get('url'));
+   urlBroker.push(":"+Homey.manager('settings').get('ip_port'));
    logmodule.writelog("Broker URL: "+ urlBroker.join(''));
    return urlBroker.join('');
 }
 
 function getConnectOptions() {
-
-  if (Homey.manager('settings').get('otbroker') == true) {
-      return null;
-   } else {
-      var rejectUnauth = "true";
-      if ( Homey.manager('settings').get('selfsigned') == true) {
-         rejectUnauth = "false";
-      }
-      var connect_options = {
-         keepalive: 10,
-         username: Homey.manager('settings').get('user'),
-         password: Homey.manager('settings').get('password'),
-         rejectUnauthorized: rejectUnauth
-      };
-      logmodule.writelog("rejectUnauthorized: " + connect_options.rejectUnauthorized);
-      return connect_options
+   var rejectUnauth = "true";
+   if ( Homey.manager('settings').get('selfsigned') == true) {
+      rejectUnauth = "false";
+   }
+   var connect_options = {
+      keepalive: 10,
+      username: Homey.manager('settings').get('user'),
+      password: Homey.manager('settings').get('password'),
+      rejectUnauthorized: rejectUnauth
    };
+   logmodule.writelog("rejectUnauthorized: " + connect_options.rejectUnauthorized);
+   return connect_options;
 }
 
 function connectToBroker(args, state) {
-   if (connectedClient == null) {
-      logmodule.writelog("connectedClient == null");
-      connectedClient = mqtt.connect(getBrokerURL(), getConnectOptions());
+   if (Homey.manager('settings').get('usebroker') == true) {
+      if (connectedClient == null) {
+         logmodule.writelog("connectedClient == null");
+         connectedClient = mqtt.connect(getBrokerURL(), getConnectOptions());
 
-      connectedClient.on('reconnect', function() {
-         logmodule.writelog("MQTT Reconnect");
-         reconnectClient = true;
-       });
+         connectedClient.on('reconnect', function() {
+            logmodule.writelog("MQTT Reconnect");
+            reconnectClient = true;
+          });
 
-      connectedClient.on('close', function() {
-         logmodule.writelog("MQTT Closed");
-         reconnectClient = true;
-       });
+         connectedClient.on('close', function() {
+            logmodule.writelog("MQTT Closed");
+            reconnectClient = true;
+          });
 
-      connectedClient.on('offline', function() {
-         logmodule.writelog("MQTT Offline");
-         reconnectClient = true;
-       });
+         connectedClient.on('offline', function() {
+            logmodule.writelog("MQTT Offline");
+            reconnectClient = true;
+          });
 
-      connectedClient.on('error', function(error) {
-         logmodule.writelog("MQTT error occured: " + error);
-      });
+         connectedClient.on('error', function(error) {
+            logmodule.writelog("MQTT error occured: " + error);
+         });
 
-      // On connection ...
-      connectedClient.on('connect', function (connack) {
-         logmodule.writelog("MQTT client connected");
-         logmodule.writelog("Connected Topics: " + globalVar.getTopicArray());
-         logmodule.writelog("reconnectedClient " + reconnectClient);
+         // On connection ...
+         connectedClient.on('connect', function (connack) {
+            logmodule.writelog("MQTT client connected");
+            logmodule.writelog("Connected Topics: " + globalVar.getTopicArray());
+            logmodule.writelog("reconnectedClient " + reconnectClient);
+         });
 
-      });
-
-      connectedClient.on('message',function(topic, message, packet) {
-         // When a message is received, call receiveMessage for further processing
-         logmodule.writelog("OnMessage called");
-         handleMessage.receiveMessage(topic, message, args, state);
-      });
-      // Since we are connecting here, we might as well subscribe to the generic
-      // Owmntracks topic.
-      // Since we subscribe to the generic owntracks topic, we do not have to subscribe to
-      // the individual topics. We will get them anyway.
-      subscribeToTopic("owntracks/#");
-      connectedClient.subscribe("owntracks/#")
-      logmodule.writelog("Subscribed to owntracks/#" );
-   };
+         connectedClient.on('message',function(topic, message, packet) {
+            // When a message is received, call receiveMessage for further processing
+            logmodule.writelog("OnMessage called");
+            handleMessage.receiveMessage(topic, message, args, state);
+         });
+         // Since we are connecting here, we might as well subscribe to the generic
+         // Owmntracks topic.
+         // Since we subscribe to the generic owntracks topic, we do not have to subscribe to
+         // the individual topics. We will get them anyway.
+         subscribeToTopic("owntracks/#");
+         connectedClient.subscribe("owntracks/#")
+         logmodule.writelog("Subscribed to owntracks/#" );
+      };
+   }
 }
 
 function subscribeToTopic(topicName) {

@@ -15,6 +15,12 @@ module.exports = {
    getUser: function(userName) {
       return getUser(userName);
    },
+   getUserByToken: function(userToken) {
+      return getUserByToken(userToken);
+   },
+   createEmptyUser: function(userName) {
+      return createEmptyUser(userName);
+   },
    addNewUser: function(callback, args) {
       return addNewUser(callback, args);
    },
@@ -151,6 +157,9 @@ function deletePresistancyFiles() {
    return returnValue; 
 }
 
+/*
+   Return the data for the given user
+*/
 function getUser(userName) {
    for (var i=0; i < userArray.length; i++) {
       if (userArray[i].userName === userName) {
@@ -161,6 +170,24 @@ function getUser(userName) {
    return null
 }
 
+/*
+   Return the data for the given user by token id
+*/
+function getUserByToken(userToken) {
+   for (var i=0; i < userArray.length; i++) {
+      if (userArray[i].userToken === userToken) {
+         return userArray[i];
+      }
+   }
+   // User has not been found, so return null
+   return null
+}
+
+
+/*
+   Update the user, or if the user does not exist, add the user
+   to the user array
+*/
 function setUser(userData) {
    var entryArray = getUser(userData.userName);
    if (entryArray !== null) {
@@ -179,18 +206,31 @@ function setUser(userData) {
    }
 }
 
+function createEmptyUser(userName) {
+   var newUser = {};
+   newUser.userName = userName;
+   newUser.userToken = require('crypto').randomBytes(16).toString('hex');
+   newUser.fence = "";
+   newUser.battery = 0;
+   newUser.battTriggered = false;
+   return newUser;
+}
+
+/*
+   addNewUser is called from the settings page when a new user is added
+   or when the token needs to be refreshed.
+*/
 function addNewUser(callback, args) {
    logmodule.writelog("New user called: "+ args.body.userName);
-   if (args.body.userName !== null && args.body.userName !== undefined && args.body.userName !== "" ) { 
-      if (getUser(args.body.userName) == null) {
-         var newUser = {};
-         newUser.userName = args.body.userName;
-         newUser.fence = "";
-         newUser.battery = 0;
-         newUser.battTriggered = false;
-         userArray.push(newUser);
+   if (args.body.userName !== null && args.body.userName !== undefined && args.body.userName !== "" ) {
+      var currentUser = getUser(args.body.userName);
+      if (currentUser == null) {
+         var newUser = createEmptyUser(args.body.userName);
+         setUser(newUser);
          logmodule.writelog("New user added: "+ newUser.userName);
          callback(false, true);
+      } else {
+         currentUser.userToken = require('crypto').randomBytes(16).toString('hex');
       }
    }
    callback(false, false);

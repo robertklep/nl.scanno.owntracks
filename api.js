@@ -128,6 +128,19 @@ module.exports = [{
       Homey.app.deleteFence(callback, args);
       callback(callback, args);
    }
+},
+{
+   description:	'Receive owntracks events',
+   method:      'POST',
+   path:        '/events/',
+   public: true,
+   requires_authorization: false,
+   fn: function(callback, args) {
+      Homey.log("");
+      Homey.log("API: Incoming POST on /events/");
+      Homey.app.handleOwntracksEvents(callback, args);
+      callback(callback, args);
+   }
 }
 
 ]

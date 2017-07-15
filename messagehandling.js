@@ -30,11 +30,11 @@ function receiveMessage(topic, message, args, state) {
       // get the user this message is from. This can be found in the topic the message is published in
       currentUser = globalVar.getUser(topicArray[1]);
       if (currentUser === null) {
-         currentUser = {};
-         currentUser.userName = topicArray[1];
-         currentUser.fence = "";
-         currentUser.battery = 0;
-         currentUser.battTriggered = false;
+         currentUser = createEmptyUser(topicArray[1]);
+ //        currentUser.userName = topicArray[1];
+ //        currentUser.fence = "";
+ //        currentUser.battery = 0;
+  //       currentUser.battTriggered = false;
       }
       
       switch (jsonMsg._type) {

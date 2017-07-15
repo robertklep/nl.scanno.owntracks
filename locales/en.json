@@ -19,7 +19,7 @@
             
             "server" : {
                 "server_title" : "Owntracks broker setings",
-                "public_broker" : "Use HiveMQ public broker",
+                "use_broker" : "Use a MQTT broker as addition to HTTP",
                 "server_details" : "Enter broker details",
                 "server_explanation" : "You need to specify a broker where the Owntracks client can connect to. The servername can either be a local ip adres when using a private broker, or a FQDN. You also need to provide the portnumber. Normally this would be port 1883 and 8883 for secure connections",
                 "url" : "Enter IP adress or DNS",

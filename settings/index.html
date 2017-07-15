@@ -13,9 +13,9 @@
                 <label data-i18n="settings.app.server.server_title"></label>
             </legend>
             <div class="field">
-                <input class="checkbox" id="otbroker" type="checkbox" checked="true"
-                    onchange="owntracks.serversettings.disabled = checked">
-                <label class="form_label" for="otbroker" data-i18n="settings.app.server.public_broker"</label>
+                <input class="checkbox" id="usebroker" type="checkbox" checked="true"
+                    onchange="owntracks.serversettings.disabled = !checked">
+                <label class="form_label" for="usebroker" data-i18n="settings.app.server.use_broker"</label>
             </div>
 
             <fieldset id="serversettings">
@@ -129,16 +129,16 @@
         var currentValues = {};
 
         function onHomeyReady(){
-           Homey.get('otbroker', function(err, otbroker) {
+           Homey.get('usebroker', function(err, usebroker) {
                   if (err) {
                     console.error(err)
                   } else {
-                    document.getElementById('otbroker').value = otbroker;
+                    document.getElementById('usebroker').value = usebroker;
                   }
-                  if (typeof otbroker == 'undefined' || otbroker == null) otbroker = false;
-                  document.getElementById('otbroker').checked = otbroker;
-                  document.getElementById('serversettings').disabled = otbroker;
-                  currentValues.otbroker = otbroker;
+                  if (typeof usebroker == 'undefined' || usebroker == null) usebroker = false;
+                  document.getElementById('usebroker').checked = usebroker;
+                  document.getElementById('serversettings').disabled = !usebroker;
+                  currentValues.usebroker = usebroker;
            })
 
            Homey.get('url', function(err, url) {
@@ -233,11 +233,11 @@
             console.log(oldValues);
             var valuesHaveBeenChanged = false;
 
-            if (currentValues.otbroker != document.getElementById('otbroker').checked) {
-                console.log("otbroker has been changed");
-                Homey.set('otbroker', document.getElementById('otbroker').checked);
+            if (currentValues.usebroker != document.getElementById('usebroker').checked) {
+                console.log("usebroker has been changed");
+                Homey.set('usebroker', document.getElementById('usebroker').checked);
                 valuesHaveBeenChanged = true;
-                currentValues.otbroker = document.getElementById('otbroker').checked;
+                currentValues.usebroker = document.getElementById('usebroker').checked;
             }
 
             if (currentValues.url != document.getElementById('url').value) {
@@ -425,7 +425,6 @@
            });
         }
 
-
         function createUserTable() {
            var table = document.getElementById("userTable");
            document.getElementById("userTable").style.width = "";
@@ -446,8 +445,12 @@
                     }
                     var cell1 = row.insertCell(0);
                     var cell2 = row.insertCell(1);
+                    var cell3 = row.insertCell(2);
+                    var cell4 = row.insertCell(3);
                     cell1.innerHTML = result[i].userName;
-                    cell2.innerHTML = '<button type="button" value="button" onclick="deleteUserRow(this)">-</button>'
+                    cell2.innerHTML = result[i].userToken;
+                    cell3.innerHTML = '<button type="button" value="button" onclick="deleteUserRow(this)">-</button>';
+                    cell4.innerHTML = '<button type="button" value="button" onclick="generateUserToken(this)">#</button>';
                  }
               };
            });
@@ -472,11 +475,11 @@
                  createUserTable();
               });
            }
-
         }
 
         function saveUserRow() {
            console.log("addRow called");
+           var token;
            var userName = document.getElementById('addUser').value;
            console.log("User to add: " + userName);
            if (userName !== null && userName !== undefined && userName !== "") {
@@ -487,6 +490,19 @@
            }
         }
 
+        function generateUserToken(element) {
+           var row = element.parentNode.parentNode.rowIndex;
+           var table = document.getElementById("userTable");
+           var userName = table.rows[row].cells[0].innerHTML;
+           console.log("Update user: "+userName);
+           if (userName !== null && userName !== undefined) {
+              Homey.api('POST', 'test/addNewUser/', {"userName": userName}, function(err, result) {
+                 console.log("Data posted");
+                 createUserTable();
+              });
+           }
+        }
+        
         function createFenceTable() {
            var table = document.getElementById("userTable");
            document.getElementById("userTable").style.width = "";

@@ -19,7 +19,7 @@
             
             "server" : {
                 "server_title" : "Owntracks broker instellingen",
-                "public_broker" : "Gebruik HiveMQ publieke broker", 
+                "use_broker" : "Gebruik MQTT broker naast HTTP", 
                 "server_details" : "Voer broker gegevens in",
                 "server_explanation" : "Er moet een broker opgegeven worden, waarmee de Owntracks client kan verbinden. De servernaam kan een IP adres bevatten, of een DNS naam. Er moet ook een poortnummer worden opgegeven. Normaal gesproken is dat poort 1883 voor een normale verbinding en poortnummer 8883 voor een beveiligde verbinding.",
                 "url" : "IP adres of DNS",
