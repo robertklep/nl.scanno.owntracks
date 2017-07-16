@@ -61,8 +61,8 @@
          {
             "id": "inGeofence",
             "title": {
-               "en": "Someone present in",
-               "nl": "Persoon aanwezig in"
+               "en": "Someone !{{present|absend}} in",
+               "nl": "Persoon !{{aanwezig|afwezig}} in"
             },
             "args": [
                {
