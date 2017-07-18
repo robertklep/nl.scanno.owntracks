@@ -137,6 +137,13 @@ function receiveMessage(topic, message, args, state) {
             // Waypoints denote specific geographical locations that you want to keep track of. You define a waypoint on the OwnTracks device, 
             // and OwnTracks publishes this waypoint (if the waypoint is marked shared)
             logmodule.writelog("We have received a waypoint message");
+
+            // Set fenceData. This is done to update or add new
+            // fences so they can be selected in an autocomplete box
+            var fenceData = {}
+            fenceData.fenceName = jsonMsg.desc;
+            fenceData.timestamp = jsonMsg.tst;
+            globalVar.setFence(fenceData);
             break;
          case 'encrypted' :
             // This payload type contains a single data element with the original JSON object _type (e.g. location, beacon, etc.) encrypted payload in it.

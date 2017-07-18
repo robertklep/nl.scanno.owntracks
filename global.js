@@ -269,15 +269,16 @@ function setFence(fenceData) {
       // Fence has not been found, so assume this is a new fence
       logmodule.writelog("Fence: " + fenceData.fenceName+" Added");
       
-      fenceArray.push(fenceData);
+      if (fenceData.fenceName.length > 0) {
+         fenceArray.push(fenceData);
       
-      Homey.manager('notifications').createNotification({
-         excerpt: __("notifications.fence_added", {"name": fenceData.fenceName})
-      }, function( err, notification ) {
-         if( err ) return console.error( err );
-            console.log( 'Notification added' );
-      });
-
+         Homey.manager('notifications').createNotification({
+            excerpt: __("notifications.fence_added", {"name": fenceData.fenceName})
+         }, function( err, notification ) {
+            if( err ) return console.error( err );
+               console.log( 'Notification added' );
+         });
+      }
    }
 }
 
