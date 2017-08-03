@@ -6,21 +6,20 @@ A GeoFence can be your home or workplace (or any place that you spicify on your 
 cards, you can trigger flows when you enter or leave a specific GeoFence.
 
 ## What is Owntracks
-Owntracks is an open source location app for Android and iOS. It sends location information to a MQTT broker.
-This can be a private MQTT broker you are hosting yourself, or a public MQTT broker. The Owntracks app does not
-use a lot of battery.
+Owntracks is an open source location app for Android and iOS. It sends location information to a MQTT broker or
+through the Athom Cloud by using HTTPS.
 
-The Owntracks apps have an integrated option to connect to the owntracks public MQTT broker, but this cannot be
-used with this client. This is due to the fact that a random userid is generated. However there are several other
-public MQTT brokers available. I have tested with broker.hivemq.com.
+The Owntracks app does not use a lot of battery.
 
-## USING A PUBLIC MQTT BROKER HAS SECURITY IMPLICATIONS. EVERYONE CAN SEE YOUR MESSAGES.
+## HTTPS or MQTT?
+Using HTTPS is for most users the easiest way to get started. You just need your homeys cloud-id, create a user in settings and 
+you good to go.
 
 The most secure solution is to use your own MQTT broker or create a private one in the cloud. CloudMQTT is a MQTT
 hosting service that has a free hosting plan. See my [tutorial](https://forum.athom.com/discussion/2810/use-cloudmqtt-as-a-broker-for-owntracks-or-mqtt-app)
 
 ## How does this work and what can it do on Homey?
-In the Owntracks app you can add geofences, and Owntracks sends events to the broker containing information about
+In the Owntracks app you can add geofences, and Owntracks sends events to the broker or athom cloud containing information about
 entering or leaving a geofence. These events can be used with trigger cards in Homey flows.
 And as such it can be used for presence detection.
 
@@ -44,7 +43,7 @@ This app supports the following activity cards:
 ### Homey now supports speech. Ask Homey where a user is, and it will tell you the current name of the GeoFence the user is at.
 
 The settings page contains:
-- The option to use the HiveMQ public broker
+- The option to use MQTT next to HTTPS (HTTPS is enabled as default)
 - IP adres or DNS name of the broker wehre to connect top
 - Portnumber to connect to.
 - The option to use a secure session (TLS). No support for self signed certificates.
