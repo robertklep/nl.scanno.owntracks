@@ -297,7 +297,7 @@ function processMessage(args, state, triggerType) {
                if (currentUser.battTriggered == false) {
                   logmodule.writelog ("battery percentage ("+ state.percBattery +"%) of "+ state.user+" is below trigger percentage of "+ args.percBattery +"%");
                   currentUser.battTriggered = true;
-                  globalVar.setUser(currentUser);
+                  globalVar.setUser(currentUser, false);
                   return true;
                } else {
                   logmodule.writelog ("battery trigger already triggered for "+ state.user);
@@ -309,7 +309,7 @@ function processMessage(args, state, triggerType) {
             if (state.percBattery >= args.percBattery && currentUser.battTriggered !== false) {
                logmodule.writelog ("Reset battery triggered state for "+ state.user);
                currentUser.battTriggered = false;
-               globalVar.setUser(currentUser);
+               globalVar.setUser(currentUser, false);
             }
             return false;
             break;

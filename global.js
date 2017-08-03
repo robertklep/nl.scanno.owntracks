@@ -11,8 +11,8 @@ module.exports = {
    initVars: function() {
       initVars();
    },
-   setUser: function(userData) {
-      setUser(userData);
+   setUser: function(userData, persistUser) {
+      setUser(userData, persistUser);
    },
    getUser: function(userName) {
       return getUser(userName);
@@ -121,16 +121,32 @@ function initVars() {
 function saveOnCloseEvent() {
    Homey.on('unload', function(){
       logmodule.writelog("unload called");
-      require('fs').writeFile("/userdata/owntracks.json",  JSON.stringify(userArray), function (err) {
-         if (err) {
-            logmodule.writelog("Persisting userArray failed: "+ err);
-         }
-      });
-      require('fs').writeFile("/userdata/owntracks_fences.json",  JSON.stringify(fenceArray), function (err) {
-         if (err) {
-            logmodule.writelog("Persisting fenceArray failed: "+ err);
-         }
-      });
+      saveUserData();
+      saveFenceData();
+   });
+}
+
+/*
+   saveUserData() saves the user data into a JSON file on the filesystem
+*/
+function saveUserData() {
+   logmodule.writelog("saveUserData called");
+   require('fs').writeFile("/userdata/owntracks.json",  JSON.stringify(userArray), function (err) {
+      if (err) {
+         logmodule.writelog("Persisting userArray failed: "+ err);
+      }
+   });
+}
+
+/*
+   saveFenceData() saves the list of geofences into a JSON file on the filesystem
+*/
+function saveFenceData() {
+   logmodule.writelog("saveFenceData called");
+   require('fs').writeFile("/userdata/owntracks_fences.json",  JSON.stringify(fenceArray), function (err) {
+      if (err) {
+         logmodule.writelog("Persisting fenceArray failed: "+ err);
+      }
    });
 }
 
@@ -189,21 +205,24 @@ function getUserByToken(userToken) {
    Update the user, or if the user does not exist, add the user
    to the user array
 */
-function setUser(userData) {
+function setUser(userData, persistUser) {
    var entryArray = getUser(userData.userName);
+   
    if (entryArray !== null) {
       entryArray = userData;
-      
    } else {
       // User has not been found, so assume this is a new user
       userArray.push(userData);
-      
+
       Homey.manager('notifications').createNotification({
          excerpt: __("notifications.user_added", {"name": userData.userName})
       }, function( err, notification ) {
          if( err ) return console.error( err );
             console.log( 'Notification added' );
       });
+   }
+   if (persistUser == true) {
+      saveUserData();
    }
 }
 
@@ -227,11 +246,12 @@ function addNewUser(callback, args) {
       var currentUser = getUser(args.body.userName);
       if (currentUser == null) {
          var newUser = createEmptyUser(args.body.userName);
-         setUser(newUser);
+         setUser(newUser, true);
          logmodule.writelog("New user added: "+ newUser.userName);
          callback(false, true);
       } else {
          currentUser.userToken = require('crypto').randomBytes(16).toString('hex');
+         saveUserData();
       }
    }
    callback(false, false);
@@ -247,6 +267,7 @@ function deleteUser(callback, args) {
          result = true;
       }
    }
+   saveUserData();
    callback(false, result);
 }
 
@@ -264,6 +285,7 @@ function setFence(fenceData) {
    var entryArray = getFence(fenceData.fenceName);
    if (entryArray !== null) {
       entryArray = fenceData;
+      saveFenceData();
       logmodule.writelog("Fence: " + fenceData.fenceName+" changed");   
    } else {
       // Fence has not been found, so assume this is a new fence
@@ -271,7 +293,7 @@ function setFence(fenceData) {
       
       if (fenceData.fenceName.length > 0) {
          fenceArray.push(fenceData);
-      
+         saveFenceData();
          Homey.manager('notifications').createNotification({
             excerpt: __("notifications.fence_added", {"name": fenceData.fenceName})
          }, function( err, notification ) {
@@ -289,7 +311,7 @@ function addNewFence(callback, args) {
          var newFence = {};
          newFence.fenceName = args.body.fenceName;
          newFence.timestamp = 0;
-         fenceArray.push(newFence);
+         setFence(newFence);
          logmodule.writelog("New fence added: "+ newFence.fenceName);
          callback(false, true);
       }
@@ -307,6 +329,7 @@ function deleteFence(callback, args) {
          result = true;
       }
    }
+   saveFenceData();
    callback(false, result);
 }
 

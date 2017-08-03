@@ -12,6 +12,7 @@ module.exports = {
 
 function receiveMessage(topic, message, args, state) {
    var validJSON = true;
+   var validTransition = false;
    var topicArray = topic.split('/');
    var currentUser = {};
    
@@ -42,7 +43,8 @@ function receiveMessage(topic, message, args, state) {
       switch (jsonMsg._type) {
          case 'transition':
             var fenceData = {};
-            var validTransition = true;
+//            var validTransition = true;
+            validTransition = true;
             // check the accuracy. If it is too low (i.e a high amount is meters) then perhaps we should skip the trigger
             if (jsonMsg.acc <= parseInt(Homey.manager('settings').get('accuracy'))) {
                // The accuracy of location is lower then the treshold value, so the location change will be trggerd
@@ -156,7 +158,7 @@ function receiveMessage(topic, message, args, state) {
          default:
             break;
       }
-      globalVar.setUser(currentUser);
+      globalVar.setUser(currentUser, validTransition);
    }
 }
 
