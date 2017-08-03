@@ -82,8 +82,6 @@ module.exports = {
 function initVars() {
    saveOnCloseEvent();
 
-//   deletePresistancyFiles();
-
    if (DEBUG) logmodule.writelog("initVars called");
 
    require('fs').readFile('/userdata/owntracks.json', 'utf8', function (err, data) {

@@ -34,16 +34,11 @@ function receiveMessage(topic, message, args, state) {
       currentUser = globalVar.getUser(topicArray[1]);
       if (currentUser === null) {
          currentUser = globalVar.createEmptyUser(topicArray[1]);
- //        currentUser.userName = topicArray[1];
- //        currentUser.fence = "";
- //        currentUser.battery = 0;
-  //       currentUser.battTriggered = false;
       }
       
       switch (jsonMsg._type) {
          case 'transition':
             var fenceData = {};
-//            var validTransition = true;
             validTransition = true;
             // check the accuracy. If it is too low (i.e a high amount is meters) then perhaps we should skip the trigger
             if (jsonMsg.acc <= parseInt(Homey.manager('settings').get('accuracy'))) {
