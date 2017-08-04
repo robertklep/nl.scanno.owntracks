@@ -1,6 +1,17 @@
-var broker    = require("./broker.js");
-var globalVar = require("./global.js");
-var logmodule = require("./logmodule.js");
+const Homey     = require('homey');
+const broker    = require("./broker.js");
+const globalVar = require("./global.js");
+const logmodule = require("./logmodule.js");
+
+var eventOwntracksAC = null;
+var enterGeofenceAC = null;
+var leaveGeofenceAC = null;
+var eventBattery = null;
+
+//var eventOwntracks = null;
+//var enterGeofence = null;
+//var leaveGeofence = null;
+
 
 module.exports = {
    getTriggerArgs: function() {
@@ -8,6 +19,27 @@ module.exports = {
    },
    listenForMessage: function() {
       listenForMessage();
+   },
+   getEventOwntracksAC: function() {
+      return eventOwntracksAC;
+   },
+   getEnterGeofenceAC: function() {
+      return enterGeofenceAC;
+   },
+   getLeaveGeofenceAC: function() {
+      return leaveGeofenceAC;
+   },
+   getEventBattery: function() {
+      return eventBattery;
+   },
+   getEventOwntracks: function() {
+      return eventOwntracks;
+   },
+   getEnterGeofence: function() {
+      return enterGeofence;
+   },
+   getLeaveGeofence: function() {
+      return leaveGeofence;
    }
 }
 
@@ -17,114 +49,116 @@ module.exports = {
 */
 function listenForMessage () {
 
-   createAutocompleteActions()
    // Start listening for the events.
 
    logmodule.writelog("listenForMessage called");
 
-   Homey.manager('flow').on('trigger.eventBattery', function( callback, args, state ) {
-      logmodule.writelog("trigger.eventBattery called");
-      if ( processMessage(args, state, 'eventBattery')) {
-         callback(null, true);
-      } else {
-         callback(null, false);
-      }
-   });
+   eventOwntracksAC = new Homey.FlowCardTrigger('eventOwntracks_AC');
+   enterGeofenceAC = new Homey.FlowCardTrigger('enterGeofence_AC');
+   leaveGeofenceAC = new Homey.FlowCardTrigger('leaveGeofence_AC');
+   eventBattery = new Homey.FlowCardTrigger('eventBattery');
 
-   Homey.manager('flow').on('trigger.eventOwntracks_AC', function( callback, args, state ) {
-      logmodule.writelog("trigger.eventOwntracks_AC called");
-      if ( processMessage(args, state, 'eventOwntracks_ac')) {
-         callback(null, true);
-      } else {
-         callback(null, false);
-      }
-   });
-   Homey.manager('flow').on('trigger.enterGeofence_AC', function( callback, args, state ) {
-      logmodule.writelog("trigger.enterGeofence_AC called");
-      if ( processMessage(args, state, 'enterGeofence_ac')) {
-         callback(null, true);
-      } else {
-         callback(null, false);
-      }
-   });
+//   eventOwntracks = new Homey.FlowCardTrigger('eventOwntracks');
+//   enterGeofence = new Homey.FlowCardTrigger('enterGeofence');
+//   leaveGeofence = new Homey.FlowCardTrigger('leaveGeofence');
 
-   Homey.manager('flow').on('trigger.leaveGeofence_AC', function( callback, args, state ) {
-      logmodule.writelog("trigger.leaveGeofence_AC called");
-      if ( processMessage(args, state, 'leaveGeofence_ac')) {
-         callback(null, true);
-      } else {
-         callback(null, false);
-      }
-   });
+   eventOwntracksAC.register();
+   enterGeofenceAC.register();
+   leaveGeofenceAC.register();
+   eventBattery.register();
 
 
-   Homey.manager('flow').on('trigger.eventOwntracks', function( callback, args, state ) {
-      logmodule.writelog("trigger.eventOwntracks called");
-      if ( processMessage(args, state, 'eventOwntracks')) {
-         callback(null, true);
-      } else {
-         callback(null, false);
-      }
-   });
-   Homey.manager('flow').on('trigger.enterGeofence', function( callback, args, state ) {
-      logmodule.writelog("trigger.enterGeofence called");
-      if ( processMessage(args, state, 'enterGeofence')) {
-         callback(null, true);
-      } else {
-         callback(null, false);
-      }
-   });
+   eventOwntracksAC.registerRunListener((args, state ) => {
+      logmodule.writelog("Listener eventOwntracksAC called");
+      try {
+         if ( processMessage(args, state, 'eventOwntracks_ac')) {
+            return Promise.resolve( true );
+         } else {
+            return Promise.resolve( false );
+         }
+       } catch(err) {
+         logmodule.writelog("Error in Listener enterGeofenceAC: " +err);
+         return Promise.reject(err);
+       }
+   })
 
-   Homey.manager('flow').on('trigger.leaveGeofence', function( callback, args, state ) {
-      logmodule.writelog("trigger.leaveGeofence called");
-      if ( processMessage(args, state, 'leaveGeofence')) {
-         callback(null, true);
-      } else {
-         callback(null, false);
+   enterGeofenceAC.registerRunListener( ( args, state ) => {
+      logmodule.writelog("Listener enterGeofence_AC called");
+      try {
+         if ( processMessage(args, state, 'enterGeofence_ac')) {
+            return Promise.resolve( true );
+         } else {
+           return Promise.resolve( false );
+         }
+      } catch(err) {
+         logmodule.writelog("Error in Listener enterGeofenceAC: " +err);
+         return Promise.reject(err);
       }
-   });
+   })
+   
+   leaveGeofenceAC.registerRunListener( ( args, state ) => {
+      logmodule.writelog("Listener leaveGeofenceAC called");
+      try {
+         if ( processMessage(args, state, 'leaveGeofence_ac')) {
+            return Promise.resolve( true );
+         } else {
+            return Promise.resolve( false );
+         }
+      } catch(err) {
+         logmodule.writelog("Error in Listener leaveGeofenceAC: " +err);
+         return Promise.reject(err);
+      }
+   })
+   
+   eventBattery.registerRunListener( ( args, state ) => {
+      logmodule.writelog("Listener eventBattery called");
+      try {
+         if ( processMessage(args, state, 'eventBattery')) {
+            return Promise.resolve( true );
+         } else {
+            return Promise.resolve( false );
+         }
+      } catch(err) {
+         logmodule.writelog("Error in Listener leaveGeofenceAC: " +err);
+         return Promise.reject(err);
+      }
+   })
+
+   createAutocompleteActions()
 }
 
 function createAutocompleteActions() {
    logmodule.writelog("createAutocompleteActions called");
    // Put all the autocomplte actions here. 
 
-   Homey.manager('flow').on('trigger.eventOwntracks_AC.nameUser.autocomplete', function (callback, args) {
-      logmodule.writelog("autocomplete called");
-      callback(null, globalVar.searchUsersAutocomplete(args.query, true));
+   eventOwntracksAC.getArgument('nameUser').registerAutocompleteListener( (query, args ) => { 
+      return Promise.resolve(globalVar.searchUsersAutocomplete(query, true) );
    });
 
-   Homey.manager('flow').on('trigger.eventOwntracks_AC.nameGeofence.autocomplete', function (callback, args) {
-      logmodule.writelog("autocomplete called");
-      callback(null, globalVar.searchFenceAutocomplete(args.query, true));
+   enterGeofenceAC.getArgument('nameUser').registerAutocompleteListener( (query, args ) => { 
+      return Promise.resolve( globalVar.searchUsersAutocomplete(query, true) );
+   });
+
+   leaveGeofenceAC.getArgument('nameUser').registerAutocompleteListener( (query, args ) => { 
+      return Promise.resolve( globalVar.searchUsersAutocomplete(query, true) );
+   });
+
+   eventBattery.getArgument('nameUser').registerAutocompleteListener(( query, args ) => { 
+      return Promise.resolve( globalVar.searchUsersAutocomplete(query, true) );
    });
 
 
-   Homey.manager('flow').on('trigger.enterGeofence_AC.nameUser.autocomplete', function (callback, args) {
-      logmodule.writelog("autocomplete called");
-      callback(null, globalVar.searchUsersAutocomplete(args.query, true));
+   eventOwntracksAC.getArgument('nameGeofence').registerAutocompleteListener( (query, args ) => { 
+      return Promise.resolve( globalVar.searchFenceAutocomplete(query, true) );
    });
 
-   Homey.manager('flow').on('trigger.enterGeofence_AC.nameGeofence.autocomplete', function (callback, args) {
-      logmodule.writelog("autocomplete called");
-      callback(null, globalVar.searchFenceAutocomplete(args.query, true));
+   enterGeofenceAC.getArgument('nameGeofence').registerAutocompleteListener( (query, args ) => { 
+      return Promise.resolve( globalVar.searchFenceAutocomplete(query, true) );
    });
 
-   Homey.manager('flow').on('trigger.leaveGeofence_AC.nameUser.autocomplete', function (callback, args) {
-      logmodule.writelog("autocomplete called");
-      callback(null, globalVar.searchUsersAutocomplete(args.query, true));
+   leaveGeofenceAC.getArgument('nameGeofence').registerAutocompleteListener( (query, args ) => { 
+      return Promise.resolve( globalVar.searchFenceAutocomplete(query, true) );
    });
-
-   Homey.manager('flow').on('trigger.leaveGeofence_AC.nameGeofence.autocomplete', function (callback, args) {
-      logmodule.writelog("autocomplete called");
-      callback(null, globalVar.searchFenceAutocomplete(args.query, true));
-   });
-
-   Homey.manager('flow').on('trigger.eventBattery.nameUser.autocomplete', function (callback, args) {
-      logmodule.writelog("autocomplete called");
-      callback(null, globalVar.searchUsersAutocomplete(args.query, true));
-   });
-
 }
 
 /*
@@ -133,6 +167,7 @@ function createAutocompleteActions() {
    need to walk through them. This is especially needed for getting the topics, so we know what
    topics we are waiting for.
 */
+/*
 function getTriggerArgs() {
    return new Promise(function (fulfill, reject) {
       if (globalVar.getTopicArray().length > 0) {
@@ -151,10 +186,11 @@ function getTriggerArgs() {
       });
    });
 }
-
+*/
 /*
    Get the arguments for the generic enter/leave trigger card(s)
 */
+/*
 function getEventOwntracksArgs() {
    return new Promise(function (fulfill, reject) {
       Homey.manager('flow').getTriggerArgs('eventOwntracks', function( err, args ) {
@@ -166,10 +202,12 @@ function getEventOwntracksArgs() {
       });
    });
 }
+*/
 
 /*
    Get the arguments for the enter geoFence trigger card(s)
 */
+/*
 function getEnterGeofenceArgs() {
    return new Promise(function (fulfill, reject) {
       Homey.manager('flow').getTriggerArgs('enterGeofence', function( err, args ) {
@@ -181,10 +219,11 @@ function getEnterGeofenceArgs() {
       });
    });
 }
-
+*/
 /*
    Get the arguments for the leave geoFence trigger card(s)
 */
+/*
 function getLeaveGeofenceArgs() {
    return new Promise(function (fulfill, reject) {
       Homey.manager('flow').getTriggerArgs('leaveGeofence', function( err, args ) {
@@ -196,11 +235,11 @@ function getLeaveGeofenceArgs() {
       });
    });
 }
-
+*/
 /*
    Get the arguments for the battery percentage warning trigger card(s)
 */
-
+/*
 function getBatteryEventArgs() {
    return new Promise(function (fulfill, reject) {
       Homey.manager('flow').getTriggerArgs('eventBattery', function( err, args ) {
@@ -212,6 +251,7 @@ function getBatteryEventArgs() {
       });
    });
 }
+*/
 
 function processMessage(args, state, triggerType) {
    var reconnectClient = false;
@@ -329,7 +369,7 @@ function processMessage(args, state, triggerType) {
       // Add another check for the existence of the topic, just in case there is somehting falling through the 
       // previous checks...
 
-      broker.subscribeToTopic(args.mqttTopic);
+//      broker.subscribeToTopic(args.mqttTopic);
    }
    return false;
 }

@@ -1,3 +1,4 @@
+const Homey     = require('homey');
 var mqtt      = require("mqtt/node_modules/mqtt");
 var globalVar = require("./global.js");
 var logmodule = require("./logmodule.js");
@@ -27,26 +28,26 @@ module.exports = {
 
 function getBrokerURL() {
    var urlBroker = []
-   if (Homey.manager('settings').get('tls') == true) {
+   if (Homey.ManagerSettings.get('tls') == true) {
       urlBroker.push("mqtts://");
    } else {
       urlBroker.push("mqtt://");
    };
-   urlBroker.push(Homey.manager('settings').get('url'));
-   urlBroker.push(":"+Homey.manager('settings').get('ip_port'));
+   urlBroker.push(Homey.ManagerSettings.get('url'));
+   urlBroker.push(":"+Homey.ManagerSettings.get('ip_port'));
    logmodule.writelog("Broker URL: "+ urlBroker.join(''));
    return urlBroker.join('');
 }
 
 function getConnectOptions() {
    var rejectUnauth = "true";
-   if ( Homey.manager('settings').get('selfsigned') == true) {
+   if ( Homey.ManagerSettings.get('selfsigned') == true) {
       rejectUnauth = "false";
    }
    var connect_options = {
       keepalive: 10,
-      username: Homey.manager('settings').get('user'),
-      password: Homey.manager('settings').get('password'),
+      username: Homey.ManagerSettings.get('user'),
+      password: Homey.ManagerSettings.get('password'),
       rejectUnauthorized: rejectUnauth
    };
    logmodule.writelog("rejectUnauthorized: " + connect_options.rejectUnauthorized);
@@ -54,7 +55,8 @@ function getConnectOptions() {
 }
 
 function connectToBroker(args, state) {
-   if (Homey.manager('settings').get('usebroker') == true) {
+//   if (Homey.manager('settings').get('usebroker') == true) {
+   if (Homey.ManagerSettings.get('usebroker') == true) {
       if (connectedClient == null) {
          logmodule.writelog("connectedClient == null");
          connectedClient = mqtt.connect(getBrokerURL(), getConnectOptions());

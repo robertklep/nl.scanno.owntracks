@@ -1,8 +1,9 @@
 <!doctype html>
 <html>
     <head>
-
-    </head>
+        <!-- The '/homey.js' script must be included in your settings view to work -->
+        <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
+   </head>
     <body>
 
         <h1 data-i18n="settings.app.title"></h1>
@@ -127,8 +128,10 @@
         <script type="text/javascript">
 
         var currentValues = {};
+        var HomeyAPI = null;
 
-        function onHomeyReady(){
+        function onHomeyReady(Homey){
+           HomeyAPI = Homey;
            Homey.get('usebroker', function(err, usebroker) {
                   if (err) {
                     console.error(err)
@@ -235,122 +238,125 @@
 
             if (currentValues.usebroker != document.getElementById('usebroker').checked) {
                 console.log("usebroker has been changed");
-                Homey.set('usebroker', document.getElementById('usebroker').checked);
+                HomeyAPI.set('usebroker', document.getElementById('usebroker').checked);
                 valuesHaveBeenChanged = true;
                 currentValues.usebroker = document.getElementById('usebroker').checked;
             }
 
             if (currentValues.url != document.getElementById('url').value) {
                 console.log("url has been changed");
-                Homey.set('url', document.getElementById('url').value);
+                HomeyAPI.set('url', document.getElementById('url').value);
                 valuesHaveBeenChanged = true;
                 currentValues.url = document.getElementById('url').value;
             }
 
             if (currentValues.ip_port != document.getElementById('ip_port').value) {
                 console.log("ip_port has been changed");
-                Homey.set('ip_port', document.getElementById('ip_port').value);
+                HomeyAPI.set('ip_port', document.getElementById('ip_port').value);
                 valuesHaveBeenChanged = true;
                 currentValues.ip_port = document.getElementById('ip_port').value;
             }
 
             if (currentValues.tls != document.getElementById('tls').checked) {
                 console.log("tls has been changed");
-                Homey.set('tls', document.getElementById('tls').checked);
+                HomeyAPI.set('tls', document.getElementById('tls').checked);
                 valuesHaveBeenChanged = true;
                 currentValues.tls = document.getElementById('tls').checked;
             }
 
             if (currentValues.selfsigned != document.getElementById('selfsigned').checked) {
                 console.log("selfsigned has been changed");
-                Homey.set('selfsigned', document.getElementById('selfsigned').checked);
+                HomeyAPI.set('selfsigned', document.getElementById('selfsigned').checked);
                 valuesHaveBeenChanged = true;
                 currentValues.selfsigned = document.getElementById('selfsigned').checked;
             }
 
             if (currentValues.user != document.getElementById('user').value) {
                 console.log("user has been changed");
-                Homey.set('user', document.getElementById('user').value);
+                HomeyAPI.set('user', document.getElementById('user').value);
                 valuesHaveBeenChanged = true;
                 currentValues.user = document.getElementById('user').value;
             }
 
             if (currentValues.password != document.getElementById('password').value) {
                 console.log("password has been changed");
-                Homey.set('password', document.getElementById('password').value);
+                HomeyAPI.set('password', document.getElementById('password').value);
                 valuesHaveBeenChanged = true;
                 currentValues.password = document.getElementById('password').value;
             }
 
             if (currentValues.accuracy != document.getElementById('accuracy').value) {
                 console.log("accuracy has been changed");
-                Homey.set('accuracy', document.getElementById('accuracy').value);
+                HomeyAPI.set('accuracy', document.getElementById('accuracy').value);
                 valuesHaveBeenChanged = true;
                 currentValues.accuracy = accuracy;
             }
 
             if (currentValues.double_enter != document.getElementById('double_enter').checked) {
                 console.log("double_enter has been changed");
-                Homey.set('double_enter', document.getElementById('double_enter').checked);
+                HomeyAPI.set('double_enter', document.getElementById('double_enter').checked);
                 valuesHaveBeenChanged = true;
                 currentValues.double_enter = document.getElementById('double_enter').checked;
             }
 
             if (currentValues.double_leave != document.getElementById('double_leave').checked) {
                 console.log("double_leave has been changed");
-                Homey.set('double_leave', document.getElementById('double_leave').checked);
+                HomeyAPI.set('double_leave', document.getElementById('double_leave').checked);
                 valuesHaveBeenChanged = true;
                 currentValues.double_leave = document.getElementById('double_leave').checked;
             }
 
             if (valuesHaveBeenChanged == true) {
                 notifySettings(oldValues);
-                Homey.alert(__('settings.app.messages.settings_saved'));
+                HomeyAPI.alert(__('settings.app.messages.settings_saved'));
             } else {
-                Homey.alert(__('settings.app.messages.settings_noSettingsChanged'));
+                HomeyAPI.alert(__('settings.app.messages.settings_noSettingsChanged'));
             }
         }
 
         function notifySettings(values) {
-             Homey.api('POST', 'test/settingschange/', values, function(err, result) {
+             HomeyAPI.api('POST', 'test/settingschange/', values, function(err, result) {
                 if (!err) {
                     console.log("Settings change succesfull");
                 } else {
                     // Oeps, something went wrong here
-                    Homey.alert(__('settings.app.messages.unable_set_settings'));
+                    HomeyAPI.alert(__('settings.app.messages.unable_set_settings'));
                 }
                 
             });
         }
 
         function purgeUserData() {
-           var resultConfirm = confirm(__('settings.app.data.data_purge_confirm'));
-           console.log(resultConfirm);
-           if (resultConfirm == true) {
-              Homey.api('GET', 'test/purgeUserData/', function(err, result) {
+ //          var resultConfirm = confirm(HomeyAPI.__('settings.app.data.data_purge_confirm'));
+           HomeyAPI.confirm( HomeyAPI.__('settings.app.data.data_purge_confirm'), 'warning', function(err, result) {
+           
+           console.log(result);
+           if (result == true) {
+              HomeyAPI.api('GET', 'test/purgeUserData/', function(err, result) {
                  console.log("err: " + err);
                  console.log("result: "+result);
                  if (!err) {
                     if (!result) {
                        console.log("Data has been purged");
-                       Homey.alert(__('settings.app.messages.data_purged'));
+                       HomeyAPI.alert(HomeyAPI__('settings.app.messages.data_purged'));
                     } else {
                        console.log("Purging failed");
-                       Homey.alert(__('settings.app.messages.data_purged_failed'));
+                       HomeyAPI.alert(HomeyAPI.__('settings.app.messages.data_purged_failed'));
                     }
                  } else {
                     console.log("Purging failed");
-                    Homey.alert(__('settings.app.messages.data_purged_failed'));
+                    HomeyAPI.alert(HomeyAPI.__('settings.app.messages.data_purged_failed'));
                  }
                  console.log("End of purge GET");
               });
            }
            console.log("End of purgeUserData");
+           })
         }
 
         function showLogLines() {
 //           showUserArray();
-           Homey.api('GET', 'test/getloglines/', function(err, result) {
+           HomeyAPI.api('GET', 'test/getloglines/', function(err, result) {
               if (!err) {
                  document.getElementById('loglines').innerHTML = '';
                  for (var i=0; i < result.length; i++) {
@@ -362,7 +368,7 @@
         }
 
         function showUserArray() {
-           Homey.api('GET', 'test/getUserArray/', function(err, result) {
+           HomeyAPI.api('GET', 'test/getUserArray/', function(err, result) {
               if (!err) {
                  document.getElementById('userdata').innerHTML = '';
                  for (var i=0; i < result.length; i++) {
@@ -402,7 +408,7 @@
            cellhead3.innerHTML="<b>Lat</b>";
            cellhead4.innerHTML="<b>Battery</b>";
 
-           Homey.api('GET', 'test/getUserArray/', function(err, result) {
+           HomeyAPI.api('GET', 'test/getUserArray/', function(err, result) {
               if (!err) {
                  for (var i=0; i < result.length; i++) {
                     console.log("Create row for " + result[i].userName);
@@ -434,7 +440,7 @@
                  table.deleteRow(-1);
               }
            }
-           Homey.api('GET', 'test/getUserArray/', function(err, result) {
+           HomeyAPI.api('GET', 'test/getUserArray/', function(err, result) {
               if (!err) {
                  console.log("UserArray data ok");
                  for (var i=0; i < result.length; i++) {
@@ -470,7 +476,7 @@
            var userName = table.rows[row].cells[0].innerHTML;
            console.log("Delete user: "+userName);
            if (userName !== null && userName !== undefined) {
-              Homey.api('POST', 'test/deleteUser/', {"userName": userName}, function(err, result) {
+              HomeyAPI.api('POST', 'test/deleteUser/', {"userName": userName}, function(err, result) {
                  console.log("Data posted");
                  createUserTable();
               });
@@ -483,7 +489,7 @@
            var userName = document.getElementById('addUser').value;
            console.log("User to add: " + userName);
            if (userName !== null && userName !== undefined && userName !== "") {
-              Homey.api('POST', 'test/addNewUser/', {"userName": userName}, function(err, result) {
+              HomeyAPI.api('POST', 'test/addNewUser/', {"userName": userName}, function(err, result) {
                  console.log("Data posted");
                  createUserTable();
               });
@@ -496,7 +502,7 @@
            var userName = table.rows[row].cells[0].innerHTML;
            console.log("Update user: "+userName);
            if (userName !== null && userName !== undefined) {
-              Homey.api('POST', 'test/addNewUser/', {"userName": userName}, function(err, result) {
+              HomeyAPI.api('POST', 'test/addNewUser/', {"userName": userName}, function(err, result) {
                  console.log("Data posted");
                  createUserTable();
               });
@@ -512,7 +518,7 @@
                  table.deleteRow(-1);
               }
            }
-           Homey.api('GET', 'test/getFenceArray/', function(err, result) {
+           HomeyAPI.api('GET', 'test/getFenceArray/', function(err, result) {
               if (!err) {
                  console.log("FenceArray data ok");
                  for (var i=0; i < result.length; i++) {
@@ -544,7 +550,7 @@
            var fenceName = table.rows[row].cells[0].innerHTML;
            console.log("Delete fence: "+fenceName);
            if (fenceName !== null && fenceName !== undefined) {
-              Homey.api('POST', 'test/deleteFence/', {"fenceName": fenceName}, function(err, result) {
+              HomeyAPI.api('POST', 'test/deleteFence/', {"fenceName": fenceName}, function(err, result) {
                  console.log("Data posted");
                  createFenceTable();
               });
@@ -557,7 +563,7 @@
            var fenceName = document.getElementById('addFence').value;
            console.log("Fence to add: " + fenceName);
            if (fenceName !== null && fenceName !== undefined && fenceName !== "") {
-              Homey.api('POST', 'test/addNewFence/', {"fenceName": fenceName}, function(err, result) {
+              HomeyAPI.api('POST', 'test/addNewFence/', {"fenceName": fenceName}, function(err, result) {
                  console.log("Data posted");
                  createFenceTable();
               });

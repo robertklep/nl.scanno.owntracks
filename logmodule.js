@@ -5,8 +5,8 @@ module.exports = {
    writelog: function(line) {
       writelog(line);
    },
-   getLogLines: function(callback, args) {
-      getLogLines(callback, args);
+   getLogLines: function() {
+      return getLogLines();
    }
 }
 
@@ -44,8 +44,8 @@ function writelog(line) {
    logArray.push(logLine);
 }
 
-function getLogLines(callback, args) {
+function getLogLines() {
    writelog("getLogLines called");
-   callback ( false, logArray);
+   return logArray;
 }
 

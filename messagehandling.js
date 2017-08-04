@@ -1,5 +1,9 @@
-var globalVar = require("./global.js");
-var logmodule = require("./logmodule.js");
+"use strict";
+const Homey = require('homey');
+
+const globalVar = require("./global.js");
+const logmodule = require("./logmodule.js");
+const triggers  = require("./triggers.js");
 
 var DEBUG = false;
 
@@ -41,7 +45,7 @@ function receiveMessage(topic, message, args, state) {
             var fenceData = {};
             validTransition = true;
             // check the accuracy. If it is too low (i.e a high amount is meters) then perhaps we should skip the trigger
-            if (jsonMsg.acc <= parseInt(Homey.manager('settings').get('accuracy'))) {
+            if (jsonMsg.acc <= parseInt(Homey.ManagerSettings.get('accuracy'))) {
                // The accuracy of location is lower then the treshold value, so the location change will be trggerd
                logmodule.writelog("Accuracy is within limits")
 
@@ -57,7 +61,7 @@ function receiveMessage(topic, message, args, state) {
 
                switch (jsonMsg.event) {
                   case 'enter':
-                     if (Homey.manager('settings').get('double_enter') == true) {
+                     if (Homey.ManagerSettings.get('double_enter') == true) {
                         logmodule.writelog("Double enter event check enabled");
                         if (currentUser.fence !== jsonMsg.desc)  {
                            validTransition = true;
@@ -67,11 +71,18 @@ function receiveMessage(topic, message, args, state) {
                      }
                      if (validTransition == true) {
                           currentUser.fence = jsonMsg.desc;
-                          Homey.manager('flow').trigger('enterGeofence', { user: currentUser.userName, fence: jsonMsg.desc, percBattery: currentUser.battery }, 
-                                                                         { triggerTopic: topic, triggerFence: jsonMsg.desc });
-
-                          Homey.manager('flow').trigger('enterGeofence_AC', { user: currentUser.userName, fence: jsonMsg.desc, percBattery: currentUser.battery }, 
-                                                                         { triggerTopic: topic, triggerFence: jsonMsg.desc });
+                          let tokens = {
+                             user: currentUser.userName, 
+                             fence: jsonMsg.desc, 
+                             percBattery: currentUser.battery
+                          }
+                          let state = {
+                             triggerTopic: topic, 
+                             triggerFence: jsonMsg.desc
+                          }
+                          triggers.getEnterGeofenceAC().trigger(tokens,state,null).catch( function(e) {
+                            logmodule.writelog("Error occured: " +e);
+                          })
 
                           logmodule.writelog("Trigger enter card for " + jsonMsg.desc);
                      } else {
@@ -79,7 +90,7 @@ function receiveMessage(topic, message, args, state) {
                      }
                      break;
                   case 'leave':
-                     if (Homey.manager('settings').get('double_leave') == true) {
+                     if (Homey.ManagerSettings.get('double_leave') == true) {
                         logmodule.writelog("Double leave event check enabled");
                         if (currentUser.fence !== "")  {
                            validTransition = true;
@@ -89,11 +100,17 @@ function receiveMessage(topic, message, args, state) {
                      }
                      if (validTransition == true) {
                         currentUser.fence = "";
-                        Homey.manager('flow').trigger('leaveGeofence', { user: currentUser.userName, fence: jsonMsg.desc, percBattery: currentUser.battery }, 
-                                                                       { triggerTopic: topic, triggerFence: jsonMsg.desc });
-
-                        Homey.manager('flow').trigger('leaveGeofence_AC', { user: currentUser.userName, fence: jsonMsg.desc, percBattery: currentUser.battery }, 
-                                                                       { triggerTopic: topic, triggerFence: jsonMsg.desc });
+                        
+                        let tokens = {
+                           user: currentUser.userName, 
+                           fence: jsonMsg.desc, 
+                           percBattery: currentUser.battery
+                        }
+                        let state = {
+                           triggerTopic: topic, 
+                           triggerFence: jsonMsg.desc
+                        }
+                        triggers.getLeaveGeofenceAC().trigger(tokens,state,null)
 
                         logmodule.writelog("Trigger leave card for " + jsonMsg.desc);
                      } else {
@@ -102,19 +119,24 @@ function receiveMessage(topic, message, args, state) {
                      break;
                }
                if (validTransition === true) {
-                  Homey.manager('flow').trigger('eventOwntracks', { user: currentUser.userName, event: jsonMsg.event, fence: jsonMsg.desc, percBattery: currentUser.battery }, 
-                                                                  { triggerTopic: topic, triggerFence: jsonMsg.desc });
-
-                  Homey.manager('flow').trigger('eventOwntracks_AC', { user: currentUser.userName, event: jsonMsg.event, fence: jsonMsg.desc, percBattery: currentUser.battery }, 
-                                                                  { triggerTopic: topic, triggerFence: jsonMsg.desc });
-                                                                  
+                  let tokens = {
+                     event: jsonMsg.event,
+                     user: currentUser.userName, 
+                     fence: jsonMsg.desc, 
+                     percBattery: currentUser.battery
+                  }
+                  let state = {
+                     triggerTopic: topic, 
+                     triggerFence: jsonMsg.desc
+                  }
+                  triggers.getEventOwntracksAC().trigger(tokens,state,null)
                                                                   
                   logmodule.writelog("Trigger generic card for " + jsonMsg.desc);
                } else {
                   logmodule.writelog("This trigger is not needed because the transition is not valid");
                }
             } else {
-               logmodule.writelog ("Accuracy is "+ jsonMsg.acc + " and needs to be below " + parseInt(Homey.manager('settings').get('accuracy')))
+               logmodule.writelog ("Accuracy is "+ jsonMsg.acc + " and needs to be below " + parseInt(Homey.ManagerSettings.get('accuracy')))
             }
             break;
          case 'location':
@@ -126,8 +148,18 @@ function receiveMessage(topic, message, args, state) {
             if (jsonMsg.batt !== undefined) {
                currentUser.battery = jsonMsg.batt;
                logmodule.writelog("Set battery percentage for "+ currentUser.userName +" to "+ currentUser.battery+ "%");
-               Homey.manager('flow').trigger('eventBattery', { user: currentUser.userName, percBattery: currentUser.battery }, 
-                                                             { triggerTopic: topic, percBattery: currentUser.battery, user: currentUser.userName });
+               
+               let tokens = {
+                  user: currentUser.userName, 
+                  fence: jsonMsg.desc, 
+                  percBattery: currentUser.battery
+               }
+               let state = {
+                  triggerTopic: topic, 
+                  percBattery: currentUser.battery,
+                  user: currentUser.userName
+               }
+               triggers.getEventBattery().trigger(tokens,state, null)
             }
             break;
          case 'waypoint' :

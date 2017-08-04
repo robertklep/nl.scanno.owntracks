@@ -8,7 +8,8 @@
       "en": "Subscripe to Owntracks MQTT messages for presence detection",
       "nl": "Abonneer op MQTT berichten van Owntracks voor aanwezigheids detectie"
    },
-   "version": "1.5.3",
+   "version": "2.0.0",
+   "sdk": 2,
    "compatibility": "1.x",
    "category": [
       "internet",
@@ -18,27 +19,71 @@
        "homey:manager:speech-input",
        "homey:manager:speech-output"
    ],
-   "speech": [
-       {
-          "id": "owntracks",
-           "importance": 1,
-           "triggers": {
-              "en": [ "location" ],
-              "nl": [ "locatie" ]
-           }
-       },
-       {
-          "id": "owntracks2",
-          "importance": 0.5,
-          "triggers": {
-             "en": [ "where" ],
-             "nl": [ "waar" ]
-           }
-       }
-   ],
+   "speech": {
+      "en": {
+         "element": {
+            "actionWords": {
+               "type": "regex",
+               "value": "(where(\\sis)?|what(\\sis)?)"
+             },
+             "location": {
+                "type": "regex",
+                "value": "((the\\s)?location)"
+             },
+             "query": {
+                "type": "regex",
+                "value": "[\\s\\S]+"
+             }
+         },
+         "group": {
+            "main": {
+               "set": "(actionWords) && location && query",
+               "ordered": false,
+               "allowDisconnect": true,
+               "capturingGroup": true
+            },
+            "where_is": {
+               "set": "actionWords && query",
+               "ordered": false,
+               "allowDisconnect": true,
+               "capturingGroup": true
+            }
+         }
+      },
+      "nl": {
+         "element": {
+            "actionWords": {
+               "type": "regex",
+               "value": "(waar(\\sis)?|wat(\\sis)?)"
+             },
+             "location": {
+                "type": "regex",
+                "value": "((de\\s)?lokatie)"
+             },
+             "query": {
+                "type": "regex",
+                "value": "[\\s\\S]+"
+             }
+         },
+         "group": {
+            "main": {
+               "set": "(actionWords) && location && query",
+               "ordered": false,
+               "allowDisconnect": true,
+               "capturingGroup": true
+            },
+            "where_is": {
+               "set": "actionWords && query",
+               "ordered": false,
+               "allowDisconnect": true,
+               "capturingGroup": true
+            }
+         }
+      }
+   },
    "speechExamples": {
        "en": [ "What is the location of Menno?" ],
-       "nl": [ "Wat is de locatie van Menno?" ]
+       "nl": [ "Wat is de lokatie van Menno?" ]
    },
    "author": {
       "name": "Menno van Grinsven",
@@ -62,7 +107,7 @@
             "id": "inGeofence",
             "title": {
                "en": "Someone !{{present|absend}} in",
-               "nl": "Persoon !{{aanwezig|afwezig}} in"
+               "nl": "Iemand !{{aanwezig|afwezig}} in"
             },
             "args": [
                {

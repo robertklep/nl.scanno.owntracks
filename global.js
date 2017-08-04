@@ -3,9 +3,10 @@ var topicArray = [];
 var userArray = [];
 var fenceArray = [];
 
-var DEBUG = false;
+var DEBUG = true;
 
-var logmodule = require("./logmodule.js");
+const Homey     = require("homey");
+const logmodule = require("./logmodule.js");
 
 module.exports = {
    initVars: function() {
@@ -23,29 +24,29 @@ module.exports = {
    createEmptyUser: function(userName) {
       return createEmptyUser(userName);
    },
-   addNewUser: function(callback, args) {
-      return addNewUser(callback, args);
+   addNewUser: function(args) {
+      return addNewUser(args);
    },
-   deleteUser: function(callback, args) {
-      return deleteUser(callback, args);
+   deleteUser: function(args) {
+      return deleteUser(args);
    },
    setFence: function(fenceData) {
       setFence(fenceData);
    },
-   addNewFence: function(callback, args) {
-      return addNewFence(callback, args);
+   addNewFence: function(args) {
+      return addNewFence(args);
    },
-   deleteFence: function(callback, args) {
-      return deleteFence(callback, args);
+   deleteFence: function(args) {
+      return deleteFence(args);
    },
-   getUserArray: function(callback, args) {
-      getUserArray(callback, args);
+   getUserArray: function() {
+      return getUserArray();
    },
-   getFenceArray: function(callback, args) {
-      getFenceArray(callback, args);
+   getFenceArray: function() {
+      return getFenceArray();
    },
-   purgeUserData: function(callback, args) {
-      purgeUserData(callback, args);
+   purgeUserData: function(args) {
+      return purgeUserData(args);
    },
    getTopic: function(topicName) {
       return getTopic(topicName);
@@ -119,8 +120,8 @@ function initVars() {
 function saveOnCloseEvent() {
    Homey.on('unload', function(){
       logmodule.writelog("unload called");
-      saveUserData();
-      saveFenceData();
+//      saveUserData();
+//      saveFenceData();
    });
 }
 
@@ -155,13 +156,13 @@ function saveFenceData() {
 function deletePresistancyFiles() {
    var returnValue = false;
 
-   try {
+/*   try {
       require('fs').unlinkSync('/userdata/owntracks.json');
    } catch(err) {
          logmodule.writelog(err);
          returnValue = true;
    }
-
+*/
    try {
       require('fs').unlinkSync('/userdata/owntracks_fences.json');
    } catch(err) {
@@ -212,8 +213,8 @@ function setUser(userData, persistUser) {
       // User has not been found, so assume this is a new user
       userArray.push(userData);
 
-      Homey.manager('notifications').createNotification({
-         excerpt: __("notifications.user_added", {"name": userData.userName})
+      Homey.ManagerNotifications.registerNotification({
+         excerpt: Homey.__("notifications.user_added", {"name": userData.userName})
       }, function( err, notification ) {
          if( err ) return console.error( err );
             console.log( 'Notification added' );
@@ -238,7 +239,7 @@ function createEmptyUser(userName) {
    addNewUser is called from the settings page when a new user is added
    or when the token needs to be refreshed.
 */
-function addNewUser(callback, args) {
+function addNewUser(args) {
    if (DEBUG) logmodule.writelog("New user called: "+ args.body.userName);
    if (args.body.userName !== null && args.body.userName !== undefined && args.body.userName !== "" ) {
       var currentUser = getUser(args.body.userName);
@@ -246,16 +247,16 @@ function addNewUser(callback, args) {
          var newUser = createEmptyUser(args.body.userName);
          setUser(newUser, true);
          logmodule.writelog("New user added: "+ newUser.userName);
-         callback(false, true);
+        return true;
       } else {
          currentUser.userToken = require('crypto').randomBytes(16).toString('hex');
          saveUserData();
       }
    }
-   callback(false, false);
+   return false;
 }
 
-function deleteUser(callback, args) {
+function deleteUser(args) {
    if (DEBUG) logmodule.writelog("Delete user called: "+ args.body.userName);
    var result = false;
    for (var i=0; i < userArray.length; i++) {
@@ -266,7 +267,7 @@ function deleteUser(callback, args) {
       }
    }
    saveUserData();
-   callback(false, result);
+   return result;
 }
 
 function getFence(fenceName) {
@@ -292,8 +293,8 @@ function setFence(fenceData) {
       if (fenceData.fenceName.length > 0) {
          fenceArray.push(fenceData);
          saveFenceData();
-         Homey.manager('notifications').createNotification({
-            excerpt: __("notifications.fence_added", {"name": fenceData.fenceName})
+         Homey.ManagerNotifications.registerNotification({
+            excerpt: Homey.__("notifications.fence_added", {"name": fenceData.fenceName})
          }, function( err, notification ) {
             if( err ) return console.error( err );
                console.log( 'Notification added' );
@@ -302,7 +303,7 @@ function setFence(fenceData) {
    }
 }
 
-function addNewFence(callback, args) {
+function addNewFence(args) {
    if (DEBUG) logmodule.writelog("New fence called: "+ args.body.fenceName);
    if (args.body.fenceName !== null && args.body.fenceName !== undefined && args.body.fenceName !== "" ) { 
       if (getFence(args.body.fenceName) == null) {
@@ -311,13 +312,13 @@ function addNewFence(callback, args) {
          newFence.timestamp = 0;
          setFence(newFence);
          logmodule.writelog("New fence added: "+ newFence.fenceName);
-         callback(false, true);
+         return true;
       }
    }
-   callback(false, false);
+   return false;
 }
 
-function deleteFence(callback, args) {
+function deleteFence(args) {
    if (DEBUG) logmodule.writelog("Delete fence called: "+ args.body.fenceName);
    var result = false;
    for (var i=0; i < fenceArray.length; i++) {
@@ -328,27 +329,27 @@ function deleteFence(callback, args) {
       }
    }
    saveFenceData();
-   callback(false, result);
+   return result;
 }
 
-function getUserArray(callback, args) {
+function getUserArray() {
    if (DEBUG) logmodule.writelog("getUserArray called");
-   callback ( false, userArray);
+   return userArray;
 }
 
-function getFenceArray(callback, args) {
+function getFenceArray() {
    if (DEBUG) logmodule.writelog("getFenceArray called");
-   callback ( false, fenceArray);
+   return fenceArray;
 }
 
-function purgeUserData(callback, args) {
+function purgeUserData(args) {
    logmodule.writelog("purgeUserData called");
 
    var returnValue = deletePresistancyFiles();
    logmodule.writelog("Return value: "+returnValue);
    fenceArray = [];
    userArray = [];
-   callback ( false, returnValue);
+   return returnValue;
 }
 
 function getTopic(topicName) {
@@ -383,7 +384,7 @@ function searchUsersAutocomplete(key, wildcards) {
 
    // If the wildcards argument is set to true, Add an option to select all fences
    if (wildcards == true) {
-     matchUsers.push({icon: '//', name: __("ac_all_users"), description: 'Wildcard', user: '*' });
+     matchUsers.push({icon: '//', name: Homey.__("ac_all_users"), description: 'Wildcard', user: '*' });
    }
 
    for (i=0; i < userArray.length; i++) {
@@ -393,7 +394,7 @@ function searchUsersAutocomplete(key, wildcards) {
            temp.icon = '//';
            temp.name = userArray[i].userName;
            temp.user = userArray[i].userName;
-           matchUsers.push({icon: temp.icon, name: temp.name, description: __("desc_all_users"), user: temp.name});
+           matchUsers.push({icon: temp.icon, name: temp.name, description: Homey.__("desc_all_users"), user: temp.name});
          }
       } catch(e) {
           logmodule.writelog("Fill user autocomplete failed: "+ e);
@@ -409,7 +410,7 @@ function searchFenceAutocomplete(key, wildcards) {
 
    // If the wildcards argument is set to true, Add an option to select all fences
    if (wildcards == true) {
-     matchFence.push({icon: '//', name: __("ac_all_fences"), description: 'Wildcard', fence: '*' });
+     matchFence.push({icon: '//', name: Homey.__("ac_all_fences"), description: 'Wildcard', fence: '*' });
    }
 
    for (i=0; i < fenceArray.length; i++) {
@@ -420,7 +421,7 @@ function searchFenceAutocomplete(key, wildcards) {
                temp.icon = '//';
                temp.name = fenceArray[i].fenceName;
                temp.fence = fenceArray[i].fenceName;
-               matchFence.push({icon: temp.icon, name: temp.name, description: __("desc_all_fences"), fence: temp.name});
+               matchFence.push({icon: temp.icon, name: temp.name, description: Homey.__("desc_all_fences"), fence: temp.name});
             }
          }
       } catch(e) {

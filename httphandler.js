@@ -5,12 +5,12 @@ var handleMessage = require("./messagehandling.js");
 var DEBUG = true;
 
 module.exports = {
-   handleOwntracksEvents: function(callback, args) {
-      handleOwntracksEvents(callback, args);
+   handleOwntracksEvents: function(args) {
+      handleOwntracksEvents(args);
    }
 }
 
-function handleOwntracksEvents(callback, args) {
+function handleOwntracksEvents(args) {
    if (DEBUG) logmodule.writelog("handleOwntracksEvents called");
    if (DEBUG) logmodule.writelog(JSON.stringify(args.query));
    if (DEBUG) logmodule.writelog(JSON.stringify(args.body));
