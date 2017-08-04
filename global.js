@@ -5,7 +5,8 @@ var fenceArray = [];
 
 var DEBUG = false;
 
-var logmodule = require("./logmodule.js");
+const Homey     = require("homey");
+const logmodule = require("./logmodule.js");
 
 module.exports = {
    initVars: function() {
@@ -119,8 +120,8 @@ function initVars() {
 function saveOnCloseEvent() {
    Homey.on('unload', function(){
       logmodule.writelog("unload called");
-      saveUserData();
-      saveFenceData();
+//      saveUserData();
+//      saveFenceData();
    });
 }
 
