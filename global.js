@@ -120,8 +120,8 @@ function initVars() {
 function saveOnCloseEvent() {
    Homey.on('unload', function(){
       logmodule.writelog("unload called");
-//      saveUserData();
-//      saveFenceData();
+      saveUserData();
+      saveFenceData();
    });
 }
 
@@ -156,13 +156,13 @@ function saveFenceData() {
 function deletePresistancyFiles() {
    var returnValue = false;
 
-/*   try {
+   try {
       require('fs').unlinkSync('/userdata/owntracks.json');
    } catch(err) {
          logmodule.writelog(err);
          returnValue = true;
    }
-*/
+
    try {
       require('fs').unlinkSync('/userdata/owntracks_fences.json');
    } catch(err) {
