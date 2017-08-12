@@ -72,7 +72,7 @@ function registerSpeech() {
    logmodule.writelog('debug', "registerSpeech");
 
    Homey.ManagerSpeechInput.on('speechEval', function( speech, callback ) {
-      if (DEBUG) logmodule.writelog(JSON.stringify(speech));
+      logmodule.writelog('debug', JSON.stringify(speech));
       
       callback( null, true );
    });
@@ -182,7 +182,7 @@ function getLocationAdress(userName) {
 
 function homeySayLocation(args) {
    return getLocationString(args.user.name).then(function(speechline) {
-      logmodule.writelog("Speech output: " + speechline)
+      logmodule.writelog('info', "Speech output: " + speechline)
       Homey.ManagerSpeechOutput.say(speechline);
    });
 }

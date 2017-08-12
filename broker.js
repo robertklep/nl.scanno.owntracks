@@ -59,7 +59,11 @@ function connectToBroker(args, state) {
    if (Homey.ManagerSettings.get('usebroker') == true) {
       if (connectedClient == null) {
          logmodule.writelog('info', "connectedClient == null");
-         connectedClient = mqtt.connect(getBrokerURL(), getConnectOptions());
+         try {
+            connectedClient = mqtt.connect(getBrokerURL(), getConnectOptions());
+         } catch(err) {
+            logmodule.writelog('error', "connectToBroker: " +err);
+         }
 
          connectedClient.on('reconnect', function() {
             logmodule.writelog('info', "MQTT Reconnect");
@@ -97,8 +101,12 @@ function connectToBroker(args, state) {
          // Since we subscribe to the generic owntracks topic, we do not have to subscribe to
          // the individual topics. We will get them anyway.
          subscribeToTopic("owntracks/#");
-         connectedClient.subscribe("owntracks/#")
-         logmodule.writelog('info', "Subscribed to owntracks/#" );
+         try {
+            connectedClient.subscribe("owntracks/#")
+            logmodule.writelog('info', "Subscribed to owntracks/#" );
+         } catch(err) {
+            logmodule.writelog('error', "connectToBroker: " +err);
+         }
       };
    }
 }
@@ -117,17 +125,25 @@ function sendMessageToTopic(args) {
    // Check if there is already a connection to the broker
    if (connectedClient == null) {
       // There is no connection, so create a connection and send the message
-      var client = mqtt.connect(getBrokerURL(), getConnectOptions());
-      client.on('connect', function () {
-         client.publish(args.mqttTopic, args.mqttMessage, function() {
-            logmodule.writelog('info', "send " + args.mqttMessage + " on topic " + args.mqttTopic);
-            client.end();
+      try {
+         var client = mqtt.connect(getBrokerURL(), getConnectOptions());
+         client.on('connect', function () {
+            client.publish(args.mqttTopic, args.mqttMessage, function() {
+               logmodule.writelog('info', "send " + args.mqttMessage + " on topic " + args.mqttTopic);
+               client.end();
+            });
          });
-      });
+      } catch(err) {
+         logmodule.writelog('error', "sendMessageToTopic: " +err);
+      }
    } else {
       // There is already a connection, so the message can be send
-      connectedClient.publish(args.mqttTopic, args.mqttMessage, function() {
-         logmodule.writelog('info', "send " + args.mqttMessage + " on topic " + args.mqttTopic);
-      });
+      try {
+         connectedClient.publish(args.mqttTopic, args.mqttMessage, function() {
+            logmodule.writelog('info', "send " + args.mqttMessage + " on topic " + args.mqttTopic);
+         });
+      } catch(err) {
+         logmodule.writelog('error', "sendMessageToTopic: " +err);
+      }
    }
 }

@@ -24,7 +24,7 @@ function receiveMessage(topic, message, args, state) {
    try {
       var jsonMsg = JSON.parse(message.toString());
    } catch(e) {
-      logmodule.writelog('info', "Received message is not a valid JSON string");
+      logmodule.writelog('error', "Received message is not a valid JSON string");
       validJSON = false;
    };
 

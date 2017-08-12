@@ -203,34 +203,43 @@ function getUserByToken(userToken) {
    to the user array
 */
 function setUser(userData, persistUser) {
-   var entryArray = getUser(userData.userName);
+   try {
+      var entryArray = getUser(userData.userName);
    
-   if (entryArray !== null) {
-      entryArray = userData;
-   } else {
-      // User has not been found, so assume this is a new user
-      userArray.push(userData);
+      if (entryArray !== null) {
+         entryArray = userData;
+      } else {
+         // User has not been found, so assume this is a new user
+         userArray.push(userData);
 
-      Homey.ManagerNotifications.registerNotification({
-         excerpt: Homey.__("notifications.user_added", {"name": userData.userName})
-      }, function( err, notification ) {
-         if( err ) return console.error( err );
-            console.log( 'Notification added' );
-      });
-   }
-   if (persistUser == true) {
-      saveUserData();
+         Homey.ManagerNotifications.registerNotification({
+            excerpt: Homey.__("notifications.user_added", {"name": userData.userName})
+         }, function( err, notification ) {
+            if( err ) return console.error( err );
+               console.log( 'Notification added' );
+         });
+      }
+      if (persistUser == true) {
+         saveUserData();
+      }
+   } catch(err) {
+      logmodule.writelog('error', "setUser: " +err);
    }
 }
 
 function createEmptyUser(userName) {
-   var newUser = {};
-   newUser.userName = userName;
-   newUser.userToken = require('crypto').randomBytes(16).toString('hex');
-   newUser.fence = "";
-   newUser.battery = 0;
-   newUser.battTriggered = false;
-   return newUser;
+   try {
+      var newUser = {};
+      newUser.userName = userName;
+      newUser.userToken = require('crypto').randomBytes(16).toString('hex');
+      newUser.fence = "";
+      newUser.battery = 0;
+      newUser.battTriggered = false;
+      return newUser;
+   } catch(err) {
+      logmodule.writelog('error', "createEmptyUser: " +err);
+      return null;
+   }
 }
 
 /*
@@ -238,34 +247,48 @@ function createEmptyUser(userName) {
    or when the token needs to be refreshed.
 */
 function addNewUser(args) {
-   logmodule.writelog('debug', "New user called: "+ args.body.userName);
-   if (args.body.userName !== null && args.body.userName !== undefined && args.body.userName !== "" ) {
-      var currentUser = getUser(args.body.userName);
-      if (currentUser == null) {
-         var newUser = createEmptyUser(args.body.userName);
-         setUser(newUser, true);
-         logmodule.writelog('info', "New user added: "+ newUser.userName);
-        return true;
-      } else {
-         currentUser.userToken = require('crypto').randomBytes(16).toString('hex');
-         saveUserData();
+   try {
+      logmodule.writelog('debug', "New user called: "+ args.body.userName);
+      if (args.body.userName !== null && args.body.userName !== undefined && args.body.userName !== "" ) {
+         var currentUser = getUser(args.body.userName);
+         if (currentUser == null) {
+            var newUser = createEmptyUser(args.body.userName);
+            setUser(newUser, true);
+            logmodule.writelog('info', "New user added: "+ newUser.userName);
+           return true;
+         } else {
+            currentUser.userToken = require('crypto').randomBytes(16).toString('hex');
+            saveUserData();
+         }
       }
+      return false;
+   } catch(err) {
+      logmodule.writelog('error', "addNewUser: " +err);
+      return err;
    }
-   return false;
 }
 
+/*
+   deleteUser is called from the settings page when a user is deleted
+   by pressing the - button
+*/
 function deleteUser(args) {
-   logmodule.writelog('debug', "Delete user called: "+ args.body.userName);
-   var result = false;
-   for (var i=0; i < userArray.length; i++) {
-      if (userArray[i].userName === args.body.userName) {
-         var deletedUser = userArray.splice(i, 1);
-         logmodule.writelog('info', "Deleted user: " + deletedUser.userName);
-         result = true;
+   try {
+      logmodule.writelog('debug', "Delete user called: "+ args.body.userName);
+      var result = false;
+      for (var i=0; i < userArray.length; i++) {
+         if (userArray[i].userName === args.body.userName) {
+            var deletedUser = userArray.splice(i, 1);
+            logmodule.writelog('info', "Deleted user: " + deletedUser.userName);
+            result = true;
+         }
       }
+      saveUserData();
+      return result;
+   } catch(err) {
+      logmodule.writelog('error', "deleteUser: " +err);
+      return err;
    }
-   saveUserData();
-   return result;
 }
 
 function getFence(fenceName) {
@@ -279,55 +302,70 @@ function getFence(fenceName) {
 }
 
 function setFence(fenceData) {
-   var entryArray = getFence(fenceData.fenceName);
-   if (entryArray !== null) {
-      entryArray = fenceData;
-      saveFenceData();
-      logmodule.writelog('debug', "Fence: " + fenceData.fenceName+" changed");   
-   } else {
-      // Fence has not been found, so assume this is a new fence
-      logmodule.writelog('info', "Fence: " + fenceData.fenceName+" Added");
-      
-      if (fenceData.fenceName.length > 0) {
-         fenceArray.push(fenceData);
+   try {
+      var entryArray = getFence(fenceData.fenceName);
+      if (entryArray !== null) {
+         entryArray = fenceData;
          saveFenceData();
-         Homey.ManagerNotifications.registerNotification({
-            excerpt: Homey.__("notifications.fence_added", {"name": fenceData.fenceName})
-         }, function( err, notification ) {
-            if( err ) return console.error( err );
-               console.log( 'Notification added' );
-         });
+         logmodule.writelog('debug', "Fence: " + fenceData.fenceName+" changed");   
+      } else {
+         // Fence has not been found, so assume this is a new fence
+         logmodule.writelog('info', "Fence: " + fenceData.fenceName+" Added");
+      
+         if (fenceData.fenceName.length > 0) {
+            fenceArray.push(fenceData);
+            saveFenceData();
+            Homey.ManagerNotifications.registerNotification({
+               excerpt: Homey.__("notifications.fence_added", {"name": fenceData.fenceName})
+            }, function( err, notification ) {
+               if( err ) return console.error( err );
+                  console.log( 'Notification added' );
+            });
+         }
       }
+   } catch(err) {
+      logmodule.writelog('error', "setFence: " +err);
+      return err;
    }
 }
 
 function addNewFence(args) {
-   logmodule.writelog('debug', "New fence called: "+ args.body.fenceName);
-   if (args.body.fenceName !== null && args.body.fenceName !== undefined && args.body.fenceName !== "" ) { 
-      if (getFence(args.body.fenceName) == null) {
-         var newFence = {};
-         newFence.fenceName = args.body.fenceName;
-         newFence.timestamp = 0;
-         setFence(newFence);
-         logmodule.writelog("New fence added: "+ newFence.fenceName);
-         return true;
+   try {
+      logmodule.writelog('debug', "New fence called: "+ args.body.fenceName);
+      if (args.body.fenceName !== null && args.body.fenceName !== undefined && args.body.fenceName !== "" ) { 
+         if (getFence(args.body.fenceName) == null) {
+            var newFence = {};
+            newFence.fenceName = args.body.fenceName;
+            newFence.timestamp = 0;
+            setFence(newFence);
+            logmodule.writelog("New fence added: "+ newFence.fenceName);
+            return true;
+         }
       }
+      return false;
+   } catch(err) {
+      logmodule.writelog('error', "addNewFence: " +err);
+      return err;
    }
-   return false;
 }
 
 function deleteFence(args) {
-   logmodule.writelog('debug', "Delete fence called: "+ args.body.fenceName);
-   var result = false;
-   for (var i=0; i < fenceArray.length; i++) {
-      if (fenceArray[i].fenceName === args.body.fenceName) {
-         var deletedFence = fenceArray.splice(i, 1);
-         logmodule.writelog('info', "Deleted fence: " + deletedFence.fenceName);
-         result = true;
+   try {
+      logmodule.writelog('debug', "Delete fence called: "+ args.body.fenceName);
+      var result = false;
+      for (var i=0; i < fenceArray.length; i++) {
+         if (fenceArray[i].fenceName === args.body.fenceName) {
+            var deletedFence = fenceArray.splice(i, 1);
+            logmodule.writelog('info', "Deleted fence: " + deletedFence.fenceName);
+            result = true;
+         }
       }
+      saveFenceData();
+      return result;
+   } catch(err) {
+      logmodule.writelog('error', "deleteFence: " +err);
+      return err;
    }
-   saveFenceData();
-   return result;
 }
 
 function getUserArray() {
