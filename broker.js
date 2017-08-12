@@ -35,7 +35,7 @@ function getBrokerURL() {
    };
    urlBroker.push(Homey.ManagerSettings.get('url'));
    urlBroker.push(":"+Homey.ManagerSettings.get('ip_port'));
-   logmodule.writelog("Broker URL: "+ urlBroker.join(''));
+   logmodule.writelog('info', "Broker URL: "+ urlBroker.join(''));
    return urlBroker.join('');
 }
 
@@ -50,7 +50,7 @@ function getConnectOptions() {
       password: Homey.ManagerSettings.get('password'),
       rejectUnauthorized: rejectUnauth
    };
-   logmodule.writelog("rejectUnauthorized: " + connect_options.rejectUnauthorized);
+   logmodule.writelog('info', "rejectUnauthorized: " + connect_options.rejectUnauthorized);
    return connect_options;
 }
 
@@ -58,38 +58,38 @@ function connectToBroker(args, state) {
 //   if (Homey.manager('settings').get('usebroker') == true) {
    if (Homey.ManagerSettings.get('usebroker') == true) {
       if (connectedClient == null) {
-         logmodule.writelog("connectedClient == null");
+         logmodule.writelog('info', "connectedClient == null");
          connectedClient = mqtt.connect(getBrokerURL(), getConnectOptions());
 
          connectedClient.on('reconnect', function() {
-            logmodule.writelog("MQTT Reconnect");
+            logmodule.writelog('info', "MQTT Reconnect");
             reconnectClient = true;
           });
 
          connectedClient.on('close', function() {
-            logmodule.writelog("MQTT Closed");
+            logmodule.writelog('info', "MQTT Closed");
             reconnectClient = true;
           });
 
          connectedClient.on('offline', function() {
-            logmodule.writelog("MQTT Offline");
+            logmodule.writelog('info', "MQTT Offline");
             reconnectClient = true;
           });
 
          connectedClient.on('error', function(error) {
-            logmodule.writelog("MQTT error occured: " + error);
+            logmodule.writelog('error', "MQTT error occured: " + error);
          });
 
          // On connection ...
          connectedClient.on('connect', function (connack) {
-            logmodule.writelog("MQTT client connected");
-            logmodule.writelog("Connected Topics: " + globalVar.getTopicArray());
-            logmodule.writelog("reconnectedClient " + reconnectClient);
+            logmodule.writelog('info', "MQTT client connected");
+            logmodule.writelog('info', "Connected Topics: " + globalVar.getTopicArray());
+            logmodule.writelog('info', "reconnectedClient " + reconnectClient);
          });
 
          connectedClient.on('message',function(topic, message, packet) {
             // When a message is received, call receiveMessage for further processing
-            logmodule.writelog("OnMessage called");
+            logmodule.writelog('info', "OnMessage called");
             handleMessage.receiveMessage(topic, message, args, state);
          });
          // Since we are connecting here, we might as well subscribe to the generic
@@ -98,7 +98,7 @@ function connectToBroker(args, state) {
          // the individual topics. We will get them anyway.
          subscribeToTopic("owntracks/#");
          connectedClient.subscribe("owntracks/#")
-         logmodule.writelog("Subscribed to owntracks/#" );
+         logmodule.writelog('info', "Subscribed to owntracks/#" );
       };
    }
 }
@@ -120,14 +120,14 @@ function sendMessageToTopic(args) {
       var client = mqtt.connect(getBrokerURL(), getConnectOptions());
       client.on('connect', function () {
          client.publish(args.mqttTopic, args.mqttMessage, function() {
-            logmodule.writelog("send " + args.mqttMessage + " on topic " + args.mqttTopic);
+            logmodule.writelog('info', "send " + args.mqttMessage + " on topic " + args.mqttTopic);
             client.end();
          });
       });
    } else {
       // There is already a connection, so the message can be send
       connectedClient.publish(args.mqttTopic, args.mqttMessage, function() {
-         logmodule.writelog("send " + args.mqttMessage + " on topic " + args.mqttTopic);
+         logmodule.writelog('info', "send " + args.mqttMessage + " on topic " + args.mqttTopic);
       });
    }
 }

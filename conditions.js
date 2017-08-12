@@ -22,12 +22,12 @@ function registerConditions() {
    inGeofence = new Homey.FlowCardCondition('inGeofence');
    inGeofence.register();
    inGeofence.registerRunListener((args, state ) => {
-      logmodule.writelog("inGeofence.registerRunListener called");
+      logmodule.writelog('info', "inGeofence.registerRunListener called");
       try {
         var result = checkForPresenceInFence( args.geoFence.name );
         return Promise.resolve( result );
       } catch(err) {
-         logmodule.writelog("Error in inGeofence.registerRunListener: " + err);
+         logmodule.writelog('error', "Error in inGeofence.registerRunListener: " + err);
          return Promise.reject(err);
       }
    });
@@ -39,7 +39,7 @@ function registerConditions() {
 
 
 function checkForPresenceInFence(geoFence) {
-   logmodule.writelog("checkForPresenceInFence called");
+   logmodule.writelog('info', "checkForPresenceInFence called");
    if (globalVar.searchGeoFence(geoFence) > 0) {
       return true;
    } else {

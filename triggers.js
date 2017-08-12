@@ -51,7 +51,7 @@ function listenForMessage () {
 
    // Start listening for the events.
 
-   logmodule.writelog("listenForMessage called");
+   logmodule.writelog('info', "listenForMessage called");
 
    eventOwntracksAC = new Homey.FlowCardTrigger('eventOwntracks_AC');
    enterGeofenceAC = new Homey.FlowCardTrigger('enterGeofence_AC');
@@ -69,7 +69,7 @@ function listenForMessage () {
 
 
    eventOwntracksAC.registerRunListener((args, state ) => {
-      logmodule.writelog("Listener eventOwntracksAC called");
+      logmodule.writelog('info', "Listener eventOwntracksAC called");
       try {
          if ( processMessage(args, state, 'eventOwntracks_ac')) {
             return Promise.resolve( true );
@@ -77,13 +77,13 @@ function listenForMessage () {
             return Promise.resolve( false );
          }
        } catch(err) {
-         logmodule.writelog("Error in Listener enterGeofenceAC: " +err);
+         logmodule.writelog('error', "Error in Listener enterGeofenceAC: " +err);
          return Promise.reject(err);
        }
    })
 
    enterGeofenceAC.registerRunListener( ( args, state ) => {
-      logmodule.writelog("Listener enterGeofence_AC called");
+      logmodule.writelog('info', "Listener enterGeofence_AC called");
       try {
          if ( processMessage(args, state, 'enterGeofence_ac')) {
             return Promise.resolve( true );
@@ -91,13 +91,13 @@ function listenForMessage () {
            return Promise.resolve( false );
          }
       } catch(err) {
-         logmodule.writelog("Error in Listener enterGeofenceAC: " +err);
+         logmodule.writelog('error', "Error in Listener enterGeofenceAC: " +err);
          return Promise.reject(err);
       }
    })
    
    leaveGeofenceAC.registerRunListener( ( args, state ) => {
-      logmodule.writelog("Listener leaveGeofenceAC called");
+      logmodule.writelog('info', "Listener leaveGeofenceAC called");
       try {
          if ( processMessage(args, state, 'leaveGeofence_ac')) {
             return Promise.resolve( true );
@@ -105,13 +105,13 @@ function listenForMessage () {
             return Promise.resolve( false );
          }
       } catch(err) {
-         logmodule.writelog("Error in Listener leaveGeofenceAC: " +err);
+         logmodule.writelog('error', "Error in Listener leaveGeofenceAC: " +err);
          return Promise.reject(err);
       }
    })
    
    eventBattery.registerRunListener( ( args, state ) => {
-      logmodule.writelog("Listener eventBattery called");
+      logmodule.writelog('info', "Listener eventBattery called");
       try {
          if ( processMessage(args, state, 'eventBattery')) {
             return Promise.resolve( true );
@@ -119,7 +119,7 @@ function listenForMessage () {
             return Promise.resolve( false );
          }
       } catch(err) {
-         logmodule.writelog("Error in Listener leaveGeofenceAC: " +err);
+         logmodule.writelog('error', "Error in Listener leaveGeofenceAC: " +err);
          return Promise.reject(err);
       }
    })
@@ -128,7 +128,7 @@ function listenForMessage () {
 }
 
 function createAutocompleteActions() {
-   logmodule.writelog("createAutocompleteActions called");
+   logmodule.writelog('info', "createAutocompleteActions called");
    // Put all the autocomplte actions here. 
 
    eventOwntracksAC.getArgument('nameUser').registerAutocompleteListener( (query, args ) => { 
@@ -256,7 +256,7 @@ function getBatteryEventArgs() {
 function processMessage(args, state, triggerType) {
    var reconnectClient = false;
 
-   logmodule.writelog ("state.topic = " + state.triggerTopic + " topic = " + args.mqttTopic );
+   logmodule.writelog ('info', "state.topic = " + state.triggerTopic + " topic = " + args.mqttTopic );
 
    // MQTT subscription topics can contain "wildcards", i.e a + sign. However the topic returned
    // by MQTT brokers contain the topic where the message is posted on. In that topic, the wildcard
@@ -286,7 +286,7 @@ function processMessage(args, state, triggerType) {
       case 'enterGeofence_ac':
       case 'leaveGeofence_ac':
          if (args.nameUser !== undefined ) {
-            logmodule.writelog("received user "+arrTriggerTopic[1]+"  trigger user: "+args.nameUser.user);
+            logmodule.writelog('info', "received user "+arrTriggerTopic[1]+"  trigger user: "+args.nameUser.user);
             if (arrTriggerTopic[1] === args.nameUser.user || args.nameUser.user == '*') {
                matchTopic = true;
             } else {
@@ -303,7 +303,7 @@ function processMessage(args, state, triggerType) {
 
    // If the topic that triggered me the topic I was waiting for?
    if (matchTopic == true) {
-      console.log ("triggerTopic = equal" )
+      console.log ('info', "triggerTopic = equal" )
       // The topic is equal, but we also need the geofence to be equal as well, if not then the 
       // callback should be false
       switch(triggerType) {
@@ -311,7 +311,7 @@ function processMessage(args, state, triggerType) {
          case 'enterGeofence':
          case 'leaveGeofence':
             if ( state.triggerFence == args.nameGeofence || args.nameGeofence == "*" ) {
-               logmodule.writelog ("triggerFence = equal")
+               logmodule.writelog ('info', "triggerFence = equal")
                return true;
             } else {
                return false;
@@ -320,9 +320,9 @@ function processMessage(args, state, triggerType) {
          case 'eventOwntracks_ac':
          case 'enterGeofence_ac':
          case 'leaveGeofence_ac':
-            logmodule.writelog ("Received Fence = "+state.triggerFence+"  trigger fenve = "+args.nameGeofence.fence)
+            logmodule.writelog ('info', "Received Fence = "+state.triggerFence+"  trigger fence = "+args.nameGeofence.fence)
             if ( state.triggerFence == args.nameGeofence.fence || args.nameGeofence.fence == "*" ) {
-               logmodule.writelog ("triggerFence = equal")
+               logmodule.writelog ('info', "triggerFence = equal")
                return true;
             } else {
                return false;
@@ -335,19 +335,19 @@ function processMessage(args, state, triggerType) {
             if ( state.percBattery < args.percBattery ) {
                // Check if the trigger has already fired. If so, do not fire again
                if (currentUser.battTriggered == false) {
-                  logmodule.writelog ("battery percentage ("+ state.percBattery +"%) of "+ state.user+" is below trigger percentage of "+ args.percBattery +"%");
+                  logmodule.writelog ('info', "battery percentage ("+ state.percBattery +"%) of "+ state.user+" is below trigger percentage of "+ args.percBattery +"%");
                   currentUser.battTriggered = true;
                   globalVar.setUser(currentUser, false);
                   return true;
                } else {
-                  logmodule.writelog ("battery trigger already triggered for "+ state.user);
+                  logmodule.writelog ('info', "battery trigger already triggered for "+ state.user);
                   return false;
                }
             }
             // Check if the battery percentage if above the trigger percentage. If this is the case
             // set the state.Triggered to false in case the phone was been charged again
             if (state.percBattery >= args.percBattery && currentUser.battTriggered !== false) {
-               logmodule.writelog ("Reset battery triggered state for "+ state.user);
+               logmodule.writelog ('info', "Reset battery triggered state for "+ state.user);
                currentUser.battTriggered = false;
                globalVar.setUser(currentUser, false);
             }
@@ -360,7 +360,7 @@ function processMessage(args, state, triggerType) {
    }
    // This is not the topic I was waiting for and it is a known topic
    else if (state.triggerTopic !== args.mqttTopic & globalVar.getTopicArray().indexOf(args.mqttTopic) !== -1) {
-      logmodule.writelog("We are not waiting for this topic");
+      logmodule.writelog('info', "We are not waiting for this topic");
       return false;
    }
    // this is (still) an unknown topic. We arrive her only 1 time for every topic. The next time the if and else if will

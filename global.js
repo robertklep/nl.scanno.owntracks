@@ -3,8 +3,6 @@ var topicArray = [];
 var userArray = [];
 var fenceArray = [];
 
-var DEBUG = true;
-
 const Homey     = require("homey");
 const logmodule = require("./logmodule.js");
 
@@ -83,28 +81,28 @@ module.exports = {
 function initVars() {
    saveOnCloseEvent();
 
-   if (DEBUG) logmodule.writelog("initVars called");
+   logmodule.writelog('debug', "initVars called");
 
    require('fs').readFile('/userdata/owntracks.json', 'utf8', function (err, data) {
       if (err) {
-         logmodule.writelog("Retreiving userArray failed: "+ err);
+         logmodule.writelog('error', "Retreiving userArray failed: "+ err);
       } else {
          try { 
              userArray = JSON.parse(data);
          } catch (e) {
-            logmodule.writelog("Parsing userArray failed: "+ e);
+            logmodule.writelog('error', "Parsing userArray failed: "+ e);
             userArray = [];
          }
       }
    });
    require('fs').readFile('/userdata/owntracks_fences.json', 'utf8', function (err, data) {
       if (err) {
-         logmodule.writelog("Retreiving fenceArray failed: "+ err);
+         logmodule.writelog('error', "Retreiving fenceArray failed: "+ err);
       } else {
          try {
             fenceArray = JSON.parse(data);
          } catch(e) {
-            logmodule.writelog("Parsing fenceArray failed: "+ e);
+            logmodule.writelog('error', "Parsing fenceArray failed: "+ e);
             fenceArray = [];
          }
       }
@@ -119,7 +117,7 @@ function initVars() {
 */
 function saveOnCloseEvent() {
    Homey.on('unload', function(){
-      logmodule.writelog("unload called");
+      logmodule.writelog('info', "unload called");
       saveUserData();
       saveFenceData();
    });
@@ -129,10 +127,10 @@ function saveOnCloseEvent() {
    saveUserData() saves the user data into a JSON file on the filesystem
 */
 function saveUserData() {
-   logmodule.writelog("saveUserData called");
+   logmodule.writelog('info', "saveUserData called");
    require('fs').writeFile("/userdata/owntracks.json",  JSON.stringify(userArray), function (err) {
       if (err) {
-         logmodule.writelog("Persisting userArray failed: "+ err);
+         logmodule.writelog('error', "Persisting userArray failed: "+ err);
       }
    });
 }
@@ -141,10 +139,10 @@ function saveUserData() {
    saveFenceData() saves the list of geofences into a JSON file on the filesystem
 */
 function saveFenceData() {
-   logmodule.writelog("saveFenceData called");
+   logmodule.writelog('debug', "saveFenceData called");
    require('fs').writeFile("/userdata/owntracks_fences.json",  JSON.stringify(fenceArray), function (err) {
       if (err) {
-         logmodule.writelog("Persisting fenceArray failed: "+ err);
+         logmodule.writelog('error', "Persisting fenceArray failed: "+ err);
       }
    });
 }
@@ -159,14 +157,14 @@ function deletePresistancyFiles() {
    try {
       require('fs').unlinkSync('/userdata/owntracks.json');
    } catch(err) {
-         logmodule.writelog(err);
+         logmodule.writelog('error', err);
          returnValue = true;
    }
 
    try {
       require('fs').unlinkSync('/userdata/owntracks_fences.json');
    } catch(err) {
-         logmodule.writelog(err);
+         logmodule.writelog('error', err);
          returnValue = true;
    }
 
@@ -240,13 +238,13 @@ function createEmptyUser(userName) {
    or when the token needs to be refreshed.
 */
 function addNewUser(args) {
-   if (DEBUG) logmodule.writelog("New user called: "+ args.body.userName);
+   logmodule.writelog('debug', "New user called: "+ args.body.userName);
    if (args.body.userName !== null && args.body.userName !== undefined && args.body.userName !== "" ) {
       var currentUser = getUser(args.body.userName);
       if (currentUser == null) {
          var newUser = createEmptyUser(args.body.userName);
          setUser(newUser, true);
-         logmodule.writelog("New user added: "+ newUser.userName);
+         logmodule.writelog('info', "New user added: "+ newUser.userName);
         return true;
       } else {
          currentUser.userToken = require('crypto').randomBytes(16).toString('hex');
@@ -257,12 +255,12 @@ function addNewUser(args) {
 }
 
 function deleteUser(args) {
-   if (DEBUG) logmodule.writelog("Delete user called: "+ args.body.userName);
+   logmodule.writelog('debug', "Delete user called: "+ args.body.userName);
    var result = false;
    for (var i=0; i < userArray.length; i++) {
       if (userArray[i].userName === args.body.userName) {
          var deletedUser = userArray.splice(i, 1);
-         logmodule.writelog("Deleted user: " + deletedUser.userName);
+         logmodule.writelog('info', "Deleted user: " + deletedUser.userName);
          result = true;
       }
    }
@@ -285,10 +283,10 @@ function setFence(fenceData) {
    if (entryArray !== null) {
       entryArray = fenceData;
       saveFenceData();
-      logmodule.writelog("Fence: " + fenceData.fenceName+" changed");   
+      logmodule.writelog('debug', "Fence: " + fenceData.fenceName+" changed");   
    } else {
       // Fence has not been found, so assume this is a new fence
-      logmodule.writelog("Fence: " + fenceData.fenceName+" Added");
+      logmodule.writelog('info', "Fence: " + fenceData.fenceName+" Added");
       
       if (fenceData.fenceName.length > 0) {
          fenceArray.push(fenceData);
@@ -304,7 +302,7 @@ function setFence(fenceData) {
 }
 
 function addNewFence(args) {
-   if (DEBUG) logmodule.writelog("New fence called: "+ args.body.fenceName);
+   logmodule.writelog('debug', "New fence called: "+ args.body.fenceName);
    if (args.body.fenceName !== null && args.body.fenceName !== undefined && args.body.fenceName !== "" ) { 
       if (getFence(args.body.fenceName) == null) {
          var newFence = {};
@@ -319,12 +317,12 @@ function addNewFence(args) {
 }
 
 function deleteFence(args) {
-   if (DEBUG) logmodule.writelog("Delete fence called: "+ args.body.fenceName);
+   logmodule.writelog('debug', "Delete fence called: "+ args.body.fenceName);
    var result = false;
    for (var i=0; i < fenceArray.length; i++) {
       if (fenceArray[i].fenceName === args.body.fenceName) {
          var deletedFence = fenceArray.splice(i, 1);
-         logmodule.writelog("Deleted fence: " + deletedFence.fenceName);
+         logmodule.writelog('info', "Deleted fence: " + deletedFence.fenceName);
          result = true;
       }
    }
@@ -333,20 +331,20 @@ function deleteFence(args) {
 }
 
 function getUserArray() {
-   if (DEBUG) logmodule.writelog("getUserArray called");
+   logmodule.writelog('debug', "getUserArray called");
    return userArray;
 }
 
 function getFenceArray() {
-   if (DEBUG) logmodule.writelog("getFenceArray called");
+   logmodule.writelog('debug', "getFenceArray called");
    return fenceArray;
 }
 
 function purgeUserData(args) {
-   logmodule.writelog("purgeUserData called");
+   logmodule.writelog('info', "purgeUserData called");
 
    var returnValue = deletePresistancyFiles();
-   logmodule.writelog("Return value: "+returnValue);
+   logmodule.writelog('debug', "Return value: "+returnValue);
    fenceArray = [];
    userArray = [];
    return returnValue;
@@ -378,7 +376,7 @@ function clearTopicArray() {
 }
 
 function searchUsersAutocomplete(key, wildcards) {
-   if (DEBUG) logmodule.writelog("searchUsers: "+ key);
+   logmodule.writelog('debug', "searchUsers: "+ key);
    var matchUsers = [];
    var temp = [];
 
@@ -390,21 +388,21 @@ function searchUsersAutocomplete(key, wildcards) {
    for (i=0; i < userArray.length; i++) {
       try {
          if (String(userArray[i].userName.toLowerCase()).includes(key.toLowerCase())) {
-           if (DEBUG) logmodule.writelog("key: " + key + "    userArray: " + userArray[i].userName);
+           logmodule.writelog('debug', "key: " + key + "    userArray: " + userArray[i].userName);
            temp.icon = '//';
            temp.name = userArray[i].userName;
            temp.user = userArray[i].userName;
            matchUsers.push({icon: temp.icon, name: temp.name, description: Homey.__("desc_all_users"), user: temp.name});
          }
       } catch(e) {
-          logmodule.writelog("Fill user autocomplete failed: "+ e);
+          logmodule.writelog('error', "Fill user autocomplete failed: "+ e);
       }
    }
    return matchUsers;
 }
 
 function searchFenceAutocomplete(key, wildcards) {
-   if (DEBUG) logmodule.writelog("searchFence: "+ key);
+   logmodule.writelog('debug', "searchFence: "+ key);
    var matchFence = [];
    var temp = [];
 
@@ -417,7 +415,7 @@ function searchFenceAutocomplete(key, wildcards) {
       try {
          if (String(fenceArray[i].fenceName.toLowerCase()).includes(key.toLowerCase())) {
             if (fenceArray[i].fenceName !== '') {
-               if (DEBUG) logmodule.writelog("key: " + key + "    fenceArray: " + fenceArray[i].fenceName);
+               logmodule.writelog('debug', "key: " + key + "    fenceArray: " + fenceArray[i].fenceName);
                temp.icon = '//';
                temp.name = fenceArray[i].fenceName;
                temp.fence = fenceArray[i].fenceName;
@@ -425,23 +423,23 @@ function searchFenceAutocomplete(key, wildcards) {
             }
          }
       } catch(e) {
-         logmodule.writelog("Fill fence autocomplete failed: "+ e);
+         logmodule.writelog('error', "Fill fence autocomplete failed: "+ e);
       }
    }
    return matchFence;
 }
 
 function getUserFromString(key) {
-   if (DEBUG) logmodule.writelog("Get the user from string: "+ key);
+   logmodule.writelog('debug', "Get the user from string: "+ key);
    var userIndex = -1;
    for (i=0; i < userArray.length; i++) {
       if (String(key).includes(userArray[i].userName)) {
-        if (DEBUG) logmodule.writelog("key: " + key + "    userArray: " + userArray[i].userName);
+        logmodule.writelog('debug', "key: " + key + "    userArray: " + userArray[i].userName);
         userIndex = i;
       }
    }
    if (userIndex == -1) {
-      logmodule.writelog("No users found");
+      logmodule.writelog('info', "No users found");
       return null;
    } else {
       logmodule.writelog(userArray[userIndex].userName);
@@ -450,15 +448,15 @@ function getUserFromString(key) {
 }
 
 function searchGeoFence(geoFence) {
-   if (DEBUG) logmodule.writelog("searchGeoFence: "+ geoFence);
+   logmodule.writelog('debug', "searchGeoFence: "+ geoFence);
    var matchFence = 0;
    for (i=0; i < userArray.length; i++) {
       if (String(userArray[i].fence).includes(geoFence)) {
-        if (DEBUG) logmodule.writelog("key: " + geoFence + "    userArray: " + userArray[i].fence);
+        logmodule.writelog('debug', "key: " + geoFence + "    userArray: " + userArray[i].fence);
         matchFence++;
       }
    }
-   logmodule.writelog("Number of matches: "+ matchFence);
+   logmodule.writelog('info', "Number of matches: "+ matchFence);
    return matchFence;
 }
 

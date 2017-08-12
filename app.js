@@ -9,8 +9,6 @@ var actions   = require("./actions.js");
 var triggers  = require("./triggers.js");
 var condition = require("./conditions.js");
 
-const DEBUG = true;
-
 class OwntracksApp extends Homey.App {
 
    /*
@@ -47,9 +45,9 @@ class OwntracksApp extends Homey.App {
    }
 
    changedSettings(args) {
-      logmodule.writelog("changedSettings called");
-      logmodule.writelog(args.body);
-      logmodule.writelog("topics:" + globalVar.getTopicArray())
+      logmodule.writelog('info', "changedSettings called");
+      logmodule.writelog('debug', args.body);
+      logmodule.writelog('info', "topics:" + globalVar.getTopicArray())
 
       try {
          if ((globalVar.getTopicArray().length > 0) && (broker.getConnectedClient() !== null)) {
@@ -61,11 +59,11 @@ class OwntracksApp extends Homey.App {
             broker.getConnectedClient().end(true);
          }
 
-         logmodule.writelog("topics:" + globalVar.getTopicArray());
+         logmodule.writelog('info', "topics:" + globalVar.getTopicArray());
          broker.clearConnectedClient();
          broker.connectToBroker();
       } catch (e) {
-         logmodule.writelog("changedSettings error: " +e)
+         logmodule.writelog('error', "changedSettings error: " +e)
          return e;
       }
       return true;
@@ -93,7 +91,7 @@ class OwntracksApp extends Homey.App {
 
    handleOwntracksEvents(args) {
       var result = httpHandler.handleOwntracksEvents(args);
-      if (DEBUG) logmodule.writelog("handleOwntracksEvents: " + JSON.stringify(result));
+      logmodule.writelog('debug', "handleOwntracksEvents: " + JSON.stringify(result));
       return result;
    }
 }

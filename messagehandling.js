@@ -5,8 +5,6 @@ const globalVar = require("./global.js");
 const logmodule = require("./logmodule.js");
 const triggers  = require("./triggers.js");
 
-var DEBUG = false;
-
 module.exports = {
    receiveMessage: function(topic, message, args, state) {
       receiveMessage(topic, message, args, state);
@@ -20,13 +18,13 @@ function receiveMessage(topic, message, args, state) {
    var topicArray = topic.split('/');
    var currentUser = {};
    
-   logmodule.writelog("received '" + message.toString() + "' on '" + topic + "'");
+   logmodule.writelog('info', "received '" + message.toString() + "' on '" + topic + "'");
 
    // parse the JSON message and put it in an object that we can use
    try {
       var jsonMsg = JSON.parse(message.toString());
    } catch(e) {
-      logmodule.writelog("Received message is not a valid JSON string");
+      logmodule.writelog('info', "Received message is not a valid JSON string");
       validJSON = false;
    };
 
@@ -47,7 +45,7 @@ function receiveMessage(topic, message, args, state) {
             // check the accuracy. If it is too low (i.e a high amount is meters) then perhaps we should skip the trigger
             if (jsonMsg.acc <= parseInt(Homey.ManagerSettings.get('accuracy'))) {
                // The accuracy of location is lower then the treshold value, so the location change will be trggerd
-               logmodule.writelog("Accuracy is within limits")
+               logmodule.writelog('info', "Accuracy is within limits")
 
                currentUser.lon = jsonMsg.lon;
                currentUser.lat = jsonMsg.lat;
@@ -62,7 +60,7 @@ function receiveMessage(topic, message, args, state) {
                switch (jsonMsg.event) {
                   case 'enter':
                      if (Homey.ManagerSettings.get('double_enter') == true) {
-                        logmodule.writelog("Double enter event check enabled");
+                        logmodule.writelog('info', "Double enter event check enabled");
                         if (currentUser.fence !== jsonMsg.desc)  {
                            validTransition = true;
                         } else {
@@ -81,17 +79,17 @@ function receiveMessage(topic, message, args, state) {
                              triggerFence: jsonMsg.desc
                           }
                           triggers.getEnterGeofenceAC().trigger(tokens,state,null).catch( function(e) {
-                            logmodule.writelog("Error occured: " +e);
+                            logmodule.writelog('error', "Error occured: " +e);
                           })
 
-                          logmodule.writelog("Trigger enter card for " + jsonMsg.desc);
+                          logmodule.writelog('info', "Trigger enter card for " + jsonMsg.desc);
                      } else {
-                        logmodule.writelog("The user is already within the fence. No need to trigger again");
+                        logmodule.writelog('info', "The user is already within the fence. No need to trigger again");
                      }
                      break;
                   case 'leave':
                      if (Homey.ManagerSettings.get('double_leave') == true) {
-                        logmodule.writelog("Double leave event check enabled");
+                        logmodule.writelog('info', "Double leave event check enabled");
                         if (currentUser.fence !== "")  {
                            validTransition = true;
                         } else {
@@ -112,9 +110,9 @@ function receiveMessage(topic, message, args, state) {
                         }
                         triggers.getLeaveGeofenceAC().trigger(tokens,state,null)
 
-                        logmodule.writelog("Trigger leave card for " + jsonMsg.desc);
+                        logmodule.writelog('info', "Trigger leave card for " + jsonMsg.desc);
                      } else {
-                        logmodule.writelog("The user is already outside the fence. No need to trigger again");
+                        logmodule.writelog('info', "The user is already outside the fence. No need to trigger again");
                      }
                      break;
                }
@@ -131,24 +129,24 @@ function receiveMessage(topic, message, args, state) {
                   }
                   triggers.getEventOwntracksAC().trigger(tokens,state,null)
                                                                   
-                  logmodule.writelog("Trigger generic card for " + jsonMsg.desc);
+                  logmodule.writelog('info', "Trigger generic card for " + jsonMsg.desc);
                } else {
-                  logmodule.writelog("This trigger is not needed because the transition is not valid");
+                  logmodule.writelog('info', "This trigger is not needed because the transition is not valid");
                }
             } else {
-               logmodule.writelog ("Accuracy is "+ jsonMsg.acc + " and needs to be below " + parseInt(Homey.ManagerSettings.get('accuracy')))
+               logmodule.writelog ('info', "Accuracy is "+ jsonMsg.acc + " and needs to be below " + parseInt(Homey.ManagerSettings.get('accuracy')))
             }
             break;
          case 'location':
             // This location object describes the location of the device that published it.
-            logmodule.writelog("We have received a location message");
+            logmodule.writelog('info', "We have received a location message");
             currentUser.lon = jsonMsg.lon;
             currentUser.lat = jsonMsg.lat;
             currentUser.timestamp = jsonMsg.tst;
             currentUser.tid = jsonMsg.tid;
             if (jsonMsg.batt !== undefined) {
                currentUser.battery = jsonMsg.batt;
-               logmodule.writelog("Set battery percentage for "+ currentUser.userName +" to "+ currentUser.battery+ "%");
+               logmodule.writelog('info', "Set battery percentage for "+ currentUser.userName +" to "+ currentUser.battery+ "%");
                
                let tokens = {
                   user: currentUser.userName, 
@@ -166,7 +164,7 @@ function receiveMessage(topic, message, args, state) {
          case 'waypoint' :
             // Waypoints denote specific geographical locations that you want to keep track of. You define a waypoint on the OwnTracks device, 
             // and OwnTracks publishes this waypoint (if the waypoint is marked shared)
-            logmodule.writelog("We have received a waypoint message");
+            logmodule.writelog('info', "We have received a waypoint message");
 
             // Set fenceData. This is done to update or add new
             // fences so they can be selected in an autocomplete box
@@ -180,8 +178,8 @@ function receiveMessage(topic, message, args, state) {
             break;
          case 'beacon' :
             // This payload contains information about detected iBeacon
-            logmodule.writelog("Beacon message detected:");
-            logmodule.writelog("uuid: "+jsonMsg.uuid+"major: "+jsonMsg.major+" minor: "+jsonMsg.minor+" tst: "+jsonMsg.tst+" acc: "+jsonMsg.acc+" rssi: "+jsonMsg.rssi+" prox: "+jsonMsg.prox);
+            logmodule.writelog('info', "Beacon message detected:");
+            logmodule.writelog('info', "uuid: "+jsonMsg.uuid+"major: "+jsonMsg.major+" minor: "+jsonMsg.minor+" tst: "+jsonMsg.tst+" acc: "+jsonMsg.acc+" rssi: "+jsonMsg.rssi+" prox: "+jsonMsg.prox);
             break;
          default:
             break;

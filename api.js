@@ -111,7 +111,7 @@ module.exports = [{
 //   requires_authorization: false,
    fn: function(args, callback) {
       var result = Homey.app.handleOwntracksEvents(args);
-      console.log("Result of POST: "+ JSON.stringify(result));
+      console.log("Result of POST: "+result);
       if( result instanceof Error ) callback( result );
       callback( null, result );
    }

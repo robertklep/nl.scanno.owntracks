@@ -2,8 +2,6 @@ var globalVar = require("./global.js");
 var logmodule = require("./logmodule.js");
 var handleMessage = require("./messagehandling.js");
 
-var DEBUG = true;
-
 module.exports = {
    handleOwntracksEvents: function(args) {
       return handleOwntracksEvents(args);
@@ -18,26 +16,26 @@ module.exports = {
    received from MQTT.
 */
 function handleOwntracksEvents(args) {
-   if (DEBUG) logmodule.writelog("handleOwntracksEvents called");
-   if (DEBUG) logmodule.writelog(JSON.stringify(args.query));
-   if (DEBUG) logmodule.writelog(JSON.stringify(args.body));
+   logmodule.writelog('debug', "handleOwntracksEvents called");
+   logmodule.writelog('debug', JSON.stringify(args.query));
+   logmodule.writelog('debug', JSON.stringify(args.body));
 
    var currentUser = globalVar.getUserByToken(args.query.token);
    if (currentUser == null) {
-      logmodule.writelog("Token "+ args.query.token + " is not found");
+      logmodule.writelog('info', "Token "+ args.query.token + " is not found");
       return false;
    }
    try {
       if (currentUser.userToken == args.query.token) {
          var dummyTopic = "owntracks/"+currentUser.userName+"/httpendpoint";
          handleMessage.receiveMessage(dummyTopic, JSON.stringify(args.body), null, null);
-         logmodule.writelog("User "+ currentUser.userName + " authenticated");
+         logmodule.writelog('info', "User "+ currentUser.userName + " authenticated");
          var result = createOwntracksLocationResponse();
-         if (DEBUG) logmodule.writelog("createOwntracksLocationResponse: "+ result);
+         logmodule.writelog('debug', "createOwntracksLocationResponse: "+  JSON.stringify(result));
          return result;	
        }
     } catch(err) {
-       logmodule.writelog("Error: " +err);
+       logmodule.writelog('error', "Error: " +err);
        return err;
     }
 }
@@ -62,9 +60,9 @@ function createOwntracksLocationResponse() {
          userLocationArray.push(userLocation);
          userLocation = {};
       }
-      if (DEBUG) logmodule.writelog(JSON.stringify(userLocationArray));
+      logmodule.writelog('debug', JSON.stringify(userLocationArray));
    } catch(err) {
-      logmodule.writelog("createOwntracksLocationResponse: "+ err);
+      logmodule.writelog('error', "createOwntracksLocationResponse: "+ err);
       return err;
    }
    return userLocationArray
