@@ -9,25 +9,35 @@ var actions   = require("./actions.js");
 var triggers  = require("./triggers.js");
 var condition = require("./conditions.js");
 
+const DEBUG = true;
 
 class OwntracksApp extends Homey.App {
- 
+
+   /*
+      Initialize the Owntracks app. Register all variables,
+      Connect to the broker when the broker is used.
+      Register triggers, actions and conditions
+   */
    onInit() {
-      this.log('My App is running!');
+      this.log('Owntracks App is running!');
       globalVar.initVars();
-//      triggers.getTriggerArgs().then(function() {
-         broker.connectToBroker();
-         triggers.listenForMessage()
-         actions.registerActions();
-         actions.registerSpeech();
-         condition.registerConditions();
- //     });
+      broker.connectToBroker();
+      triggers.listenForMessage()
+      actions.registerActions();
+      actions.registerSpeech();
+      condition.registerConditions();
    }
 
+   /*
+      getUserArray: Getter for returning the user array to settings.
+   */
    getUserArray() {
       return globalVar.getUserArray();
    }
 
+   /*
+      getFenceArray: Getter for returning the fence array to settings.
+   */
    getFenceArray() {
       return globalVar.getFenceArray();
    }
@@ -53,9 +63,7 @@ class OwntracksApp extends Homey.App {
 
          logmodule.writelog("topics:" + globalVar.getTopicArray());
          broker.clearConnectedClient();
- //        triggers.getTriggerArgs().then(function() {
-            broker.connectToBroker();
-//         });
+         broker.connectToBroker();
       } catch (e) {
          logmodule.writelog("changedSettings error: " +e)
          return e;
@@ -84,16 +92,10 @@ class OwntracksApp extends Homey.App {
    }
 
    handleOwntracksEvents(args) {
-      return httpHandler.handleOwntracksEvents(args);
+      var result = httpHandler.handleOwntracksEvents(args);
+      if (DEBUG) logmodule.writelog("handleOwntracksEvents: " + JSON.stringify(result));
+      return result;
    }
 }
 
-
 module.exports = OwntracksApp;
-//module.exports.purgeUserData = globalVar.purgeUserData;
-//module.exports.addNewUser = globalVar.addNewUser;
-//module.exports.deleteUser = globalVar.deleteUser;
-//module.exports.addNewFence = globalVar.addNewFence;
-//module.exports.deleteFence = globalVar.deleteFence;
-//module.exports.handleOwntracksEvents = httpHandler.handleOwntracksEvents;
-

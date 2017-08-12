@@ -108,11 +108,12 @@ module.exports = [{
    method:      'POST',
    path:        '/events/',
    public: true,
-   requires_authorization: false,
+//   requires_authorization: false,
    fn: function(args, callback) {
       var result = Homey.app.handleOwntracksEvents(args);
-      if( result instanceof Error ) return callback( result );
-      return callback( null, result );
+      console.log("Result of POST: "+ JSON.stringify(result));
+      if( result instanceof Error ) callback( result );
+      callback( null, result );
    }
 }
 

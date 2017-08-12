@@ -145,6 +145,7 @@ function receiveMessage(topic, message, args, state) {
             currentUser.lon = jsonMsg.lon;
             currentUser.lat = jsonMsg.lat;
             currentUser.timestamp = jsonMsg.tst;
+            currentUser.tid = jsonMsg.tid;
             if (jsonMsg.batt !== undefined) {
                currentUser.battery = jsonMsg.batt;
                logmodule.writelog("Set battery percentage for "+ currentUser.userName +" to "+ currentUser.battery+ "%");
