@@ -302,6 +302,7 @@ function getFence(fenceName) {
 }
 
 function setFence(fenceData) {
+   var result = true;
    try {
       var entryArray = getFence(fenceData.fenceName);
       if (entryArray !== null) {
@@ -311,22 +312,26 @@ function setFence(fenceData) {
       } else {
          // Fence has not been found, so assume this is a new fence
          logmodule.writelog('info', "Fence: " + fenceData.fenceName+" Added");
-      
-         if (fenceData.fenceName.length > 0) {
-            fenceArray.push(fenceData);
-            saveFenceData();
-            Homey.ManagerNotifications.registerNotification({
-               excerpt: Homey.__("notifications.fence_added", {"name": fenceData.fenceName})
-            }, function( err, notification ) {
-               if( err ) return console.error( err );
-                  console.log( 'Notification added' );
-            });
+         if (fenceData.fenceName !== undefined) {
+            if (fenceData.fenceName.length > 0) {
+               fenceArray.push(fenceData);
+               saveFenceData();
+               Homey.ManagerNotifications.registerNotification({
+                  excerpt: Homey.__("notifications.fence_added", {"name": fenceData.fenceName})
+               }, function( err, notification ) {
+                  if( err ) return console.error( err );
+                     console.log( 'Notification added' );
+               });
+            }
+         } else {
+            result = false;
          }
       }
    } catch(err) {
       logmodule.writelog('error', "setFence: " +err);
       return err;
    }
+   return result;
 }
 
 function addNewFence(args) {
@@ -337,9 +342,9 @@ function addNewFence(args) {
             var newFence = {};
             newFence.fenceName = args.body.fenceName;
             newFence.timestamp = 0;
-            setFence(newFence);
-            logmodule.writelog("New fence added: "+ newFence.fenceName);
-            return true;
+            var result = setFence(newFence);
+            if (result === true) logmodule.writelog("New fence added: "+ newFence.fenceName);
+            return result;
          }
       }
       return false;
