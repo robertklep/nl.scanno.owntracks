@@ -30,9 +30,10 @@ function handleOwntracksEvents(args) {
          var dummyTopic = "owntracks/"+currentUser.userName+"/httpendpoint";
          handleMessage.receiveMessage(dummyTopic, JSON.stringify(args.body), null, null);
          logmodule.writelog('info', "User "+ currentUser.userName + " authenticated");
-         var result = createOwntracksLocationResponse();
-         logmodule.writelog('debug', "createOwntracksLocationResponse: "+  JSON.stringify(result));
-         return result;	
+//         var result = createOwntracksLocationResponse();
+//         logmodule.writelog('debug', "createOwntracksLocationResponse: "+  JSON.stringify(result));
+//         return result;	
+          return true;
        }
     } catch(err) {
        logmodule.writelog('error', "Error: " +err);
