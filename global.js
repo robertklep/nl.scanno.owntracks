@@ -295,6 +295,9 @@ class globalOwntracks {
             if (ref.getFence(args.body.fenceName) == null) {
                var newFence = {};
                newFence.fenceName = args.body.fenceName;
+               if (args.body.lon == undefined) newFence.lon = 0;
+               if (args.body.lat == undefined) newFence.lat = 0;
+               if (args.body.rad == undefined) newFence.rad = 0;
                newFence.timestamp = 0;
                var result = ref.setFence(newFence);
                if (result === true) ref.logmodule.writelog("New fence added: "+ newFence.fenceName);

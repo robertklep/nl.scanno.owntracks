@@ -518,19 +518,37 @@
                  table.deleteRow(-1);
               }
            }
+           var header = table.createTHead();
+           var rowhead = header.insertRow(0);
+           var cellhead = rowhead.insertCell(0);
+           var cellhead1 = rowhead.insertCell(1);
+           var cellhead2 = rowhead.insertCell(2);
+           var cellhead3 = rowhead.insertCell(3);
+           cellhead.innerHTML = "<b>Fence</b>";
+           cellhead1.innerHTML="<b>Lon</b>";
+           cellhead2.innerHTML="<b>Lat</b>";
+           cellhead3.innerHTML="<b>Radius</b>";
+
            HomeyAPI.api('GET', 'test/getFenceArray/', function(err, result) {
               if (!err) {
                  console.log("FenceArray data ok");
                  for (var i=0; i < result.length; i++) {
                     console.log("Create row for " + result[i].fenceName);
-                    var row = table.insertRow(i);
+                    var row = table.insertRow(i+1);
                     if (isEven(table.rows.length)) {
                        row.style.backgroundColor = "rgb(250,250,250)";
                     }
                     var cell1 = row.insertCell(0);
                     var cell2 = row.insertCell(1);
+                    var cell3 = row.insertCell(2);
+                    var cell4 = row.insertCell(3);
+                    var cell5 = row.insertCell(4);
                     cell1.innerHTML = result[i].fenceName;
-                    cell2.innerHTML = '<button type="button" value="button" onclick="deleteFenceRow(this)">-</button>'
+                    cell2.innerHTML = result[i].lon;
+                    cell3.innerHTML = result[i].lat;
+                    cell4.style.textAlign="right";
+                    cell4.innerHTML = result[i].rad;
+                    cell5.innerHTML = '<button type="button" value="button" onclick="deleteFenceRow(this)">-</button>'
                  }
               };
            });

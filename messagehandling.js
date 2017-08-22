@@ -52,6 +52,9 @@ class handleOwntracks {
                   // Set fenceData. This is done to update or add new
                   // fences so they can be selected in an autocomplete box
                   fenceData.fenceName = jsonMsg.desc;
+                  fenceData.lon = jsonMsg.lon;
+                  fenceData.lat = jsonMsg.lat;
+                  fenceData.rad = jsonMsg.rad;
                   fenceData.timestamp = jsonMsg.tst;
                   ref.globalVar.setFence(fenceData);
 
@@ -168,9 +171,27 @@ class handleOwntracks {
                // fences so they can be selected in an autocomplete box
                var fenceData = {}
                fenceData.fenceName = jsonMsg.desc;
+               fenceData.lon = jsonMsg.lon;
+               fenceData.lat = jsonMsg.lat;
+               fenceData.rad = jsonMsg.rad;
                fenceData.timestamp = jsonMsg.tst;
                ref.globalVar.setFence(fenceData);
                break;
+            case 'waypoints' :
+               // The message type waypoints is send when publish waypoints is selected in the owntracks phone app.
+               // The phone app sends all regions to homey. So lets handle that message and add all the regions 
+               // as geofence. Also store the coordinates and radius. 
+               var fenceData = {}
+               for (let i=0; i < jsonMsg.waypoints.length; i++) {
+                  ref.logmodule.writelog('debug', "Waypoint "+i+": "+JSON.stringify(jsonMsg.waypoints[i]));
+                  fenceData = {};
+                  fenceData.fenceName = jsonMsg.waypoints[i].desc;
+                  fenceData.lon = jsonMsg.waypoints[i].lon;
+                  fenceData.lat = jsonMsg.waypoints[i].lat;
+                  fenceData.rad = jsonMsg.waypoints[i].rad;
+                  fenceData.timestamp = jsonMsg.waypoints[i].tst;
+                  ref.globalVar.setFence(fenceData);
+               }
             case 'encrypted' :
                // This payload type contains a single data element with the original JSON object _type (e.g. location, beacon, etc.) encrypted payload in it.
                break;
