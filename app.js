@@ -1,13 +1,14 @@
 "use strict";
+
 const Homey = require('homey');
 
-var globalVar = require("./global.js");
-var logmodule = require("./logmodule.js");
-var broker    = require("./broker.js");
-var httpHandler = require("./httphandler.js");
-var actions   = require("./actions.js");
-var triggers  = require("./triggers.js");
-var condition = require("./conditions.js");
+var globalOwntracks = require("./global.js");
+
+var brokerOwntracks = require("./broker.js");
+var httpOwntracks = require("./httphandler.js");
+var actionOwntracks = require("./actions.js");
+var triggerOwntracks = require("./triggers.js");
+var conditionOwntracks = require("./conditions.js");
 
 class OwntracksApp extends Homey.App {
 
@@ -18,80 +19,82 @@ class OwntracksApp extends Homey.App {
    */
    onInit() {
       this.log('Owntracks App is running!');
-      globalVar.initVars();
-      broker.connectToBroker();
-      triggers.listenForMessage()
-      actions.registerActions();
-      actions.registerSpeech();
-      condition.registerConditions();
+      this.logmodule = require("./logmodule.js");
+      this.globalVar = new globalOwntracks(this);
+      this.broker    = new brokerOwntracks(this);
+      this.triggers  = new triggerOwntracks(this);
+      this.actions   = new actionOwntracks(this);
+      this.condition = new conditionOwntracks(this);
+      this.httpHandler = new httpOwntracks(this);
+      this.broker.updateRef(this);
    }
 
    /*
       getUserArray: Getter for returning the user array to settings.
    */
    getUserArray() {
-      return globalVar.getUserArray();
+      return this.globalVar.getUserArray();
    }
 
    /*
       getFenceArray: Getter for returning the fence array to settings.
    */
    getFenceArray() {
-      return globalVar.getFenceArray();
+      return this.globalVar.getFenceArray();
    }
 
    getLogLines() {
-      return logmodule.getLogLines();
+      return this.logmodule.getLogLines();
    }
 
    changedSettings(args) {
-      logmodule.writelog('info', "changedSettings called");
-      logmodule.writelog('debug', args.body);
-      logmodule.writelog('info', "topics:" + globalVar.getTopicArray())
+      this.logmodule.writelog('info', "changedSettings called");
+      this.logmodule.writelog('debug', args.body);
+      this.logmodule.writelog('info', "topics:" + this.globalVar.getTopicArray())
 
       try {
-         if ((globalVar.getTopicArray().length > 0) && (broker.getConnectedClient() !== null)) {
-            broker.getConnectedClient().unsubscribe("owntracks/#");
-            globalVar.clearTopicArray();
+         if ((this.globalVar.getTopicArray().length > 0) && (this.broker.getConnectedClient() !== null)) {
+            this.broker.getConnectedClient().unsubscribe("owntracks/#");
+            this.globalVar.clearTopicArray();
          };
 
-         if (broker.getConnectedClient() !== null) {
-            broker.getConnectedClient().end(true);
+         if (this.broker.getConnectedClient() !== null) {
+            this.broker.getConnectedClient().end(true);
          }
 
-         logmodule.writelog('info', "topics:" + globalVar.getTopicArray());
-         broker.clearConnectedClient();
-         broker.connectToBroker();
-      } catch (e) {
-         logmodule.writelog('error', "changedSettings error: " +e)
-         return e;
+         this.logmodule.writelog('info', "topics:" + this.globalVar.getTopicArray());
+         this.broker.clearConnectedClient();
+         this.broker.connectToBroker();
+      } catch (err) {
+         this.logmodule.writelog('error', "changedSettings error: " +err)
+         return err;
       }
       return true;
    }
 
    addNewUser(args) {
-      return globalVar.addNewUser(args);
+      return this.globalVar.addNewUser(args);
    }
 
    deleteUser(args) {
-      return globalVar.deleteUser(args);
+      return this.globalVar.deleteUser(args);
    }
 
    addNewFence(args) {
-      return globalVar.addNewFence(args);
+      return this.globalVar.addNewFence(args);
    }
 
    deleteFence(args) {
-      return globalVar.deleteFence(args);
+      return this.globalVar.deleteFence(args);
    }
    
    purgeUserData(args) {
-      return globalVar.purgeUserData(args);
+      return this.globalVar.purgeUserData(args);
    }
 
    handleOwntracksEvents(args) {
-      var result = httpHandler.handleOwntracksEvents(args);
-      logmodule.writelog('debug', "handleOwntracksEvents: " + JSON.stringify(result));
+      var result = this.httpHandler.handleOwntracksEvents(args);
+      this.logmodule.writelog('debug', "handleOwntracksEvents: " + JSON.stringify(result));
       return result;
    }
 }
