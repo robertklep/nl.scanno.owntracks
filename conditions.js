@@ -1,49 +1,51 @@
 "use strict";
-const Homey = require('homey');
 
-var globalVar = require("./global.js");
-var logmodule = require("./logmodule.js");
+class conditionOwntracks {
+   constructor(app) {
+      this.Homey = require('homey');
+      this.globalVar = app.globalVar;
+      this.logmodule = app.logmodule;
 
-var inGeofence = null;
-
-module.exports = {
-   registerConditions: function() {
-      registerConditions();
+      this.inGeofence = null;
+      
+      this.OnInit();
    }
-}
-
-function registerConditions() {
-   logmodule.writelog("registerConditions called");
-/*   Homey.manager('flow').on('condition.inGeofence', function( callback, args ){
-       var result = checkForPresenceInFence( args.geoFence.name );
-       callback( null, result );
-   }); */
    
-   inGeofence = new Homey.FlowCardCondition('inGeofence');
-   inGeofence.register();
-   inGeofence.registerRunListener((args, state ) => {
-      logmodule.writelog('info', "inGeofence.registerRunListener called");
-      try {
-        var result = checkForPresenceInFence( args.geoFence.name );
-        return Promise.resolve( result );
-      } catch(err) {
-         logmodule.writelog('error', "Error in inGeofence.registerRunListener: " + err);
-         return Promise.reject(err);
+   OnInit() {
+      this.registerConditions();
+   }
+   
+   registerConditions() {
+      const ref = this;
+      ref.logmodule.writelog('debug', "registerConditions called");
+   
+      ref.inGeofence = new ref.Homey.FlowCardCondition('inGeofence');
+      ref.inGeofence.register();
+      ref.inGeofence.registerRunListener((args, state ) => {
+         ref.logmodule.writelog('info', "inGeofence.registerRunListener called");
+         try {
+           var result = ref.checkForPresenceInFence( args.geoFence.name );
+           return Promise.resolve( result );
+         } catch(err) {
+            ref.logmodule.writelog('error', "Error in inGeofence.registerRunListener: " + err);
+            return Promise.reject(err);
+         }
+      });
+
+      ref.inGeofence.getArgument('geoFence').registerAutocompleteListener( (query, args ) => { 
+         return Promise.resolve(ref.globalVar.searchFenceAutocomplete(query, false) );
+      });
+   }
+
+
+   checkForPresenceInFence(geoFence) {
+      this.logmodule.writelog('info', "checkForPresenceInFence called");
+      if (this.globalVar.searchGeoFence(geoFence) > 0) {
+         return true;
+      } else {
+         return false;
       }
-   });
-
-   inGeofence.getArgument('geoFence').registerAutocompleteListener( (query, args ) => { 
-      return Promise.resolve(globalVar.searchFenceAutocomplete(query, false) );
-   });
-}
-
-
-function checkForPresenceInFence(geoFence) {
-   logmodule.writelog('info', "checkForPresenceInFence called");
-   if (globalVar.searchGeoFence(geoFence) > 0) {
-      return true;
-   } else {
-      return false;
    }
 }
 
+module.exports = conditionOwntracks;
