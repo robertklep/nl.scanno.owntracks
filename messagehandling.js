@@ -169,7 +169,7 @@ class handleOwntracks {
                var fenceData = {}
                fenceData.fenceName = jsonMsg.desc;
                fenceData.timestamp = jsonMsg.tst;
-               globalVar.setFence(fenceData);
+               ref.globalVar.setFence(fenceData);
                break;
             case 'encrypted' :
                // This payload type contains a single data element with the original JSON object _type (e.g. location, beacon, etc.) encrypted payload in it.
