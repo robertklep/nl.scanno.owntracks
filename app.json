@@ -22,9 +22,13 @@
    "speech": {
       "en": {
          "element": {
-            "actionWords": {
+            "action_Where": {
                "type": "regex",
-               "value": "(where(\\sis)?|what(\\sis)?)"
+               "value": "where(\\sis)?"
+             },
+             "action_What": {
+                "type": "regex",
+                "value": "what(\\sis)?"
              },
              "location": {
                 "type": "regex",
@@ -37,13 +41,13 @@
          },
          "group": {
             "main": {
-               "set": "(actionWords) && location && query",
+               "set": "action_What && location && query",
                "ordered": false,
                "allowDisconnect": true,
                "capturingGroup": true
             },
             "where_is": {
-               "set": "actionWords && query",
+               "set": "action_Where && query",
                "ordered": false,
                "allowDisconnect": true,
                "capturingGroup": true
@@ -52,13 +56,17 @@
       },
       "nl": {
          "element": {
-            "actionWords": {
+            "action_Where": {
                "type": "regex",
-               "value": "(waar(\\sis)?|wat(\\sis)?)"
+               "value": "waar(\\sis)?"
+             },
+             "action_What": {
+                "type": "regex",
+                "value": "wat(\\sis)?"
              },
              "location": {
                 "type": "regex",
-                "value": "((de\\s)?lokatie)"
+                "value": "((de\\s)?lo[ck]atie)"
              },
              "query": {
                 "type": "regex",
@@ -67,13 +75,13 @@
          },
          "group": {
             "main": {
-               "set": "(actionWords) && location && query",
+               "set": "action_What && location && query",
                "ordered": false,
                "allowDisconnect": true,
                "capturingGroup": true
             },
             "where_is": {
-               "set": "actionWords && query",
+               "set": "action_Where && query",
                "ordered": false,
                "allowDisconnect": true,
                "capturingGroup": true

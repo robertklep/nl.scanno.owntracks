@@ -433,7 +433,7 @@ class globalOwntracks {
       this.logmodule.writelog('debug', "Get the user from string: "+ key);
       var userIndex = -1;
       for (var i=0; i < this.userArray.length; i++) {
-         if (String(key).includes(this.userArray[i].userName)) {
+         if (String(key.toLowerCase()).includes(this.userArray[i].userName.toLowerCase())) {
            this.logmodule.writelog('debug', "key: " + key + "    userArray: " + this.userArray[i].userName);
            userIndex = i;
          }
