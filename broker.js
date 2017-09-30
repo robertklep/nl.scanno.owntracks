@@ -34,16 +34,15 @@ class brokerOwntracks {
    }
 
    getConnectOptions() {
-      var rejectUnauth = "true";
+      var rejectUnauth = true;
       if ( this.Homey.ManagerSettings.get('selfsigned') == true) {
-         rejectUnauth = "false";
+         rejectUnauth = false;
       }
-      var connect_options = {
-         keepalive: 10,
-         username: this.Homey.ManagerSettings.get('user'),
-         password: this.Homey.ManagerSettings.get('password'),
-         rejectUnauthorized: rejectUnauth
-      };
+      var connect_options = {};
+      connect_options.keepalive = 10;
+      connect_options.username = this.Homey.ManagerSettings.get('user');
+      connect_options.password = this.Homey.ManagerSettings.get('password');
+      connect_options.rejectUnauthorized = rejectUnauth;
       this.logmodule.writelog('info', "rejectUnauthorized: " + connect_options.rejectUnauthorized);
       return connect_options;
    }
