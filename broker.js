@@ -74,7 +74,7 @@ class brokerOwntracks {
              });
 
             ref.connectedClient.on('error', function(error) {
-               ref.logmodule.writelog('error', "MQTT error occured: " + error);
+               ref.logmodule.writelog('info', "MQTT error occured: " + error);
             });
 
             // On connection ...
