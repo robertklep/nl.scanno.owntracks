@@ -66,17 +66,17 @@
             <legend>
                 <label data-i18n="settings.app.client.client_settings"></label>
             </legend>
-            
+
             <p data-i18n="settings.app.client.accuracy_explanation"></p>
-            
+
             <div class="field row">
                 <label class="form_label" for="Accuracy" data-i18n="settings.app.client.accuracy"></label>
                 <br>
                 <input class="form_input" id="accuracy" type="text" value="100" /> <br>
             </div>
-            
+
             <p data-i18n="settings.app.client.doublevent_explanation"></p>
-           
+
             <div class="field">
                 <input class="checkbox" id="double_enter" type="checkbox" />
                 <label class="form_label" for="double_enter" data-i18n="settings.app.client.double_enter"></label>
@@ -86,20 +86,20 @@
                 <input class="checkbox" id="double_leave" type="checkbox" />
                 <label class="form_label" for="double_leave" data-i18n="settings.app.client.double_leave"></label>
             </div>
-            
+
         </fieldset>
 
         <fieldset id="data_settings">
             <legend>
                 <label data-i18n="settings.app.data.data_settings"></label>
             </legend>
-            
+
             <p data-i18n="settings.app.data.data_explanation"></p>
 
             <div>
-               <button type="button" id="button_userStatus" onclick="createUserStatus()" data-i18n="settings.app.button.userStatus">Show Userdata</button> 
-               <button type="button" id="button_userTable" onclick="createUserTable()" data-i18n="settings.app.button.userArray">Edit Userdata</button> 
-               <button type="button" id="button_fenceTable" onclick="createFenceTable()" data-i18n="settings.app.button.fenceArray">Edit geofences</button> 
+               <button type="button" id="button_userStatus" onclick="createUserStatus()" data-i18n="settings.app.button.userStatus">Show Userdata</button>
+               <button type="button" id="button_userTable" onclick="createUserTable()" data-i18n="settings.app.button.userArray">Edit Userdata</button>
+               <button type="button" id="button_fenceTable" onclick="createFenceTable()" data-i18n="settings.app.button.fenceArray">Edit geofences</button>
             </div>
 
             <fieldset id="edit_data">
@@ -109,7 +109,7 @@
                <div id="data_addRow"></div>
             </fieldset>
 
-            <button type="button" id="button_purge" onclick="purgeUserData()" data-i18n="settings.app.button.purgedata">Purge Data</button>           
+            <button type="button" id="button_purge" onclick="purgeUserData()" data-i18n="settings.app.button.purgedata">Purge Data</button>
 
         </fieldset>
 
@@ -322,14 +322,14 @@
                     // Oeps, something went wrong here
                     HomeyAPI.alert(__('settings.app.messages.unable_set_settings'));
                 }
-                
+
             });
         }
 
         function purgeUserData() {
  //          var resultConfirm = confirm(HomeyAPI.__('settings.app.data.data_purge_confirm'));
            HomeyAPI.confirm( HomeyAPI.__('settings.app.data.data_purge_confirm'), 'warning', function(err, result) {
-           
+
            console.log(result);
            if (result == true) {
               HomeyAPI.api('GET', 'test/purgeUserData/', function(err, result) {
@@ -367,7 +367,7 @@
            });
         }
 
-        function showUserArray() {
+/*        function showUserArray() {
            HomeyAPI.api('GET', 'test/getUserArray/', function(err, result) {
               if (!err) {
                  document.getElementById('userdata').innerHTML = '';
@@ -380,7 +380,7 @@
                  }
               };
            });
-        }
+        } */
 
         function isEven(n) {
            return n == parseFloat(n)? !(n%2) : void 0;
@@ -402,11 +402,13 @@
            var cellhead2 = rowhead.insertCell(2);
            var cellhead3 = rowhead.insertCell(3);
            var cellhead4 = rowhead.insertCell(4);
+           var cellhead5 = rowhead.insertCell(5);
            cellhead.innerHTML = "<b>User</b>";
            cellhead1.innerHTML="<b>Fence</b>";
            cellhead2.innerHTML="<b>Lon</b>";
            cellhead3.innerHTML="<b>Lat</b>";
            cellhead4.innerHTML="<b>Battery</b>";
+           cellhead5.innerHTML="<b>Device</b>";
 
            HomeyAPI.api('GET', 'test/getUserArray/', function(err, result) {
               if (!err) {
@@ -421,11 +423,13 @@
                     var cell3 = row.insertCell(2);
                     var cell4 = row.insertCell(3);
                     var cell5 = row.insertCell(4);
+                    var cell6 = row.insertCell(5);
                     cell1.innerHTML = result[i].userName;
                     cell2.innerHTML = result[i].fence;
                     cell3.innerHTML = result[i].lon;
                     cell4.innerHTML = result[i].lat;
                     cell5.innerHTML = result[i].battery+"%";
+                    cell6.innerHTML = result[i].userDevice;
                  }
               };
            });
@@ -508,7 +512,7 @@
               });
            }
         }
-        
+
         function createFenceTable() {
            var table = document.getElementById("userTable");
            document.getElementById("userTable").style.width = "";
@@ -591,4 +595,3 @@
 
     </body>
 </html>
-

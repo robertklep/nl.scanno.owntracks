@@ -19,7 +19,7 @@ class globalOwntracks {
    /*
       initVars() is called as soon as the owntracks app is loaded and it will
       initialise the unload event that will persist the userArray and fenceArray
-      It also loads the userArray and fenceArray from file and puts them in the 
+      It also loads the userArray and fenceArray from file and puts them in the
       array.
    */
    initVars() {
@@ -32,7 +32,7 @@ class globalOwntracks {
          if (err) {
             ref.logmodule.writelog('error', "Retreiving userArray failed: "+ err);
          } else {
-            try { 
+            try {
                 ref.userArray = JSON.parse(data);
             } catch (err) {
                ref.logmodule.writelog('error', "Parsing userArray failed: "+ err);
@@ -117,7 +117,7 @@ class globalOwntracks {
          returnValue = true;
       }
 
-      return returnValue; 
+      return returnValue;
    }
 
    /*
@@ -155,7 +155,7 @@ class globalOwntracks {
       const ref = this;
       try {
          var entryArray = ref.getUser(userData.userName);
-   
+
          if (entryArray !== null) {
             entryArray = userData;
          } else {
@@ -177,7 +177,7 @@ class globalOwntracks {
       }
    }
 
-   createEmptyUser(userName) {
+   createEmptyUser(userName, userDevice) {
       try {
          var newUser = {};
          newUser.userName = userName;
@@ -185,6 +185,7 @@ class globalOwntracks {
          newUser.fence = "";
          newUser.battery = 0;
          newUser.battTriggered = false;
+         newUser.userDevice = userDevice;
          return newUser;
       } catch(err) {
          this.logmodule.writelog('error', "createEmptyUser: " +err);
@@ -203,7 +204,7 @@ class globalOwntracks {
          if (args.body.userName !== null && args.body.userName !== undefined && args.body.userName !== "" ) {
             var currentUser = ref.getUser(args.body.userName);
             if (currentUser == null) {
-               var newUser = ref.createEmptyUser(args.body.userName);
+               var newUser = ref.createEmptyUser(args.body.userName, args.body.userDevice);
                ref.setUser(newUser, true);
                ref.logmodule.writelog('info', "New user added: "+ newUser.userName);
               return true;
@@ -261,7 +262,7 @@ class globalOwntracks {
          if (entryArray !== null) {
             entryArray = fenceData;
             ref.saveFenceData();
-            ref.logmodule.writelog('debug', "Fence: " + fenceData.fenceName+" changed");   
+            ref.logmodule.writelog('debug', "Fence: " + fenceData.fenceName+" changed");
          } else {
             // Fence has not been found, so assume this is a new fence
             ref.logmodule.writelog('info', "Fence: " + fenceData.fenceName+" Added");
@@ -291,7 +292,7 @@ class globalOwntracks {
       const ref = this;
       try {
          ref.logmodule.writelog('debug', "New fence called: "+ args.body.fenceName);
-         if (args.body.fenceName !== null && args.body.fenceName !== undefined && args.body.fenceName !== "" ) { 
+         if (args.body.fenceName !== null && args.body.fenceName !== undefined && args.body.fenceName !== "" ) {
             if (ref.getFence(args.body.fenceName) == null) {
                var newFence = {};
                newFence.fenceName = args.body.fenceName;
@@ -357,7 +358,7 @@ class globalOwntracks {
             return this.topicArray[i];
          }
       }
-      // User has not been found, so return null
+      // Topic has not been found, so return null
       return null
    }
 
@@ -366,7 +367,7 @@ class globalOwntracks {
       if (entryArray !== null) {
          entryArray = topicData;
       } else {
-         // User has not been found, so assume this is a new user
+         // Topic has not been found, so assume this is a new user
          this.topicArray.push(topicData);
       }
    }

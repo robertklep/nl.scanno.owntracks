@@ -6,7 +6,7 @@ class handleOwntracks {
       this.globalVar = app.globalVar;
       this.logmodule = app.logmodule;
       this.triggers  = app.triggers;
-   
+
    }
 
    receiveMessage(topic, message, args, state) {
@@ -15,7 +15,7 @@ class handleOwntracks {
       var validTransition = false;
       var topicArray = topic.split('/');
       var currentUser = {};
-   
+
       ref.logmodule.writelog('info', "received '" + message.toString() + "' on '" + topic + "'");
 
       // parse the JSON message and put it in an object that we can use
@@ -26,16 +26,23 @@ class handleOwntracks {
          validJSON = false;
       };
 
-      // owntracks has several different mesages that can be retreived and that should be handeld 
+      // owntracks has several different mesages that can be retreived and that should be handeld
       // differently. For now we only support the transition message. But prepare for more.
       // for more information see http://owntracks.org/booklet/tech/json/
       if (validJSON && jsonMsg._type !== undefined) {
          // get the user this message is from. This can be found in the topic the message is published in
          currentUser = ref.globalVar.getUser(topicArray[1]);
          if (currentUser === null) {
-            currentUser = ref.globalVar.createEmptyUser(topicArray[1]);
+            currentUser = ref.globalVar.createEmptyUser(topicArray[1], topicArray[2]);
+         } else {
+           // Check if we already know the device the user is using. If not, add the device to the
+           // user data. If the known device differs from the actual device, update!
+           if (currentUser.userDevice == undefined || currentUser.userDevice !== topicArray[2]) {
+             currentUser.userDevice = topicArray[2];
+             ref.logmodule.writelog('error', "Device changed for user "+currentUser.userName+" to " + currentUser.userDevice);
+           }
          }
-      
+
          switch (jsonMsg._type) {
             case 'transition':
                var fenceData = {};
@@ -71,12 +78,12 @@ class handleOwntracks {
                         if (validTransition == true) {
                              currentUser.fence = jsonMsg.desc;
                              let tokens = {
-                                user: currentUser.userName, 
-                                fence: jsonMsg.desc, 
+                                user: currentUser.userName,
+                                fence: jsonMsg.desc,
                                 percBattery: currentUser.battery
                              }
                              let state = {
-                                triggerTopic: topic, 
+                                triggerTopic: topic,
                                 triggerFence: jsonMsg.desc
                              }
                              ref.triggers.getEnterGeofenceAC().trigger(tokens,state,null).catch( function(e) {
@@ -99,14 +106,14 @@ class handleOwntracks {
                         }
                         if (validTransition == true) {
                            currentUser.fence = "";
-                        
+
                            let tokens = {
-                              user: currentUser.userName, 
-                              fence: jsonMsg.desc, 
+                              user: currentUser.userName,
+                              fence: jsonMsg.desc,
                               percBattery: currentUser.battery
                            }
                            let state = {
-                              triggerTopic: topic, 
+                              triggerTopic: topic,
                               triggerFence: jsonMsg.desc
                            }
                            ref.triggers.getLeaveGeofenceAC().trigger(tokens,state,null)
@@ -120,16 +127,16 @@ class handleOwntracks {
                   if (validTransition === true) {
                      let tokens = {
                         event: jsonMsg.event,
-                        user: currentUser.userName, 
-                        fence: jsonMsg.desc, 
+                        user: currentUser.userName,
+                        fence: jsonMsg.desc,
                         percBattery: currentUser.battery
                      }
                      let state = {
-                        triggerTopic: topic, 
+                        triggerTopic: topic,
                         triggerFence: jsonMsg.desc
                      }
                      ref.triggers.getEventOwntracksAC().trigger(tokens,state,null)
-                                                                  
+
                      ref.logmodule.writelog('info', "Trigger generic card for " + jsonMsg.desc);
                   } else {
                      ref.logmodule.writelog('info', "This trigger is not needed because the transition is not valid");
@@ -148,14 +155,14 @@ class handleOwntracks {
                if (jsonMsg.batt !== undefined) {
                   currentUser.battery = jsonMsg.batt;
                   ref.logmodule.writelog('info', "Set battery percentage for "+ currentUser.userName +" to "+ currentUser.battery+ "%");
-               
+
                   let tokens = {
-                     user: currentUser.userName, 
-                     fence: jsonMsg.desc, 
+                     user: currentUser.userName,
+                     fence: jsonMsg.desc,
                      percBattery: currentUser.battery
                   }
                   let state = {
-                     triggerTopic: topic, 
+                     triggerTopic: topic,
                      percBattery: currentUser.battery,
                      user: currentUser.userName
                   }
@@ -163,7 +170,7 @@ class handleOwntracks {
                }
                break;
             case 'waypoint' :
-               // Waypoints denote specific geographical locations that you want to keep track of. You define a way point on the OwnTracks device, 
+               // Waypoints denote specific geographical locations that you want to keep track of. You define a way point on the OwnTracks device,
                // and OwnTracks publishes this waypoint (if the waypoint is marked shared)
                ref.logmodule.writelog('info', "We have received a waypoint message");
 
@@ -179,8 +186,8 @@ class handleOwntracks {
                break;
             case 'waypoints' :
                // The message type waypoints is send when publish waypoints is selected in the owntracks phone app.
-               // The phone app sends all regions to homey. So lets handle that message and add all the regions 
-               // as geofence. Also store the coordinates and radius. 
+               // The phone app sends all regions to homey. So lets handle that message and add all the regions
+               // as geofence. Also store the coordinates and radius.
                var fenceData = {}
                for (let i=0; i < jsonMsg.waypoints.length; i++) {
                   ref.logmodule.writelog('debug', "Waypoint "+i+": "+JSON.stringify(jsonMsg.waypoints[i]));
@@ -206,6 +213,15 @@ class handleOwntracks {
          ref.globalVar.setUser(currentUser, validTransition);
       }
    }
+
+   /*
+      sendCommand: Send a command to connected clients
+   */
+   sendCommand(command, user) {
+     arrayWayoint = [];
+
+   }
+
    updateRef(app) {
       this.triggers = app.triggers;
    }
