@@ -87,7 +87,7 @@ class OwntracksApp extends Homey.App {
    deleteFence(args) {
       return this.globalVar.deleteFence(args);
    }
-   
+
    purgeUserData(args) {
       return this.globalVar.purgeUserData(args);
    }
@@ -96,6 +96,24 @@ class OwntracksApp extends Homey.App {
       var result = this.httpHandler.handleOwntracksEvents(args);
       this.logmodule.writelog('debug', "handleOwntracksEvents: " + JSON.stringify(result));
       return result;
+   }
+
+   /*
+     uploadFenceData(args) is called from the settings page to push fench data to the
+     device of the selected user.
+   */
+   uploadFenceData(args) {
+     try {
+       var topic = "owntracks/"+args.body.userName+"/"+args.body.deviceName+"/cmd";
+       this.logmodule.writelog('debug',"Start fence data push on "+topic);
+       const message = this.broker.handleMessage.createCommandMessage('setWaypoints');
+       if( message instanceof Error ) return message;
+       this.broker.sendMessageToTopic({"mqttTopic": topic, "mqttMessage": JSON.stringify(message)})
+       return true;
+     } catch(err) {
+       this.logmodule.writelog('info', "uploadFenceData error: "+ err);
+       return err;
+     }
    }
 }
 

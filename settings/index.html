@@ -424,15 +424,42 @@
                     var cell4 = row.insertCell(3);
                     var cell5 = row.insertCell(4);
                     var cell6 = row.insertCell(5);
+                    if (currentValues.usebroker == true) {
+                      var cell7 = row.insertCell(6);
+                    }
                     cell1.innerHTML = result[i].userName;
                     cell2.innerHTML = result[i].fence;
                     cell3.innerHTML = result[i].lon;
                     cell4.innerHTML = result[i].lat;
                     cell5.innerHTML = result[i].battery+"%";
                     cell6.innerHTML = result[i].userDevice;
+                    if (currentValues.usebroker == true) {
+                      cell7.innerHTML = '<button type="button" value="button" onclick="uploadFenceData(this)">^</button>';
+                    }
                  }
               };
            });
+        }
+
+        function uploadFenceData(element) {
+          var row = element.parentNode.parentNode.rowIndex;
+          var table = document.getElementById("userTable");
+          var userName = table.rows[row].cells[0].innerHTML;
+          var deviceName = table.rows[row].cells[5].innerHTML;
+          console.log("Delete user: "+userName);
+          try {
+             HomeyAPI.api('POST', 'test/uploadFenceData/', {"userName": userName, "deviceName": deviceName}, function(err, result) {
+                console.log("Data posted");
+                if (!err) {
+                  HomeyAPI.alert(__('settings.app.messages.fencedate_pushed'));
+                } else {
+                  HomeyAPI.alert(__('settings.app.messages.fencedate_pushed_failed'));
+                }
+
+             });
+          } catch(err) {
+            console.log("uploadFenceData error: "+err);
+          }
         }
 
         function createUserTable() {

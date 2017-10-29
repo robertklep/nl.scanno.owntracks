@@ -217,9 +217,44 @@ class handleOwntracks {
    /*
       sendCommand: Send a command to connected clients
    */
-   sendCommand(command, user) {
-     arrayWayoint = [];
+   createCommandMessage(command) {
+     var msgArray = [];
+     var arrayContainer = {};
+     var msgCommand = {};
 
+     switch (command) {
+       case 'setWaypoints':
+         try {
+           for (var i=0; i < this.globalVar.getFenceArray().length; i++) {
+             let waypoint = {
+               "_type": "waypoint",
+               "desc": this.globalVar.getFenceArray()[i].fenceName,
+               "lat": this.globalVar.getFenceArray()[i].lat,
+               "lon": this.globalVar.getFenceArray()[i].lon,
+               "rad": this.globalVar.getFenceArray()[i].rad,
+               "tst": this.globalVar.getFenceArray()[i].timestamp
+             }
+             msgArray.push(waypoint);
+//             this.logmodule.writelog('debug', "waypoint: "+JSON.stringify(waypoint))
+           }
+           arrayContainer = {
+             "_type": "waypoints",
+             "waypoints": msgArray
+           }
+           msgCommand = {
+             "_type": "cmd",
+             "action": "setWaypoints",
+             "waypoints": arrayContainer
+           }
+         } catch(err) {
+           this.logmodule.writelog('error', "createCommandMessage error: "+err);
+           return err;
+         }
+         break;
+       default:
+         break;
+     }
+     return msgCommand;
    }
 
    updateRef(app) {

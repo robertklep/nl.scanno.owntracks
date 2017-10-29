@@ -104,6 +104,18 @@ module.exports = [{
    }
 },
 {
+   description:	'Push geofence data to device',
+   method:      'POST',
+   path:        '/test/uploadFenceData/',
+   requires_authorization: true,
+   role: 'owner',
+   fn: function(args, callback) {
+      var result = Homey.app.uploadFenceData(args);
+      if( result instanceof Error ) return callback( result );
+      return callback( null, result );
+   }
+},
+{
    description:	'Receive owntracks events',
    method:      'POST',
    path:        '/events/',
@@ -118,7 +130,3 @@ module.exports = [{
 }
 
 ]
-
-
-
-

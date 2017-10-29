@@ -16,7 +16,7 @@
     "settings" : {
         "app" : {
             "title" : "Owntracks client settings",
-            
+
             "server" : {
                 "server_title" : "Owntracks broker setings",
                 "use_broker" : "Use a MQTT broker as addition to HTTP",
@@ -29,7 +29,7 @@
                 "username" : "Username for the broker",
                 "password" : "Password for the broker"
             },
-            
+
             "client" : {
                 "accuracy" : "Enter accuracy in meters",
                 "accuracy_explanation" : "Sometimes the location accuracy can be very low (i.e. accuracy > 50 meters). This could result in an unwanted event regarding enterin / leaving a geofence. If the location accuracy is below the set value, that event is ignored.",
@@ -43,7 +43,7 @@
                "data_explanation": "This app collects data from users, such as usernames and geofences. This data is used to fill menu's from where you can select a user and a geofence. Use the Delete data button to purge alle the user data.",
                "data_purge_confirm": "Are you sure you want to purge the user data?"
             },
-                        
+
             "button" : {
                 "save" : "Save",
                 "test" : "Test",
@@ -53,7 +53,7 @@
                 "fenceArray": "Edit geofences",
                 "userStatus": "Current data"
             },
-            
+
              "user" : {
                 "title" : "Last known user data: "
             },
@@ -61,12 +61,14 @@
              "log" : {
                 "title" : "Log lines:"
             },
-            
+
              "messages" : {
                  "settings_saved" : "Settings saved",
                  "settings_noSettingsChanged" : "No setting has been changed",
                  "data_purged": "The user data has been removed",
-                 "data_purged_failed": "An error occured during the removal of the user data"
+                 "data_purged_failed": "An error occured during the removal of the user data",
+                 "fencedate_pushed": "Fence data has been pushed to the device",
+                 "fencedate_pushed_failed": "Error occured when pushing Fence data to device"
              }
         }
     }

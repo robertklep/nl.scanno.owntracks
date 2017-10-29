@@ -16,10 +16,10 @@
     "settings" : {
         "app" : {
             "title" : "Owntracks client instellingen",
-            
+
             "server" : {
                 "server_title" : "Owntracks broker instellingen",
-                "use_broker" : "Gebruik MQTT broker naast HTTP", 
+                "use_broker" : "Gebruik MQTT broker naast HTTP",
                 "server_details" : "Voer broker gegevens in",
                 "server_explanation" : "Er moet een broker opgegeven worden, waarmee de Owntracks client kan verbinden. De servernaam kan een IP adres bevatten, of een DNS naam. Er moet ook een poortnummer worden opgegeven. Normaal gesproken is dat poort 1883 voor een normale verbinding en poortnummer 8883 voor een beveiligde verbinding.",
                 "url" : "IP adres of DNS",
@@ -29,7 +29,7 @@
                 "username" : "Gebruikersnaam",
                 "password" : "Wachtwoord"
             },
-            
+
             "client" : {
                 "accuracy" : "Minimale nauwkeurigheid",
                 "accuracy_explanation" : "Het kan soms voorkomen dat de lokatie bepaling niet nauwkeurig is (bijvoorbeeld meer dan 50 meter). Dit kan een ongewenste melding opleveren met betrekking tot het binnengaan of verlaten van een geofence. Als de nauwkeurigheid boven de gestelde waard uitkomt, wordt de ontvangen melding genegeerd.",
@@ -43,7 +43,7 @@
                "data_explanation": "Deze app slaat gegevens op die gebruikt worden in de verschillende trigger, action en condition kaarten. Dit betreft namen en geofence namen die in de owntracks apps zijn aangemaakt. Gebruik de Verwijder gegevens knop om alle verzamelde gegevens te verwijderen.",
                "data_purge_confirm": "Weet u zeker dat u de gebruikersgegevens wilt verwijderen?"
             },
-                        
+
             "button" : {
                 "save" : "Opslaan",
                 "test" : "Test",
@@ -61,12 +61,14 @@
              "log" : {
                 "title" : "Laatste log regels:"
             },
-            
+
              "messages" : {
                  "settings_saved" : "Instellingen opgeslagen",
                  "settings_noSettingsChanged" : "Er zijn geen instellingen aangepast.",
                  "data_purged": "De gebruikersgegevens zijn verwijderd",
-                 "data_purged_failed": "Er is een fout opgetreden bij het verwijderen van de gebruikers gegevens"
+                 "data_purged_failed": "Er is een fout opgetreden bij het verwijderen van de gebruikers gegevens",
+                 "fencedate_pushed": "Geofence gegevens zijn naar het apparaat verzonden",
+                 "fencedate_pushed_failed": "Fout bij het verzenden van Geofence gegevens"
              }
         }
     }
