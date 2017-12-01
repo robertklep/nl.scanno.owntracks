@@ -64,8 +64,8 @@ class globalOwntracks {
       const ref = this;
       this.Homey.on('unload', function(){
          ref.logmodule.writelog('info', "unload called");
-         ref.saveUserData();
-         ref.saveFenceData();
+//         ref.saveUserData();
+//         ref.saveFenceData();
       });
    }
 
