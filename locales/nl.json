@@ -10,7 +10,9 @@
 
     "notifications": {
        "user_added": "De gebruiker __name__ is aan de gebruikers gegevens toegevoegd",
-       "fence_added": "De geofence __name__ is aan de gebruikers gegevens toegevoegd"
+       "fence_added": "De geofence __name__ is aan de gebruikers gegevens toegevoegd",
+       "mqtt_offline": "De MQTT broker is ONBESCHIKBAAR",
+       "mqtt_online": "De MQTT broker is weer BESCHIKBAAR"
     },
 
     "settings" : {

@@ -10,7 +10,9 @@
 
     "notifications": {
        "user_added": "User __name__ has been added to the user data",
-       "fence_added": "Geofence __name__ has been added to the user data"
+       "fence_added": "Geofence __name__ has been added to the user data",
+       "mqtt_offline": "The MQTT broker is UNAVAILABLE",
+       "mqtt_online": "The MQTT broker is AVAILABLE again"
     },
 
     "settings" : {
