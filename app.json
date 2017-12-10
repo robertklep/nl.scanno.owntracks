@@ -142,21 +142,24 @@
                   "title": {
                      "en": "Type of event (enter or leave)",
                      "nl": "Type gebeurtenis (enter / leave)"
-                  }
+                  },
+                  "example": "enter"
                },
                {
                   "name": "user",
                   "title": {
                      "en": "User that enters/leaves geofence",
                      "nl": "Gebruiker welke de geofence binnenkomt of verlaat"
-                  }
+                  },
+                  "example": "John"
                },
                {
                   "name": "fence",
                   "title": {
                      "en": "Name of geofence",
                      "nl": "Naam van de geofence"
-                  }
+                  },
+                  "example": "Home"
                },
                {
                   "name": "percBattery",
@@ -164,7 +167,8 @@
                   "title": {
                      "en": "Current battery percentage",
                      "nl": "Huidige accu percentage"
-                  }
+                  },
+                  "example": 65
                }
             ],
             "args":[
@@ -198,14 +202,16 @@
                   "title": {
                      "en": "User that enters geofence",
                      "nl": "Gebruiker welke de geofence binnenkomt"
-                  }
+                  },
+                  "example": "John"
                },
                {
                   "name": "fence",
                   "title": {
                      "en": "Name of geofence",
                      "nl": "Naam van de geofence"
-                  }
+                  },
+                  "example": "Home"
                },
                {
                   "name": "percBattery",
@@ -213,7 +219,8 @@
                   "title": {
                      "en": "Current battery percentage",
                      "nl": "Huidige accu percentage"
-                  }
+                  },
+                  "example": 65
                }
             ],
             "args":[
@@ -247,14 +254,16 @@
                   "title": {
                      "en": "User that enters geofence",
                      "nl": "Gebruiker welke de geofence binnenkomt"
-                  }
+                  },
+                  "example": "John"
                },
                {
                   "name": "fence",
                   "title": {
                      "en": "Name of geofence",
                      "nl": "Naam van de geofence"
-                  }
+                  },
+                  "example": "Home"
                },
                {
                   "name": "percBattery",
@@ -262,7 +271,8 @@
                   "title": {
                      "en": "Current battery percentage",
                      "nl": "Huidige accu percentage"
-                  }
+                  },
+                  "example": 65
                }
             ],
             "args":[
@@ -296,7 +306,8 @@
                   "title": {
                      "en": "User of the phone",
                      "nl": "Gebruiker van de telefoon"
-                  }
+                  },
+                  "example": "John"
                },
                {
                   "name": "percBattery",
@@ -304,7 +315,8 @@
                   "title": {
                      "en": "Current battery percentage",
                      "nl": "Huidige accu percentage"
-                  }
+                  },
+                  "example": 65
                }
             ],
             "args":[
