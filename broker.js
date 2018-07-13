@@ -93,10 +93,10 @@ class brokerOwntracks {
 
             // On connection ...
             ref.connectedClient.on('connect', function (connack) {
-               ref.brokerState = "CONNECTED";
-               if (ref.errorOccured) {
+               if (ref.errorOccured || ref.brokerState == "RECONNECTING") {
                  ref.logmodule.writelog('error', ref.Homey.__("notifications.mqtt_online"));
                }
+               ref.brokerState = "CONNECTED";
                ref.errorOccured = false;
                ref.logmodule.writelog('info', "MQTT client connected");
                ref.logmodule.writelog('info', "Connected Topics: " + ref.globalVar.getTopicArray());
