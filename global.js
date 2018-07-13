@@ -37,6 +37,7 @@ class globalOwntracks {
             } catch (err) {
                ref.logmodule.writelog('error', "Parsing userArray failed: "+ err);
                ref.userArray = [];
+               ref.logmodule.writelog('debug', data);
             }
          }
       });
@@ -74,12 +75,28 @@ class globalOwntracks {
    */
    saveUserData() {
       const ref = this;
+      const { writeFile, } = require('fs');
       this.logmodule.writelog('info', "saveUserData called");
-      require('fs').writeFile("/userdata/owntracks.json",  JSON.stringify(this.userArray), function (err) {
-         if (err) {
-            ref.logmodule.writelog('error', "Persisting userArray failed: "+ err);
-         }
+      new Promise(function (resolve, reject) {
+        try {
+          writeFile("/userdata/owntracks.json",  JSON.stringify(ref.userArray), function (err) {
+             if (err) {
+                ref.logmodule.writelog('error', "Persisting userArray failed: "+ err);
+                reject(err);
+             } else {
+                resolve();
+             }
+          });
+        } catch (err) {
+          ref.logmodule.writelog('error', "Persisting userArray failed: "+ err);
+          reject(err);
+        }
       });
+//      require('fs').writeFile("/userdata/owntracks.json",  JSON.stringify(this.userArray), function (err) {
+//         if (err) {
+//            ref.logmodule.writelog('error', "Persisting userArray failed: "+ err);
+//         }
+//      });
    }
 
    /*
@@ -87,14 +104,22 @@ class globalOwntracks {
    */
    saveFenceData() {
       const ref = this;
+      const { writeFile, } = require('fs');
       this.logmodule.writelog('debug', "saveFenceData called");
-      require('fs').writeFile("/userdata/owntracks_fences.json",  JSON.stringify(this.fenceArray), function (err) {
-         if (err) {
-            ref.logmodule.writelog('error', "Persisting fenceArray failed: "+ err);
-         }
+      new Promise(function (resolve, reject) {
+//        require('fs').writeFile("/userdata/owntracks_fences.json",  JSON.stringify(this.fenceArray), function (err) {
+        try {
+          writeFile("/userdata/owntracks_fences.json",  JSON.stringify(ref.fenceArray), function (err) {
+             if (err) {
+                ref.logmodule.writelog('error', "Persisting fenceArray failed: "+ err);
+             }
+          });
+        } catch (err) {
+          ref.logmodule.writelog('error', "Persisting fenceArray failed: "+ err);
+          reject(err);
+        }
       });
    }
-
    /*
       deletePersistancyFiles() deletes the saved arrays from the filesystem. This
       can be used when the persistency files were borked.
