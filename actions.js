@@ -6,11 +6,11 @@ class actionOwntracks {
       this.publishOwntracks = null;
       this.sayLocation = null;
       this.Homey = require('homey');
-      this.geocoder  = require("geocoder/node_modules/geocoder"); 
+      this.geocoder  = require("geocoder/node_modules/geocoder");
       this.globalVar = app.globalVar;
       this.logmodule = app.logmodule;
       this.broker    = app.broker;
-      
+
       this.OnInit();
    }
 
@@ -18,13 +18,13 @@ class actionOwntracks {
       this.registerActions();
       this.registerSpeech();
    }
-      
+
    createAutocompleteActions() {
       const ref = this;
       this.logmodule.writelog('info', "createAutocompleteActions called");
-      // Put all the autocomplte actions here. 
+      // Put all the autocomplte actions here.
 
-      this.sayLocation.getArgument('user').registerAutocompleteListener( (query, args ) => { 
+      this.sayLocation.getArgument('user').registerAutocompleteListener( (query, args ) => {
          return Promise.resolve(ref.globalVar.searchUsersAutocomplete(query, true) );
       });
    }
@@ -116,7 +116,7 @@ class actionOwntracks {
                   fulfill(locationString);
                } else {
                   // We have a user, but the user is not inside a known geoFence, so we are
-                  // going to see if we can find an address based on the known coordinates of 
+                  // going to see if we can find an address based on the known coordinates of
                   // the user.
                   return ref.getLocationAdress(userName).then(function (foundAddress) {
                      ref.logmodule.writelog('debug', "getLocationAdress in getString enter");
@@ -157,7 +157,7 @@ class actionOwntracks {
 
    getLocationAdress(userName) {
       // Here we make the call to the reverse geo lookup engine.
-      // Also just to be sure, we use a Promise to try to get the response before the 
+      // Also just to be sure, we use a Promise to try to get the response before the
       // speech command is given.
       const ref = this;
       return new Promise(function (fulfill, reject){
@@ -166,8 +166,12 @@ class actionOwntracks {
             ref.logmodule.writelog('debug', "getLocationAdress promise enter" );
             ref.geocoder.reverseGeocode( ref.globalVar.getUser(userName).lat, ref.globalVar.getUser(userName).lon, function ( err, data ) {
                // do something with data
-               ref.logmodule.writelog('info', "Address data retreived: " + data.results[0].formatted_address);
-               getAddress = data.results[0].formatted_address;
+               try {
+                 ref.logmodule.writelog('info', "Address data retreived: " + data.results[0].formatted_address);
+                 getAddress = data.results[0].formatted_address;
+               } catch(error) {
+                  ref.logmodule.writelog('error', "Could not retreive addres: " + error);
+               }
                fulfill(getAddress);
             });
          } catch(err) {
