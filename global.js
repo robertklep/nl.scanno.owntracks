@@ -211,6 +211,7 @@ class globalOwntracks {
          newUser.battery = 0;
          newUser.battTriggered = false;
          newUser.userDevice = userDevice;
+         newUser.inregionsSupported = false;
          return newUser;
       } catch(err) {
          this.logmodule.writelog('error', "createEmptyUser: " +err);

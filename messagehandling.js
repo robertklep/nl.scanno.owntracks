@@ -9,6 +9,17 @@ class handleOwntracks {
 
    }
 
+   /**
+    * receiveMessage - Handles the received messages from the MQTT topic.
+    * The message will be paesed as JSON and checked what event was received from the
+    * Owntracks phone app.
+    *
+    * @param  {type} topic   topic where the messages was received on
+    * @param  {type} message payload from the MQTT message.
+    * @param  {type} args    array with arguments from trigger card.
+    * @param  {type} state   array with parameters that are kept inside the triger card.
+    * @return {type}         none.
+    */
    receiveMessage(topic, message, args, state) {
       const ref = this;
       var validJSON = true;
@@ -147,27 +158,7 @@ class handleOwntracks {
                break;
             case 'location':
                // This location object describes the location of the device that published it.
-               ref.logmodule.writelog('info', "We have received a location message");
-               currentUser.lon = jsonMsg.lon;
-               currentUser.lat = jsonMsg.lat;
-               currentUser.timestamp = jsonMsg.tst;
-               currentUser.tid = jsonMsg.tid;
-               if (jsonMsg.batt !== undefined) {
-                  currentUser.battery = jsonMsg.batt;
-                  ref.logmodule.writelog('info', "Set battery percentage for "+ currentUser.userName +" to "+ currentUser.battery+ "%");
-
-                  let tokens = {
-                     user: currentUser.userName,
-                     fence: jsonMsg.desc,
-                     percBattery: currentUser.battery
-                  }
-                  let state = {
-                     triggerTopic: topic,
-                     percBattery: currentUser.battery,
-                     user: currentUser.userName
-                  }
-                  ref.triggers.getEventBattery().trigger(tokens,state, null)
-               }
+               ref.handleLocationMessage(topic, currentUser, jsonMsg);
                break;
             case 'waypoint' :
                // Waypoints denote specific geographical locations that you want to keep track of. You define a way point on the OwnTracks device,
@@ -214,9 +205,146 @@ class handleOwntracks {
       }
    }
 
-   /*
-      sendCommand: Send a command to connected clients
-   */
+   /**
+    * handleLocationMessage - The received message is a location message.
+    * The location message is further processed for battery percentage and inregions field.
+    * The inregions field can be used to fix missed enter / leave events due to GPS or network
+    * problems.
+    *
+    * @param  {type} topic       The topic the message was received on.
+    * @param  {type} currentUser Reference to the currentUser array so fields can be accessed.
+    * @param  {type} jsonMsg     The parsed MQTT message payload into JSON format.
+    * @return {type}             none.
+    */
+   handleLocationMessage(topic, currentUser, jsonMsg) {
+     const ref=this;
+     this.logmodule.writelog('info', "We have received a location message");
+     currentUser.lon = jsonMsg.lon;
+     currentUser.lat = jsonMsg.lat;
+     currentUser.timestamp = jsonMsg.tst;
+     currentUser.tid = jsonMsg.tid;
+     if (jsonMsg.batt !== undefined) {
+        currentUser.battery = jsonMsg.batt;
+        ref.logmodule.writelog('info', "Set battery percentage for "+ currentUser.userName +" to "+ currentUser.battery+ "%");
+
+        let tokens = {
+           user: currentUser.userName,
+           fence: jsonMsg.desc,
+           percBattery: currentUser.battery
+        }
+        let state = {
+           triggerTopic: topic,
+           percBattery: currentUser.battery,
+           user: currentUser.userName
+        }
+        ref.triggers.getEventBattery().trigger(tokens,state, null).catch( function(e) {
+          ref.logmodule.writelog('error', "Error occured: " +e);
+        });
+     }
+     // There is a field inregions that contains the region(s) the user is in.
+     // If this field is available, check if the region reported, is the same as
+     // the current region stored.
+     if (jsonMsg.inregions !== undefined) {
+       var bInRegion = false;
+       var isCurrentRegionSet = false;
+       var region = 0;
+       // The client supports inregions, so for future calls, lets remember that.
+       currentUser.inregionsSupported = true;
+
+       ref.logmodule.writelog('info', "inregions: " + jsonMsg.inregions);
+       for (region in jsonMsg.inregions) {
+         ref.logmodule.writelog('info', "region " + jsonMsg.inregions[region]);
+         if (currentUser.fence === jsonMsg.inregions[region]) {
+           ref.logmodule.writelog('debug', "User "+currentUser.userName+ " already is in region " + jsonMsg.inregions[region]);
+           bInRegion = true;
+         }
+       }
+       if (ref.isAccurate(jsonMsg)) {
+         ref.logmodule.writelog('debug', "isAccurate");
+       }
+       if (ref.isAccurate(jsonMsg) && bInRegion === false) {
+         // if currentUser.fence is set, but the current region is different, then we missed
+         // a leave event.
+         if (currentUser.fence !== "") {
+           ref.logmodule.writelog('debug', "User "+currentUser.userName+ " is in " + currentUser.fence+ " but should not be.");
+           isCurrentRegionSet = true;
+           ref.generateLeaveEvent(topic, currentUser, jsonMsg);
+         }
+
+         // If bInRegion is true, then at least one of the received regions is already set
+         // If bInRegion is false, we must have missed a trigger event.
+         if (currentUser.fence === "") {
+           currentUser.fence = jsonMsg.inregions[0];
+           let tokens = {
+              event: "enter",
+              user: currentUser.userName,
+              fence: currentUser.fence,
+              percBattery: currentUser.battery
+           }
+           let state = {
+              triggerTopic: topic,
+              triggerFence: jsonMsg.inregions[0]
+           }
+           ref.triggers.getEnterGeofenceAC().trigger(tokens,state,null).catch( function(e) {
+             ref.logmodule.writelog('error', "Error occured: " +e);
+           });
+           ref.triggers.getEventOwntracksAC().trigger(tokens,state,null).catch( function(e) {
+             ref.logmodule.writelog('error', "Error occured: " +e);
+           });
+         }
+       }
+     }
+     else {
+       // When there is no inregions field, but the inregions field IS supported,
+       // then the phone is NOT inside any region. If the userdata shows a fence name,
+       // we might have missed a leave event, so we can send one now.
+       if (currentUser.inregionsSupported === true && currentUser.fence !== "" && ref.isAccurate(jsonMsg)) {
+         ref.logmodule.writelog('debug', "handleLocationMessage - no inregions field, fence = "+currentUser.fence);
+         ref.generateLeaveEvent(topic, currentUser, jsonMsg);
+       }
+     }
+   }
+
+   /**
+    * generateLeaveEvent - description
+    *
+    * @param  {type} topic       description
+    * @param  {type} currentUser description
+    * @param  {type} jsonMsg     description
+    * @return {type}             description
+    */
+   generateLeaveEvent(topic, currentUser, jsonMsg) {
+     const ref = this;
+     ref.logmodule.writelog('debug', "generateLeaveEvent - for " + currentUser.userName);
+     let tokens = {
+        event: "leave",
+        user: currentUser.userName,
+        fence: "",
+        percBattery: currentUser.battery
+     }
+     let state = {
+        triggerTopic: topic,
+        triggerFence: ""
+     }
+
+     currentUser.fence = "";
+
+     ref.triggers.getLeaveGeofenceAC().trigger(tokens,state,null).catch( function(e) {
+       ref.logmodule.writelog('error', "Error occured: " +e);
+     });
+     ref.triggers.getEventOwntracksAC().trigger(tokens,state,null).catch( function(e) {
+       ref.logmodule.writelog('error', "Error occured: " +e);
+     });
+   }
+
+   /**
+    * createCommandMessage - Creates a message that sends a command to a phone.
+    * This command contains an array with all the fences that are registered. This way it is
+    * easy to sync fences with phones that use the owntracks client
+    *
+    * @param  {type} command contains the command to send to the phone
+    * @return {type}         the full command body that should be send with the command.
+    */
    createCommandMessage(command) {
      var msgArray = [];
      var arrayContainer = {};
@@ -257,6 +385,22 @@ class handleOwntracks {
      return msgCommand;
    }
 
+
+   /**
+    * isAccurate - Checks if the accuracy of the current message is within specified limits
+    *
+    * @return {type}  true if accuracy is within limits
+    */
+   isAccurate(jsonMsg) {
+     return (jsonMsg.acc <= parseInt(this.Homey.ManagerSettings.get('accuracy')));
+   }
+
+   /**
+    * updateRef - description
+    *
+    * @param  {type} app description
+    * @return {type}     description
+    */
    updateRef(app) {
       this.triggers = app.triggers;
    }
