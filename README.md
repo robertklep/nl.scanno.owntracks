@@ -12,7 +12,7 @@ through the Athom Cloud by using HTTPS.
 The Owntracks app does not use a lot of battery.
 
 ## HTTPS or MQTT?
-Using HTTPS is for most users the easiest way to get started. You just need your homeys cloud-id, create a user in settings and 
+Using HTTPS is for most users the easiest way to get started. You just need your homeys cloud-id, create a user in settings and
 you good to go.
 
 The most secure solution is to use your own MQTT broker or create a private one in the cloud. CloudMQTT is a MQTT
@@ -25,7 +25,7 @@ And as such it can be used for presence detection.
 
 The Owntracks app sends its data to a MQTT topic on the broker. This topic is different for each user and each device.
 A typical topic name would be: `owntracks/<user-id>/<device-name>/event`
-The trailing event means that only events regarding geofences will be received by the Homey client. In the Owntracks 
+The trailing event means that only events regarding geofences will be received by the Homey client. In the Owntracks
 clients, you can find out what topic is used to send the messages to (do not forget to add event to that topic).
 Besides subscribing to the MQTT topic, you have to enter the name of the geofence you specified in the Owntracks Android
 or iOS app (regions section). Make sure you enbale the share option. Otherwise the name of the geofence is not included in
@@ -34,7 +34,7 @@ the message and the trigger will not fire.
 This app supports the following trigger cards:
 - a card that will trigger when entering the specified geofence
 - a card that will trigger when leaving the specified geofence
-- a card that will trigger on a enter / leave event on the specified geofence. This card provides a tag that contains 
+- a card that will trigger on a enter / leave event on the specified geofence. This card provides a tag that contains
   the event (i.e. the values can be enter or leave)
 
 This app supports the following activity cards:
@@ -53,9 +53,3 @@ The settings page contains:
   100 meters, the received event will be ignored.
 
 *Ingmar made a very nice [tutorial](https://forum.athom.com/discussion/2804/setup-homey-with-mqtt-for-location-detection/p1) on the workings of this app.*
-
-
-**If you like this app, then consider to buy me a beer :)**
-
-[![](https://www.paypalobjects.com/en_US/NL/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=scanno71%40gmail%2ecom&lc=NL&item_name=Homey%20MQTT%20%2f%20Owntracks%20apps&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
-
