@@ -28,6 +28,7 @@
                 "port" : "Enter port number",
                 "tls" : "Use a secure connection to the broker (TLS)",
                 "selfsigned" : "Disable certificate checking (by use of selfsigned certificates",
+                "keepalive" : "Keepalive time in seconds",
                 "username" : "Username for the broker",
                 "password" : "Password for the broker"
             },

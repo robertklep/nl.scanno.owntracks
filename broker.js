@@ -39,8 +39,15 @@ class brokerOwntracks {
       if ( this.Homey.ManagerSettings.get('selfsigned') == true) {
          rejectUnauth = false;
       }
+
+      var keepalive = parseInt(this.Homey.ManagerSettings.get('keepalive'));
+      if (isNaN(keepalive)) {
+        keepalive = 60;
+      }
+      this.logmodule.writelog('info', "keepalive: " + keepalive);
+
       var connect_options = {};
-      connect_options.keepalive = 10;
+      connect_options.keepalive = keepalive;
       connect_options.username = this.Homey.ManagerSettings.get('user');
       connect_options.password = this.Homey.ManagerSettings.get('password');
       connect_options.rejectUnauthorized = rejectUnauth;

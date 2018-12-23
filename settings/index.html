@@ -49,6 +49,12 @@
                 </div>
 
                 <div class="field row">
+                    <label class="form_label" for="keepalive" data-i18n="settings.app.server.keepalive"></label>
+                    <br>
+                    <input class="form_input" id="keepalive" type="text" value="60" /> <br>
+                 </div>
+
+                <div class="field row">
                     <label class="form_label" for="User" data-i18n="settings.app.server.username"></label>
                     <br>
                     <input class="form_input" id="user" type="text" value="" /> <br>
@@ -181,6 +187,15 @@
                   currentValues.selfsigned = selfsigned;
            })
 
+           Homey.get('keepalive', function(err, keepalive) {
+                  if (err) {
+                    console.error(err)
+                  } else {
+                    document.getElementById('keepalive').value = keepalive;
+                    currentValues.keepalive = keepalive;
+                  }
+           })
+
            Homey.get('user', function(err, user) {
                   if (err) {
                     console.error(err)
@@ -269,6 +284,13 @@
                 HomeyAPI.set('selfsigned', document.getElementById('selfsigned').checked);
                 valuesHaveBeenChanged = true;
                 currentValues.selfsigned = document.getElementById('selfsigned').checked;
+            }
+
+            if (currentValues.keepalive != document.getElementById('keepalive').value) {
+                console.log("keepalive has been changed");
+                HomeyAPI.set('keepalive', document.getElementById('keepalive').value);
+                valuesHaveBeenChanged = true;
+                currentValues.keepalive = document.getElementById('keepalive').value;
             }
 
             if (currentValues.user != document.getElementById('user').value) {
