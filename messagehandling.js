@@ -229,7 +229,7 @@ class handleOwntracks {
 
         let tokens = {
            user: currentUser.userName,
-           fence: jsonMsg.desc,
+           fence: currentUser.fence,
            percBattery: currentUser.battery
         }
         let state = {
@@ -268,13 +268,13 @@ class handleOwntracks {
          if (currentUser.fence !== "") {
            ref.logmodule.writelog('debug', "User "+currentUser.userName+ " is in " + currentUser.fence+ " but should not be.");
            isCurrentRegionSet = true;
-           ref.generateLeaveEvent(topic, currentUser, jsonMsg);
+//           ref.generateLeaveEvent(topic, currentUser, jsonMsg);
          }
 
          // If bInRegion is true, then at least one of the received regions is already set
          // If bInRegion is false, we must have missed a trigger event.
          if (currentUser.fence === "") {
-           currentUser.fence = jsonMsg.inregions[0];
+//           currentUser.fence = jsonMsg.inregions[0];
            let tokens = {
               event: "enter",
               user: currentUser.userName,
@@ -285,12 +285,12 @@ class handleOwntracks {
               triggerTopic: topic,
               triggerFence: jsonMsg.inregions[0]
            }
-           ref.triggers.getEnterGeofenceAC().trigger(tokens,state,null).catch( function(e) {
+/*           ref.triggers.getEnterGeofenceAC().trigger(tokens,state,null).catch( function(e) {
              ref.logmodule.writelog('error', "Error occured: " +e);
            });
            ref.triggers.getEventOwntracksAC().trigger(tokens,state,null).catch( function(e) {
              ref.logmodule.writelog('error', "Error occured: " +e);
-           });
+           }); */
          }
        }
      }
@@ -300,7 +300,7 @@ class handleOwntracks {
        // we might have missed a leave event, so we can send one now.
        if (currentUser.inregionsSupported === true && currentUser.fence !== "" && ref.isAccurate(jsonMsg)) {
          ref.logmodule.writelog('debug', "handleLocationMessage - no inregions field, fence = "+currentUser.fence);
-         ref.generateLeaveEvent(topic, currentUser, jsonMsg);
+//         ref.generateLeaveEvent(topic, currentUser, jsonMsg);
        }
      }
    }
