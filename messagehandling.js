@@ -229,7 +229,7 @@ class handleOwntracks {
 
         let tokens = {
            user: currentUser.userName,
-           fence: jsonMsg.desc,
+           fence: currentUser.fence,
            percBattery: currentUser.battery
         }
         let state = {
@@ -241,66 +241,70 @@ class handleOwntracks {
           ref.logmodule.writelog('error', "Error occured: " +e);
         });
      }
-     // There is a field inregions that contains the region(s) the user is in.
-     // If this field is available, check if the region reported, is the same as
-     // the current region stored.
-     if (jsonMsg.inregions !== undefined) {
-       var bInRegion = false;
-       var isCurrentRegionSet = false;
-       var region = 0;
-       // The client supports inregions, so for future calls, lets remember that.
-       currentUser.inregionsSupported = true;
+     if (ref.Homey.ManagerSettings.get('use_inregions') == true) {
+       // There is a field inregions that contains the region(s) the user is in.
+       // If this field is available, check if the region reported, is the same as
+       // the current region stored.
+       if (jsonMsg.inregions !== undefined) {
+         var bInRegion = false;
+         var isCurrentRegionSet = false;
+         var region = 0;
+         // The client supports inregions, so for future calls, lets remember that.
+         currentUser.inregionsSupported = true;
 
-       ref.logmodule.writelog('info', "inregions: " + jsonMsg.inregions);
-       for (region in jsonMsg.inregions) {
-         ref.logmodule.writelog('info', "region " + jsonMsg.inregions[region]);
-         if (currentUser.fence === jsonMsg.inregions[region]) {
-           ref.logmodule.writelog('debug', "User "+currentUser.userName+ " already is in region " + jsonMsg.inregions[region]);
-           bInRegion = true;
+         ref.logmodule.writelog('info', "inregions: " + jsonMsg.inregions);
+         for (region in jsonMsg.inregions) {
+           ref.logmodule.writelog('info', "region " + jsonMsg.inregions[region]);
+           if (currentUser.fence === jsonMsg.inregions[region]) {
+             ref.logmodule.writelog('debug', "User "+currentUser.userName+ " already is in region " + jsonMsg.inregions[region]);
+             bInRegion = true;
+           }
+         }
+         if (ref.isAccurate(jsonMsg)) {
+           ref.logmodule.writelog('debug', "isAccurate");
+         }
+         if (ref.isAccurate(jsonMsg) && bInRegion === false) {
+           // if currentUser.fence is set, but the current region is different, then we missed
+           // a leave event.
+           if (currentUser.fence !== "") {
+             ref.logmodule.writelog('debug', "User "+currentUser.userName+ " is in " + currentUser.fence+ " but should not be.");
+             isCurrentRegionSet = true;
+             ref.generateLeaveEvent(topic, currentUser, jsonMsg);
+           }
+
+           // If bInRegion is true, then at least one of the received regions is already set
+           // If bInRegion is false, we must have missed a trigger event.
+           ref.logmodule.writelog('debug', "Fence: "+currentUser.fence);
+           if (currentUser.fence === "") {
+             ref.logmodule.writelog('debug', "User "+currentUser.userName+ " is not in a fence, but should be in: "+jsonMsg.inregions[0]);
+             currentUser.fence = jsonMsg.inregions[0];
+             let tokens = {
+                event: "enter",
+                user: currentUser.userName,
+                fence: currentUser.fence,
+                percBattery: currentUser.battery
+             }
+             let state = {
+                triggerTopic: topic,
+                triggerFence: jsonMsg.inregions[0]
+             }
+             ref.triggers.getEnterGeofenceAC().trigger(tokens,state,null).catch( function(e) {
+               ref.logmodule.writelog('error', "Error occured: " +e);
+             });
+             ref.triggers.getEventOwntracksAC().trigger(tokens,state,null).catch( function(e) {
+               ref.logmodule.writelog('error', "Error occured: " +e);
+             });
+           }
          }
        }
-       if (ref.isAccurate(jsonMsg)) {
-         ref.logmodule.writelog('debug', "isAccurate");
-       }
-       if (ref.isAccurate(jsonMsg) && bInRegion === false) {
-         // if currentUser.fence is set, but the current region is different, then we missed
-         // a leave event.
-         if (currentUser.fence !== "") {
-           ref.logmodule.writelog('debug', "User "+currentUser.userName+ " is in " + currentUser.fence+ " but should not be.");
-           isCurrentRegionSet = true;
+       else {
+         // When there is no inregions field, but the inregions field IS supported,
+         // then the phone is NOT inside any region. If the userdata shows a fence name,
+         // we might have missed a leave event, so we can send one now.
+         if (currentUser.inregionsSupported === true && currentUser.fence !== "" && ref.isAccurate(jsonMsg)) {
+           ref.logmodule.writelog('debug', "handleLocationMessage - no inregions field, fence = "+currentUser.fence);
            ref.generateLeaveEvent(topic, currentUser, jsonMsg);
          }
-
-         // If bInRegion is true, then at least one of the received regions is already set
-         // If bInRegion is false, we must have missed a trigger event.
-         if (currentUser.fence === "") {
-           currentUser.fence = jsonMsg.inregions[0];
-           let tokens = {
-              event: "enter",
-              user: currentUser.userName,
-              fence: currentUser.fence,
-              percBattery: currentUser.battery
-           }
-           let state = {
-              triggerTopic: topic,
-              triggerFence: jsonMsg.inregions[0]
-           }
-           ref.triggers.getEnterGeofenceAC().trigger(tokens,state,null).catch( function(e) {
-             ref.logmodule.writelog('error', "Error occured: " +e);
-           });
-           ref.triggers.getEventOwntracksAC().trigger(tokens,state,null).catch( function(e) {
-             ref.logmodule.writelog('error', "Error occured: " +e);
-           });
-         }
-       }
-     }
-     else {
-       // When there is no inregions field, but the inregions field IS supported,
-       // then the phone is NOT inside any region. If the userdata shows a fence name,
-       // we might have missed a leave event, so we can send one now.
-       if (currentUser.inregionsSupported === true && currentUser.fence !== "" && ref.isAccurate(jsonMsg)) {
-         ref.logmodule.writelog('debug', "handleLocationMessage - no inregions field, fence = "+currentUser.fence);
-         ref.generateLeaveEvent(topic, currentUser, jsonMsg);
        }
      }
    }

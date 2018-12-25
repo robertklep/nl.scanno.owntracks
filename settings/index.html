@@ -93,6 +93,11 @@
                 <label class="form_label" for="double_leave" data-i18n="settings.app.client.double_leave"></label>
             </div>
 
+            <div class="field">
+                <input class="checkbox" id="use_inregions" type="checkbox" />
+                <label class="form_label" for="use_inregions" data-i18n="settings.app.client.use_inregions"></label>
+            </div>
+
         </fieldset>
 
         <fieldset id="data_settings">
@@ -240,6 +245,16 @@
                   document.getElementById('double_leave').checked = double_leave;
                   currentValues.double_leave = double_leave;
            })
+           Homey.get('use_inregions', function(err, use_inregions) {
+                  if (err) {
+                    console.error(err)
+                  } else {
+                    document.getElementById('use_inregions').value = use_inregions;
+                  }
+                  if (typeof use_inregions == 'undefined' || use_inregions == null) use_inregions = false;
+                  document.getElementById('use_inregions').checked = use_inregions;
+                  currentValues.use_inregions = use_inregions;
+           })
 
            createUserStatus();
 
@@ -326,6 +341,12 @@
                 HomeyAPI.set('double_leave', document.getElementById('double_leave').checked);
                 valuesHaveBeenChanged = true;
                 currentValues.double_leave = document.getElementById('double_leave').checked;
+            }
+            if (currentValues.use_inregions != document.getElementById('use_inregions').checked) {
+                console.log("use_inregions has been changed");
+                HomeyAPI.set('use_inregions', document.getElementById('use_inregions').checked);
+                valuesHaveBeenChanged = true;
+                currentValues.use_inregions = document.getElementById('use_inregions').checked;
             }
 
             if (valuesHaveBeenChanged == true) {

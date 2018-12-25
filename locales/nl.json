@@ -38,7 +38,8 @@
                 "accuracy_explanation" : "Het kan soms voorkomen dat de lokatie bepaling niet nauwkeurig is (bijvoorbeeld meer dan 50 meter). Dit kan een ongewenste melding opleveren met betrekking tot het binnengaan of verlaten van een geofence. Als de nauwkeurigheid boven de gestelde waard uitkomt, wordt de ontvangen melding genegeerd.",
                 "double_enter" : "Controleer op dubbele enter events",
                 "double_leave" : "Controleer op dubbele leave events",
-                "doublevent_explanation" : "Het kan voorkomen dat er dubbele enter/leave events binnenkomen. Dit komt voor als door GPS onnauwkeurigheid de telefoon denkt dat deze de geofence verlaten heeft. Als daarna de nauwkeurigheid binnen de opgegeven waarde komt en dan kan het voorkomen dat het aparaat een event verstuurd."
+                "doublevent_explanation" : "Het kan voorkomen dat er dubbele enter/leave events binnenkomen. Dit komt voor als door GPS onnauwkeurigheid de telefoon denkt dat deze de geofence verlaten heeft. Als daarna de nauwkeurigheid binnen de opgegeven waarde komt en dan kan het voorkomen dat het aparaat een event verstuurd.",
+                "use_inregions" : "Gebruik location events om gemiste transities te herstellen"
             },
 
             "data": {

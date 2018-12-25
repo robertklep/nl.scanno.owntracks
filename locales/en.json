@@ -38,7 +38,8 @@
                 "accuracy_explanation" : "Sometimes the location accuracy can be very low (i.e. accuracy > 50 meters). This could result in an unwanted event regarding enterin / leaving a geofence. If the location accuracy is below the set value, that event is ignored.",
                 "double_enter" : "Check for double enter events",
                 "double_leave" : "Check for double leave events",
-                "doublevent_explanation" : "If the accuracy of a device is too low, the device can move out of the geofence (but the app does not process this). If the accuracy is within limits, it can occur that the device re-enters a geofence and as such triggers an enter/leave event. This option aims to prevent this from happening."
+                "doublevent_explanation" : "If the accuracy of a device is too low, the device can move out of the geofence (but the app does not process this). If the accuracy is within limits, it can occur that the device re-enters a geofence and as such triggers an enter/leave event. This option aims to prevent this from happening.",
+                "use_inregions" : "Use location events to catch missed events"
             },
 
             "data": {
