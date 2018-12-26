@@ -6,7 +6,7 @@ class actionOwntracks {
       this.publishOwntracks = null;
       this.sayLocation = null;
       this.Homey = require('homey');
-      this.geocoder  = require("geocoder/node_modules/geocoder");
+      this.geocoder = require("./geo-code.js");
       this.globalVar = app.globalVar;
       this.logmodule = app.logmodule;
       this.broker    = app.broker;
@@ -15,6 +15,7 @@ class actionOwntracks {
    }
 
    OnInit() {
+      this.geocoder = new this.geocoder();
       this.registerActions();
       this.registerSpeech();
    }
@@ -164,16 +165,16 @@ class actionOwntracks {
          try {
             var getAddress = null;
             ref.logmodule.writelog('debug', "getLocationAdress promise enter" );
-            ref.geocoder.reverseGeocode( ref.globalVar.getUser(userName).lat, ref.globalVar.getUser(userName).lon, function ( err, data ) {
-               // do something with data
-               try {
-                 ref.logmodule.writelog('info', "Address data retreived: " + data.results[0].formatted_address);
-                 getAddress = data.results[0].formatted_address;
-               } catch(error) {
-                  ref.logmodule.writelog('error', "Could not retreive addres: " + error);
-               }
-               fulfill(getAddress);
-            });
+
+            ref.geocoder.reverse(ref.globalVar.getUser(userName).lat, ref.globalVar.getUser(userName).lon).then(result => {
+              ref.logmodule.writelog('debug', "result: " + JSON.stringify(result.raw.address));
+              getAddress = result.raw.address.road+' '+result.raw.address.house_number+', '+result.raw.address.postcode+', '+result.raw.address.city;
+              ref.logmodule.writelog('debug',getAddress);
+              fulfill(getAddress);
+            }).catch(error => {
+              ref.logmodule.writelog('error', "Could not retreive addres: " + error);
+              reject(error);
+            })
          } catch(err) {
             ref.logmodule.writelog('error', "Error in getLocationString: " + err);
             reject(err);

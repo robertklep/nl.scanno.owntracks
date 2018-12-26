@@ -20,7 +20,11 @@ class brokerOwntracks {
    OnInit() {
       this.connectToBroker();
    }
-
+  /**
+   * getBrokerURL - create broker URL based on several settings.
+   *
+   * @return {type}  String with the URL of the broker to connect to.
+   */
    getBrokerURL() {
       var urlBroker = []
       if (this.Homey.ManagerSettings.get('tls') == true) {
@@ -34,6 +38,12 @@ class brokerOwntracks {
       return urlBroker.join('');
    }
 
+   /**
+    * getConnectOptions - create structure with several options.
+    * Options are depending on several settings from the settings page.
+    *
+    * @return {type}  returns structure with the options to use when connecting.
+    */
    getConnectOptions() {
       var rejectUnauth = true;
       if ( this.Homey.ManagerSettings.get('selfsigned') == true) {
@@ -55,6 +65,13 @@ class brokerOwntracks {
       return connect_options;
    }
 
+   /**
+    * connectToBroker - description
+    *
+    * @param  {type} args  description
+    * @param  {type} state description
+    * @return {type}       description
+    */
    connectToBroker(args, state) {
       const ref = this;
       if (ref.Homey.ManagerSettings.get('usebroker') == true) {
@@ -130,6 +147,12 @@ class brokerOwntracks {
       }
    }
 
+   /**
+    * subscribeToTopic - description
+    *
+    * @param  {type} topicName description
+    * @return {type}           description
+    */
    subscribeToTopic(topicName) {
       if ( this.globalVar.getTopicArray().indexOf(topicName) == -1 ) {
 
@@ -140,6 +163,12 @@ class brokerOwntracks {
       }
    }
 
+   /**
+    * sendMessageToTopic - description
+    *
+    * @param  {type} args description
+    * @return {type}      description
+    */
    sendMessageToTopic(args) {
       const ref = this;
       // Check if there is already a connection to the broker
@@ -168,14 +197,30 @@ class brokerOwntracks {
       }
    }
 
+   /**
+    * getConnectedClient - description
+    *
+    * @return {type}  description
+    */
    getConnectedClient() {
       return this.connectedClient;
    }
 
+   /**
+    * clearConnectedClient - description
+    *
+    * @return {type}  description
+    */
    clearConnectedClient() {
       this.connectedClient = null;
    }
 
+   /**
+    * updateRef - description
+    *
+    * @param  {type} app description
+    * @return {type}     description
+    */
    updateRef(app) {
       this.handleMessage.updateRef(app);
    }
