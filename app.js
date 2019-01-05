@@ -7,7 +7,8 @@ var globalOwntracks = require("./global.js");
 var brokerOwntracks = require("./broker.js");
 var httpOwntracks = require("./httphandler.js");
 var actionOwntracks = require("./actions.js");
-var triggerOwntracks = require("./triggers.js");
+var triggerOwntracks = require("./OwntracksTrigger.js");
+
 var conditionOwntracks = require("./conditions.js");
 
 class OwntracksApp extends Homey.App {
@@ -22,7 +23,7 @@ class OwntracksApp extends Homey.App {
       this.logmodule = require("./logmodule.js");
       this.globalVar = new globalOwntracks(this);
       this.broker    = new brokerOwntracks(this);
-      this.triggers  = new triggerOwntracks(this);
+      this.triggers = new triggerOwntracks.TriggerHandler(this);
       this.actions   = new actionOwntracks(this);
       this.condition = new conditionOwntracks(this);
       this.httpHandler = new httpOwntracks(this);
