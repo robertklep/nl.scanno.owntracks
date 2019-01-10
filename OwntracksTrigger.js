@@ -66,6 +66,8 @@ class Trigger {
    * @return {type}       true when the card matches, otherwise false.
    */
   isMatch(args, state) {
+
+    this.logmodule.writelog('debug', "isMatch called");
     var matchTopic = false;
     var arrTriggerTopic = state.triggerTopic.split('/');
 
@@ -77,6 +79,7 @@ class Trigger {
           matchTopic = false;
        }
     } else {
+       this.logmodule.writelog('debug', "no match");
        matchTopic = false;
     }
     return matchTopic;
@@ -100,6 +103,7 @@ class Trigger {
          return false;
       }
     }
+    return false;
   }
 
   getTrigger() {
@@ -132,7 +136,7 @@ class EventTrigger extends Trigger {
    */
   processMessage(args, state) {
     this.logmodule.writelog('debug', "EventTrigger processMessage called")
-    this.processEventMessage(args,state);
+    return this.processEventMessage(args,state);
   }
 
   /**
@@ -178,7 +182,7 @@ class EnterTrigger extends Trigger {
    */
   processMessage(args, state) {
     this.logmodule.writelog('debug', "EnterTrigger processMessage called")
-    this.processEventMessage(args,state);
+    return this.processEventMessage(args,state);
   }
 
   /**
@@ -224,7 +228,7 @@ class LeaveTrigger extends Trigger {
    */
   processMessage(args, state) {
     this.logmodule.writelog('debug', "LeaveTrigger processMessage called")
-    this.processEventMessage(args,state);
+    return this.processEventMessage(args,state);
   }
 
   /**
@@ -293,6 +297,7 @@ class BatteryTrigger extends Trigger {
       }
       return false;
     }
+    return false;
   }
 
   /**
