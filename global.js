@@ -359,7 +359,7 @@ class globalOwntracks {
    }
 
    getUserArray() {
-      this.logmodule.writelog('debug', "getUserArray called");
+      //this.logmodule.writelog('debug', "getUserArray called");
       return this.userArray;
    }
 
