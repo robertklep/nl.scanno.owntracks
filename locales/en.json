@@ -20,26 +20,27 @@
             "title" : "Owntracks client settings",
 
             "server" : {
-                "server_title" : "Owntracks broker setings",
+                "server_title" : "MQTT Broker setings",
                 "use_broker" : "Use a MQTT broker as addition to HTTP",
                 "server_details" : "Enter broker details",
                 "server_explanation" : "You need to specify a broker where the Owntracks client can connect to. The servername can either be a local ip adres when using a private broker, or a FQDN. You also need to provide the portnumber. Normally this would be port 1883 and 8883 for secure connections",
-                "url" : "Enter IP adress or DNS",
-                "port" : "Enter port number",
-                "tls" : "Use a secure connection to the broker (TLS)",
-                "selfsigned" : "Disable certificate checking (by use of selfsigned certificates",
-                "keepalive" : "Keepalive time in seconds",
-                "username" : "Username for the broker",
-                "password" : "Password for the broker"
+                "url" : "IP adress or DNS",
+                "port" : "Port number",
+                "tls" : "Secure connection (TLS)",
+                "selfsigned" : "Disable certificate checking",
+                "keepalive" : "Keepalive (seconds)",
+                "username" : "Username",
+                "password" : "Password"
             },
 
             "client" : {
-                "accuracy" : "Enter accuracy in meters",
+                "client_settings" : "Tweaks",
+                "accuracy" : "GPS accuracy (meters)",
                 "accuracy_explanation" : "Sometimes the location accuracy can be very low (i.e. accuracy > 50 meters). This could result in an unwanted event regarding enterin / leaving a geofence. If the location accuracy is below the set value, that event is ignored.",
                 "double_enter" : "Check for double enter events",
                 "double_leave" : "Check for double leave events",
                 "doublevent_explanation" : "If the accuracy of a device is too low, the device can move out of the geofence (but the app does not process this). If the accuracy is within limits, it can occur that the device re-enters a geofence and as such triggers an enter/leave event. This option aims to prevent this from happening.",
-                "use_inregions" : "Use location events to catch missed events"
+                "use_inregions" : "Use Inregions in location"
             },
 
             "data": {
@@ -53,9 +54,9 @@
                 "test" : "Test",
                 "getlogs" : "Get logs",
                 "purgedata": "Delete data",
-                "userArray": "Edit users",
-                "fenceArray": "Edit geofences",
-                "userStatus": "Current data"
+                "userArray": "Users",
+                "fenceArray": "Geofences",
+                "userStatus": "Overview"
             },
 
              "user" : {

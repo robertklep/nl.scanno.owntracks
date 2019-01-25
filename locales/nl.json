@@ -20,26 +20,27 @@
             "title" : "Owntracks client instellingen",
 
             "server" : {
-                "server_title" : "Owntracks broker instellingen",
+                "server_title" : "MQTT Broker instellingen",
                 "use_broker" : "Gebruik MQTT broker naast HTTP",
                 "server_details" : "Voer broker gegevens in",
                 "server_explanation" : "Er moet een broker opgegeven worden, waarmee de Owntracks client kan verbinden. De servernaam kan een IP adres bevatten, of een DNS naam. Er moet ook een poortnummer worden opgegeven. Normaal gesproken is dat poort 1883 voor een normale verbinding en poortnummer 8883 voor een beveiligde verbinding.",
                 "url" : "IP adres of DNS",
                 "port" : "Poortnummer",
-                "tls" : "Gebruik een beveiligde verbinding met de broker (TLS)",
-                "selfsigned" : "Schakel de certificaat controle uit ( bij gebruik van self signed cerificates)",
-                "keepalive" : "Keepalive tijd in seconden",
+                "tls" : "Beveiligde verbinding (TLS)",
+                "selfsigned" : "Certificaat controle uitgeschakelen)",
+                "keepalive" : "Keepalive (seconden)",
                 "username" : "Gebruikersnaam",
                 "password" : "Wachtwoord"
             },
 
             "client" : {
-                "accuracy" : "Minimale nauwkeurigheid",
+                "client_settings" : "Tweaks",
+                "accuracy" : "Minimale nauwkeurigheid GPS (meters)",
                 "accuracy_explanation" : "Het kan soms voorkomen dat de lokatie bepaling niet nauwkeurig is (bijvoorbeeld meer dan 50 meter). Dit kan een ongewenste melding opleveren met betrekking tot het binnengaan of verlaten van een geofence. Als de nauwkeurigheid boven de gestelde waard uitkomt, wordt de ontvangen melding genegeerd.",
                 "double_enter" : "Controleer op dubbele enter events",
                 "double_leave" : "Controleer op dubbele leave events",
                 "doublevent_explanation" : "Het kan voorkomen dat er dubbele enter/leave events binnenkomen. Dit komt voor als door GPS onnauwkeurigheid de telefoon denkt dat deze de geofence verlaten heeft. Als daarna de nauwkeurigheid binnen de opgegeven waarde komt en dan kan het voorkomen dat het aparaat een event verstuurd.",
-                "use_inregions" : "Gebruik location events om gemiste transities te herstellen"
+                "use_inregions" : "Gebruik inregions in lokatie"
             },
 
             "data": {
@@ -53,9 +54,9 @@
                 "test" : "Test",
                 "getlogs" : "Log ophalen",
                 "purgedata": "Verwijder gegevens",
-                "userArray": "Wijzig gebruikers",
-                "fenceArray": "Wijzig geofences",
-                "userStatus": "Huidige gegevens"
+                "userArray": "Gebruikers",
+                "fenceArray": "Geofences",
+                "userStatus": "Overzicht"
             },
 
              "user" : {
