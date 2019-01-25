@@ -1,7 +1,7 @@
 {
   "name": "nl.scanno.owntracks",
-  "version": "2.2.3",
-  "description": "Advanced Presence and Location",
+  "version": "2.2.2",
+  "description": "Owntracks Client",
   "main": "app.js",
   "dependencies": {
     "mqtt": "2.18.8"
@@ -15,9 +15,7 @@
     "url": "git+https://github.com/scanno/nl.scanno.owntracks.git"
   },
   "keywords": [
-    "Presence",
-    "Location",
-    "Geofencing",
+    "Owntracks",
     "Homey"
   ],
   "author": "Menno van Grinsven",
