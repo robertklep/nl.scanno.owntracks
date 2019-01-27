@@ -109,9 +109,9 @@
             <!--<p data-i18n="settings.app.data.data_explanation"></p>-->
 
             <div>
-               <button type="button" id="button_userStatus" onclick="createUserStatus()" data-i18n="settings.app.button.userStatus">Show Userdata</button>
-               <button type="button" id="button_userTable" onclick="createUserTable()" data-i18n="settings.app.button.userArray">Edit Userdata</button>
-               <button type="button" id="button_fenceTable" onclick="createFenceTable()" data-i18n="settings.app.button.fenceArray">Edit geofences</button>
+               <button type="button" id="button_userStatus" onclick="createUserStatus()" data-i18n="settings.app.button.userStatus">Overview</button>
+               <button type="button" id="button_userTable" onclick="createUserTable()" data-i18n="settings.app.button.userArray">Users</button>
+               <button type="button" id="button_fenceTable" onclick="createFenceTable()" data-i18n="settings.app.button.fenceArray">Geofences</button>
             </div>
 
             <fieldset id="edit_data">
@@ -127,15 +127,26 @@
 
         </form>
 
+        <!-- Save settings and get log buttons -->
         <div>
-        <button type="button" class="right" id="button_getlog" onclick="showLogLines()" data-i18n="settings.app.button.getlogs">Get Logs</button>
-        <button type="button" class="right" id="button_save" onclick="save()" data-i18n="settings.app.button.save">Save</button>
+        <button type="button" class="left" id="button_save" onclick="save()" data-i18n="settings.app.button.save">Save</button>
+<!--        <button type="button" class="right" id="button_getlog" onclick="showLogLines()" data-i18n="settings.app.button.getlogs">Get Logs</button> -->
         </div>
 
-<!--        <p data-i18n="settings.app.user.title"></p>
-        <div id="userdata"></div> <br> -->
-        <p data-i18n="settings.app.log.title"></p>
-        <div id="loglines"></div>
+        <br/>
+        <br/>
+
+        <form>
+          <fieldset>
+            <legend>
+                <label data-i18n="settings.app.log.title"></label>
+            </legend>
+
+<!--            <p data-i18n="settings.app.log.title"></p>-->
+            <div id="loglines"></div>
+        </fieldset>
+       </form>
+       <button type="button" class="right" id="button_getlog" onclick="showLogLines()" data-i18n="settings.app.button.getlogs">Get Logs</button>
 
         <script type="text/javascript">
 
