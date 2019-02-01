@@ -233,8 +233,14 @@
                   if (err) {
                     console.error(err)
                   } else {
+                    if (typeof accuracy == 'undefined' || accuracy == null || accuracy =='') {
+                      currentValues.accuracy = accuracy;
+                      accuracy = '150';
+                      HomeyAPI.set('accuracy', accuracy);
+                    } else {
+                      currentValues.accuracy = accuracy;
+                    }
                     document.getElementById('accuracy').value = accuracy;
-                    currentValues.accuracy = accuracy;
                   }
            })
            Homey.get('double_enter', function(err, double_enter) {
