@@ -26,14 +26,14 @@
                 "server_details" : "Enter broker details",
                 "server_security" : "Security settings",
                 "server_explanation" : "You need to specify a broker where the Owntracks client can connect to. The servername can either be a local ip adres when using a private broker, or a FQDN. You also need to provide the portnumber. Normally this would be port 1883 and 8883 for secure connections",
-                "security_explanation" : "You can disable certificate checking by using selfsigned certificates",
-                "url" : "Enter IP adress or DNS",
-                "port" : "Enter port number",
+                "security_explanation" : "You can disable certificate checking when the broker uses selfsigned certificates",
+                "url" : "Hostname",
+                "port" : "Port number",
                 "tls" : "Use a secure connection to the broker",
                 "selfsigned" : "Disable certificate checking",
-                "keepalive" : "Keepalive time in seconds",
-                "username" : "Username for the broker",
-                "password" : "Password for the broker"
+                "keepalive" : "Keepalive (sec)",
+                "username" : "Username",
+                "password" : "Password"
             },
 
             "client" : {

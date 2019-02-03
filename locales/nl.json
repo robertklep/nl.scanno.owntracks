@@ -31,7 +31,7 @@
                 "port" : "Poortnummer",
                 "tls" : "Beveiligde verbinding (TLS)",
                 "selfsigned" : "Certificaat controle uitgeschakelen)",
-                "keepalive" : "Keepalive (seconden)",
+                "keepalive" : "Keepalive (sec)",
                 "username" : "Gebruikersnaam",
                 "password" : "Wachtwoord"
             },

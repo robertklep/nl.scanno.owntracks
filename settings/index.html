@@ -21,98 +21,90 @@
                </div>
                <div class="settings-item-last">
                   <label class="form-switch">
-                     <input class="checkbox" id="usebroker" type="checkbox" checked="true" onchange="owntracks.serversettings.disabled = !checked">
+                     <input id="usebroker" type="checkbox" unchecked onClick="useBroker()">
                      <i></i>
                   </label>
                </div>
             </div>
          </div>
-         <div class="settings-spacer"></div>
-         <div data-i18n="settings.app.server.server_details" class="text-header">-Enter broker details-</div>
-         <div class="settings-itemgroup">
-            <div class="settings-item">
-               <div class="settings-item-text-above">
-                  <span data-i18n="settings.app.server.url"></span>
+         <div id="serversettings" style="display:none">
+            <div class="settings-spacer"></div>
+            <div data-i18n="settings.app.server.server_details" class="text-header">-Enter broker details-</div>
+            <div class="settings-itemgroup">
+               <div class="settings-item">
+                  <div class="settings-item-text-above">
+                     <span data-i18n="settings.app.server.url"></span>
+                  </div>
+                  <div class="settings-item-input">
+                     <input class="hy-nostyle input-wide" id="url" type="text" value="" />
+                  </div>
+               </div>
+               <div class="settings-item">
+                  <div class="settings-item-text-above">
+                     <span data-i18n="settings.app.server.port"></span>
+                  </div>
+                  <div class="settings-item-input">
+                     <input class="hy-nostyle input-wide" id="ip_port" type="text" value="1883" />
+                  </div>
+               </div>
+               <div class="settings-item">
+                  <div class="settings-item-text-above">
+                     <span data-i18n="settings.app.server.keepalive"></span>
+                  </div>
+                  <div class="settings-item-input">
+                     <input class="hy-nostyle input-wide" id="keepalive" type="text" value="60" />
+                  </div>
+               </div>
+               <div class="settings-item">
+                  <div class="settings-item-text-above">
+                     <span data-i18n="settings.app.server.username"></span>
+                  </div>
+                  <div class="settings-item-input">
+                     <input class="hy-nostyle input-wide" id="user" type="text" value="" />
+                  </div>
+               </div>
+               <div class="settings-item">
+                  <div class="settings-item-text-above">
+                     <span data-i18n="settings.app.server.password"></span>
+                  </div>
+                  <div class="settings-item-input">
+                     <input class="hy-nostyle input-wide" id="password" type="password" value="" />
+                  </div>
+               </div>
+            </div>   
+            <div class="text-description">
+                  <span data-i18n="settings.app.server.server_explanation">-Description goes here-</span>
+            </div>
+            <div class="settings-spacer"></div>
+            <div data-i18n="settings.app.server.server_security" class="text-header">-Security settings-</div>
+            <div class="settings-itemgroup">
+               <div class="settings-item">
+                  <div class="settings-item-text">
+                     <span data-i18n="settings.app.server.tls"></span>
+                  </div>
+                  <div class="settings-item-last">
+                     <label class="form-switch">
+                        <input id="tls" type="checkbox"/>
+                        <i></i>
+                     </label>
+                  </div>
+               </div>
+               <div class="settings-item"><div class="settings-item-divider"></div><div class="settings-item-divider"></div></div>
+               <div class="settings-item">
+                  <div class="settings-item-text">
+                     <span for="selfsigned" data-i18n="settings.app.server.selfsigned"></span>
+                  </div>
+                  <div class="settings-item-last">
+                     <label class="form-switch">
+                        <input id="selfsigned" type="checkbox"/>
+                           <i></i>
+                     </label>
+                  </div>   
                </div>
             </div>
-            <div class="settings-item">
-               <div class="settings-item-input">
-                  <input class="hy-nostyle input-wide" id="url" type="text" value="" />
-               </div>
+            <div class="text-description">
+                  <span data-i18n="settings.app.server.security_explanation">-Description goes here-</span>
             </div>
-            <div class="settings-item">
-               <div class="settings-item-text-above">
-                  <span data-i18n="settings.app.server.port"></span>
-               </div>
-            </div>
-            <div class="settings-item">
-               <div class="settings-item-input">
-                  <input class="hy-nostyle input-wide" id="ip_port" type="text" value="1883" />
-               </div>
-            </div>
-            <div class="settings-item">
-               <div class="settings-item-text-above">
-                  <span data-i18n="settings.app.server.keepalive"></span>
-               </div>
-            </div>
-            <div class="settings-item">
-               <div class="settings-item-input">
-                  <input class="hy-nostyle input-wide" id="keepalive" type="text" value="60" />
-               </div>
-            </div>
-            <div class="settings-item">
-               <div class="settings-item-text-above">
-                  <span data-i18n="settings.app.server.username"></span>
-               </div>
-            </div>
-            <div class="settings-item">
-               <div class="settings-item-input">
-                  <input class="hy-nostyle input-wide" id="user" type="text" value="" />
-               </div>
-            </div>
-            <div class="settings-item">
-               <div class="settings-item-text-above">
-                  <span data-i18n="settings.app.server.password"></span>
-               </div>
-            </div>
-            <div class="settings-item">
-               <div class="settings-item-input">
-                  <input class="hy-nostyle input-wide" id="password" type="password" value="" />
-               </div>
-            </div>
-         </div>   
-         <div class="text-description">
-               <span data-i18n="settings.app.server.server_explanation">-Description goes here-</span>
-         </div>
-         <div class="settings-spacer"></div>
-         <div data-i18n="settings.app.server.server_security" class="text-header">-Security settings-</div>
-         <div class="settings-itemgroup">
-            <div class="settings-item">
-               <div class="settings-item-text">
-                  <span for="tls" data-i18n="settings.app.server.tls"></span>
-               </div>
-               <div class="settings-item-last">
-                  <label class="form-switch">
-                     <input class="checkbox" id="tls" type="checkbox"/>
-                     <i></i>
-                  </label>
-               </div>
-            </div>
-            <div class="settings-item"><div class="settings-item-divider"></div><div class="settings-item-divider"></div></div>
-            <div class="settings-item">
-               <div class="settings-item-text">
-                  <span for="selfsigned" data-i18n="settings.app.server.selfsigned"></span>
-               </div>
-               <div class="settings-item-last">
-                  <label class="form-switch">
-                  <input class="checkbox" id="selfsigned" type="checkbox"/>
-                     <i></i>
-                  </label>
-               </div>   
-            </div>
-         </div>
-         <div class="text-description">
-               <span data-i18n="settings.app.server.security_explanation">-Description goes here-</span>
          </div>
          <div class="settings-spacer"></div>
          <div data-i18n="settings.app.client.client_settings" class="text-header">-Client settings-</div>
@@ -137,7 +129,7 @@
                </div>
                <div class="settings-item-last">
                   <label class="form-switch">
-                     <input class="checkbox" id="double_enter" type="checkbox" />
+                     <input id="double_enter" type="checkbox" />
                   <i></i>
                   </label>
                </div>           
@@ -149,7 +141,7 @@
                </div>
                <div class="settings-item-last">
                   <label class="form-switch">
-                     <input class="checkbox" id="double_leave" type="checkbox" />
+                     <input id="double_leave" type="checkbox" />
                   <i></i>
                   </label>
                </div> 
@@ -162,7 +154,7 @@
                </div>
                <div class="settings-item-last">
                   <label class="form-switch">
-                     <input class="checkbox" id="use_inregions" type="checkbox" />
+                     <input id="use_inregions" type="checkbox" />
                   <i></i>
                   </label>
                </div> 
@@ -245,6 +237,7 @@
                   if (typeof usebroker == 'undefined' || usebroker == null) usebroker = false;
                   document.getElementById('usebroker').checked = usebroker;
                   document.getElementById('serversettings').disabled = !usebroker;
+                  useBroker();
                   currentValues.usebroker = usebroker;
            })
 
@@ -760,6 +753,15 @@
               });
            }
         }
+
+         function useBroker() {
+            //console.log( document.getElementById("usebroker").checked )
+            if ( document.getElementById("usebroker").checked ) {
+               $("#serversettings").show( "fast" )
+            } else {
+               $("#serversettings").hide( "fast" )
+            }
+         }
 
         function showTab(tab){
             document.getElementById("tabs").style.display = "inline";
