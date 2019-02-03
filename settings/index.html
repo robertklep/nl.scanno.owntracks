@@ -1,152 +1,233 @@
 <!doctype html>
 <html>
     <head>
+         <link rel="stylesheet" type="text/css" href="styles.css" />
         <!-- The '/homey.js' script must be included in your settings view to work -->
         <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
+        <script type="text/javascript" src="/manager/webserver/assets/js/jquery.js"></script>
    </head>
-    <body>
+   <body>
 
-        <!--<h1 data-i18n="settings.app.title"></h1>-->
-        <form id="owntracks">
-
-        <fieldset id="server">
-            <legend>
-                <label data-i18n="settings.app.server.server_title"></label>
-            </legend>
-            <div class="field">
-                <input class="checkbox" id="usebroker" type="checkbox" checked="true"
-                    onchange="owntracks.serversettings.disabled = !checked">
-                <label class="form_label" for="usebroker" data-i18n="settings.app.server.use_broker"</label>
+   <p data-i18n="settings.benefit"></p>
+   <form id="owntracks">
+      <div class="panel">
+         <div class="settings-top"></div>
+         <div class="settings-spacer"></div>
+         <div data-i18n="settings.app.server.server_title" class="text-header">-Owntracks broker setings-</div>
+         <div class="settings-itemgroup">
+            <div class="settings-item">
+               <div class="settings-item-text">
+                  <span data-i18n="settings.app.server.use_broker">-Use a MQTT Broker as addition to http-</span>
+               </div>
+               <div class="settings-item-last">
+                  <label class="form-switch">
+                     <input class="checkbox" id="usebroker" type="checkbox" checked="true" onchange="owntracks.serversettings.disabled = !checked">
+                     <i></i>
+                  </label>
+               </div>
             </div>
-
-            <fieldset id="serversettings">
-                <legend>
-                    <label data-i18n="settings.app.server.server_details"></label>
-                </legend>
-
-                <!--<p data-i18n="settings.app.server.server_explanation"></p>-->
-
-                <div class="field row">
-                    <label class="form_label" for="Url" data-i18n="settings.app.server.url"></label>
-                    <br>
-                    <input class="form_input" id="url" type="text" value="" /> <br>
-                </div>
-
-                <div class="field row">
-                    <label class="form_label" for="ip_port" data-i18n="settings.app.server.port"></label>
-                    <br>
-                    <input class="form_input" id="ip_port" type="text" value="1883" /> <br>
-                </div>
-                <br/>
-                <div class="field">
-                    <input class="checkbox" id="tls" type="checkbox"/>
-                    <label class="form_label" for="tls" data-i18n="settings.app.server.tls"></label>
-                </div>
-
-                <div class="field">
-                    <input class="checkbox" id="selfsigned" type="checkbox"/>
-                    <label class="form_label" for="selfsigned" data-i18n="settings.app.server.selfsigned"></label>
-                </div>
-                <br/>
-                <div class="field row">
-                    <label class="form_label" for="keepalive" data-i18n="settings.app.server.keepalive"></label>
-                    <br>
-                    <input class="form_input" id="keepalive" type="text" value="60" /> <br>
-                 </div>
-
-                <div class="field row">
-                    <label class="form_label" for="User" data-i18n="settings.app.server.username"></label>
-                    <br>
-                    <input class="form_input" id="user" type="text" value="" /> <br>
-                 </div>
-
-                 <div class="field row">
-                     <label class="form_label" for="Password" data-i18n="settings.app.server.password"></label>
-                     <br>
-                     <input class="form_input" id="password" type="password" value="" /> <br>
-                </div>
-            </fieldset>
-        </fieldset>
-
-        <fieldset id="client_settings">
-            <legend>
-                <label data-i18n="settings.app.client.client_settings"></label>
-            </legend>
-
-            <!--<p data-i18n="settings.app.client.accuracy_explanation"></p>-->
-
-            <div class="field row">
-                <label class="form_label" for="Accuracy" data-i18n="settings.app.client.accuracy"></label>
-                <br>
-                <input class="form_input" id="accuracy" type="text" value="100" /> <br>
+         </div>
+         <div class="settings-spacer"></div>
+         <div data-i18n="settings.app.server.server_details" class="text-header">-Enter broker details-</div>
+         <div class="settings-itemgroup">
+            <div class="settings-item">
+               <div class="settings-item-text-above">
+                  <span data-i18n="settings.app.server.url"></span>
+               </div>
             </div>
-
-            <br/>
-<!--            <p data-i18n="settings.app.client.doublevent_explanation"></p>-->
-
-            <div class="field">
-                <input class="checkbox" id="double_enter" type="checkbox" />
-                <label class="form_label" for="double_enter" data-i18n="settings.app.client.double_enter"></label>
+            <div class="settings-item">
+               <div class="settings-item-input">
+                  <input class="hy-nostyle input-wide" id="url" type="text" value="" />
+               </div>
             </div>
-
-            <div class="field">
-                <input class="checkbox" id="double_leave" type="checkbox" />
-                <label class="form_label" for="double_leave" data-i18n="settings.app.client.double_leave"></label>
+            <div class="settings-item">
+               <div class="settings-item-text-above">
+                  <span data-i18n="settings.app.server.port"></span>
+               </div>
             </div>
-
-            <div class="field">
-                <input class="checkbox" id="use_inregions" type="checkbox" />
-                <label class="form_label" for="use_inregions" data-i18n="settings.app.client.use_inregions"></label>
+            <div class="settings-item">
+               <div class="settings-item-input">
+                  <input class="hy-nostyle input-wide" id="ip_port" type="text" value="1883" />
+               </div>
             </div>
-
-        </fieldset>
-
-        <fieldset id="data_settings">
-            <legend>
-                <label data-i18n="settings.app.data.data_settings"></label>
-            </legend>
-
-            <!--<p data-i18n="settings.app.data.data_explanation"></p>-->
-
-            <div>
-               <button type="button" id="button_userStatus" onclick="createUserStatus()" data-i18n="settings.app.button.userStatus">Overview</button>
-               <button type="button" id="button_userTable" onclick="createUserTable()" data-i18n="settings.app.button.userArray">Users</button>
-               <button type="button" id="button_fenceTable" onclick="createFenceTable()" data-i18n="settings.app.button.fenceArray">Geofences</button>
+            <div class="settings-item">
+               <div class="settings-item-text-above">
+                  <span data-i18n="settings.app.server.keepalive"></span>
+               </div>
             </div>
+            <div class="settings-item">
+               <div class="settings-item-input">
+                  <input class="hy-nostyle input-wide" id="keepalive" type="text" value="60" />
+               </div>
+            </div>
+            <div class="settings-item">
+               <div class="settings-item-text-above">
+                  <span data-i18n="settings.app.server.username"></span>
+               </div>
+            </div>
+            <div class="settings-item">
+               <div class="settings-item-input">
+                  <input class="hy-nostyle input-wide" id="user" type="text" value="" />
+               </div>
+            </div>
+            <div class="settings-item">
+               <div class="settings-item-text-above">
+                  <span data-i18n="settings.app.server.password"></span>
+               </div>
+            </div>
+            <div class="settings-item">
+               <div class="settings-item-input">
+                  <input class="hy-nostyle input-wide" id="password" type="password" value="" />
+               </div>
+            </div>
+         </div>   
+         <div class="text-description">
+               <span data-i18n="settings.app.server.server_explanation">-Description goes here-</span>
+         </div>
+         <div class="settings-spacer"></div>
+         <div data-i18n="settings.app.server.server_security" class="text-header">-Security settings-</div>
+         <div class="settings-itemgroup">
+            <div class="settings-item">
+               <div class="settings-item-text">
+                  <span for="tls" data-i18n="settings.app.server.tls"></span>
+               </div>
+               <div class="settings-item-last">
+                  <label class="form-switch">
+                     <input class="checkbox" id="tls" type="checkbox"/>
+                     <i></i>
+                  </label>
+               </div>
+            </div>
+            <div class="settings-item"><div class="settings-item-divider"></div><div class="settings-item-divider"></div></div>
+            <div class="settings-item">
+               <div class="settings-item-text">
+                  <span for="selfsigned" data-i18n="settings.app.server.selfsigned"></span>
+               </div>
+               <div class="settings-item-last">
+                  <label class="form-switch">
+                  <input class="checkbox" id="selfsigned" type="checkbox"/>
+                     <i></i>
+                  </label>
+               </div>   
+            </div>
+         </div>
+         <div class="text-description">
+               <span data-i18n="settings.app.server.security_explanation">-Description goes here-</span>
+         </div>
+         <div class="settings-spacer"></div>
+         <div data-i18n="settings.app.client.client_settings" class="text-header">-Client settings-</div>
+         <div class="settings-itemgroup">
+            <div class="settings-item">
+               <div class="settings-item-text">
+                  <span data-i18n="settings.app.client.accuracy"></span>
+               </div>
+               <div class="settings-item-input">
+                  <input class="hy-nostyle input-small" id="accuracy" type="text" value="100" />
+               </div>
+            </div>
+         </div>
+         <div class="text-description">
+               <span data-i18n="settings.app.client.accuracy_explanation">-Description goes here-</span>
+         </div>
+         <div class="settings-spacer"></div>
+         <div class="settings-itemgroup">
+            <div class="settings-item">
+               <div class="settings-item-text">
+                     <span for="double_enter" data-i18n="settings.app.client.double_enter"></span>
+               </div>
+               <div class="settings-item-last">
+                  <label class="form-switch">
+                     <input class="checkbox" id="double_enter" type="checkbox" />
+                  <i></i>
+                  </label>
+               </div>           
+            </div>
+            <div class="settings-item"><div class="settings-item-divider"></div><div class="settings-item-divider"></div></div>
+            <div class="settings-item">
+               <div class="settings-item-text">
+                     <span for="double_leave" data-i18n="settings.app.client.double_leave"></span>
+               </div>
+               <div class="settings-item-last">
+                  <label class="form-switch">
+                     <input class="checkbox" id="double_leave" type="checkbox" />
+                  <i></i>
+                  </label>
+               </div> 
 
-            <fieldset id="edit_data">
-               <table id="userTable"/>
+            </div>
+            <div class="settings-item"><div class="settings-item-divider"></div><div class="settings-item-divider"></div></div>
+            <div class="settings-item">
+               <div class="settings-item-text">
+                     <span for="use_inregions" data-i18n="settings.app.client.use_inregions"></span>
+               </div>
+               <div class="settings-item-last">
+                  <label class="form-switch">
+                     <input class="checkbox" id="use_inregions" type="checkbox" />
+                  <i></i>
+                  </label>
+               </div> 
+            </div>
+         </div>
+         <div class="text-description">
+               <span data-i18n="settings.app.client.doublevent_explanation">-Description goes here-</span>
+         </div>   
+         <div class="settings-spacer"></div>
+         <div data-i18n="settings.app.data.data_settings" class="text-header">-User Data-</div>
+         <div class="settings-itemgroup">
+            <div class="settings-item">
+               <div id="tabs" class="rTable">
+                  <div id="tabb1" class="tab tab-active" onclick="showTab(1)" data-i18n="settings.app.button.userStatus">-Show Userdata-</div>
+                  <div id="tabb2" class="tab tab-inactive" onclick="showTab(2)" data-i18n="settings.app.button.userArray">-Edit Userdata-</div>
+                  <div id="tabb3" class="tab tab-inactive" onclick="showTab(3)" data-i18n="settings.app.button.fenceArray">-Edit geofences-</div>                  
+               </div>
+               <div class="settings-top"></div>
+            </div>
+            <div class="settings-item">
+
+               <table id="userTable">
                </table>
-
                <div id="data_addRow"></div>
-            </fieldset>
 
-            <button type="button" id="button_purge" onclick="purgeUserData()" data-i18n="settings.app.button.purgedata">Purge Data</button>
-
-        </fieldset>
-
-        </form>
-
-        <!-- Save settings and get log buttons -->
-        <div>
-        <button type="button" class="left" id="button_save" onclick="save()" data-i18n="settings.app.button.save">Save</button>
-<!--        <button type="button" class="right" id="button_getlog" onclick="showLogLines()" data-i18n="settings.app.button.getlogs">Get Logs</button> -->
-        </div>
-
-        <br/>
-        <br/>
-
-        <form>
-          <fieldset>
-            <legend>
-                <label data-i18n="settings.app.log.title"></label>
-            </legend>
-
-<!--            <p data-i18n="settings.app.log.title"></p>-->
-            <div id="loglines"></div>
-        </fieldset>
-       </form>
-       <button type="button" class="right" id="button_getlog" onclick="showLogLines()" data-i18n="settings.app.button.getlogs">Get Logs</button>
+            </div>
+         </div>
+         <div class="text-description">
+               <span data-i18n="settings.app.data.data_explanation">-Description goes here-</span>
+         </div>
+         <div class="settings-spacer"></div>
+         <div id="button_purge" class="settings-itemgroup">
+            <div class="settings-item">
+                  <div class="settings-item-button" onClick="purgeUserData()">
+                     <span data-i18n="settings.app.button.purgedata">-Purge Data-</span>
+                  </div>
+            </div>
+         </div>
+         <div id="button_save" class="settings-itemgroup">
+            <div class="settings-item">
+               <div class="settings-item-button" onClick="save()">
+                  <span data-i18n="settings.app.button.save">-Save-</span>
+               </div>
+            </div>
+         </div>
+         <div class="settings-spacer"></div>
+         <div data-i18n="settings.app.log.title" class="text-header">-Loglines-</div>
+         <div class="settings-itemgroup">
+            <div class="settings-item">
+               <div id="loglines"></div>
+            </div>
+            <div class="settings-spacer"></div>
+            <div id="button_getlog" class="settings-itemgroup">
+               <div class="settings-item">
+                  <div class="settings-item-button" onClick="showLogLines()">
+                     <span data-i18n="settings.app.button.getlogs">-Get Logs-</span>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </form>
+               
+               <!--        <p data-i18n="settings.app.user.title"></p>
+                       <div id="userdata"></div> <br> -->
 
         <script type="text/javascript">
 
@@ -679,6 +760,21 @@
               });
            }
         }
+
+        function showTab(tab){
+            document.getElementById("tabs").style.display = "inline";
+            $('.tab').addClass('tab-inactive')
+            $('.tab').removeClass('tab-active')
+
+            $('#tabb' + tab).addClass('tab-active')
+            $('#tabb' + tab).removeClass('tab-inactive')
+
+            //$('.panel').hide()
+            $('#tab' + tab).show()
+            if (tab === 1) {createUserStatus()}
+            if (tab === 2) {createUserTable()}
+            if (tab === 3) {createFenceTable()}
+         }
         </script>
 
     </body>
