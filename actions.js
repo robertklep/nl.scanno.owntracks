@@ -7,9 +7,12 @@ class actionOwntracks {
       this.sayLocation = null;
       this.Homey = require('homey');
       this.geocoder = require("./geo-code.js");
-      this.globalVar = app.globalVar;
+//      this.globalVar = app.globalVar;
       this.logmodule = app.logmodule;
       this.broker    = app.broker;
+
+      this.users = app.users;
+      this.fences = app.fences;
 
       this.OnInit();
    }
@@ -26,7 +29,8 @@ class actionOwntracks {
       // Put all the autocomplte actions here.
 
       this.sayLocation.getArgument('user').registerAutocompleteListener( (query, args ) => {
-         return Promise.resolve(ref.globalVar.searchUsersAutocomplete(query, true) );
+         //return Promise.resolve(ref.globalVar.searchUsersAutocomplete(query, true) );
+         return Promise.resolve(ref.users.searchUsersAutocomplete(query, true) );
       });
    }
 
@@ -80,7 +84,8 @@ class actionOwntracks {
          ref.logmodule.writelog('debug', speech.transcript);
 
          // Search useraray to see if we can match the user in he transcript
-         var foundUser = ref.globalVar.getUserFromString(speech.transcript);
+         //var foundUser = ref.globalVar.getUserFromString(speech.transcript);
+         var foundUser = ref.users.getUserFromString(speech.transcript);
          if (foundUser !== null) {
             ref.logmodule.writelog('debug', "Found user: " + foundUser.userName + "   Fence: " + foundUser.fence);
             return ref.getLocationString(foundUser.userName).then(function(speechline) {
@@ -110,9 +115,12 @@ class actionOwntracks {
          // the outside world. We also check if the user is not null. If the user is null, that
          // means that we have not found a user.
          try {
-            if ( userName !== null && ref.globalVar.getUser(userName) !== null) {
-               if (ref.globalVar.getUser(userName).fence !== "" ) {
-                  locationString = ref.Homey.__("location_known", {"name": userName, "location": ref.globalVar.getUser(userName).fence});
+            //if ( userName !== null && ref.globalVar.getUser(userName) !== null) {
+            if ( userName !== null && ref.users.getUser(userName) !== null) {
+               //if (ref.globalVar.getUser(userName).fence !== "" ) {
+               if (ref.users.getUser(userName).fence !== "" ) {
+                  //locationString = ref.Homey.__("location_known", {"name": userName, "location": ref.globalVar.getUser(userName).fence});
+                  locationString = ref.Homey.__("location_known", {"name": userName, "location": ref.users.getUser(userName).fence});
                   // We have found a user and the user is inside a known geoFence, so fulfill te request
                   fulfill(locationString);
                } else {
@@ -166,7 +174,8 @@ class actionOwntracks {
             var getAddress = null;
             ref.logmodule.writelog('debug', "getLocationAdress promise enter" );
 
-            ref.geocoder.reverse(ref.globalVar.getUser(userName).lat, ref.globalVar.getUser(userName).lon).then(result => {
+            //ref.geocoder.reverse(ref.globalVar.getUser(userName).lat, ref.globalVar.getUser(userName).lon).then(result => {
+            ref.geocoder.reverse(ref.users.getUser(userName).lat, ref.users.getUser(userName).lon).then(result => {
               ref.logmodule.writelog('debug', "result: " + JSON.stringify(result.raw.address));
               getAddress = result.raw.address.road+' '+result.raw.address.house_number+', '+result.raw.address.postcode+', '+result.raw.address.city;
               ref.logmodule.writelog('debug',getAddress);

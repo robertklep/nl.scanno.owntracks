@@ -1,14 +1,18 @@
 "use strict";
 
 const handleOwntracks = require("./messagehandling.js");
+var TopicArray = require("./Topics.js");
 
 class brokerOwntracks {
    constructor(app) {
       this.Homey     = require('homey');
       this.mqtt      = require("mqtt/node_modules/mqtt");
-      this.globalVar = app.globalVar;
+//      this.globalVar = app.globalVar;
       this.logmodule = app.logmodule;
       this.handleMessage = new handleOwntracks(app);
+      this.topics = new TopicArray();
+      this.fences = app.fences;
+      this.users = app.users;
 
       this.connectedClient = null;
       this.brokerState = "DISCONNECTED";
@@ -123,7 +127,7 @@ class brokerOwntracks {
                ref.brokerState = "CONNECTED";
                ref.errorOccured = false;
                ref.logmodule.writelog('info', "MQTT client connected");
-               ref.logmodule.writelog('info', "Connected Topics: " + ref.globalVar.getTopicArray());
+               ref.logmodule.writelog('info', "Connected Topics: " + ref.topics.getTopics());
                ref.logmodule.writelog('info', "Broker State: " + ref.brokerState);
             });
 
@@ -154,12 +158,13 @@ class brokerOwntracks {
     * @return {type}           description
     */
    subscribeToTopic(topicName) {
-      if ( this.globalVar.getTopicArray().indexOf(topicName) == -1 ) {
-
+      //if ( this.globalVar.getTopicArray().indexOf(topicName) == -1 ) {
+      if ( this.topics.getTopic(topicName) == null ) {
          // Fill the array with known topics.... We only fill the
          // topic array because on connection, wel already subsribe
          // to the generic owntracks topic
-         this.globalVar.getTopicArray().push(topicName);
+         //this.globalVar.getTopicArray().push(topicName);
+         this.topics.addTriggerTopic(topicName);
       }
    }
 
@@ -223,6 +228,10 @@ class brokerOwntracks {
     */
    updateRef(app) {
       this.handleMessage.updateRef(app);
+   }
+
+   getTopicArray() {
+     return topics;
    }
 }
 

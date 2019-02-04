@@ -3,22 +3,24 @@
 class conditionOwntracks {
    constructor(app) {
       this.Homey = require('homey');
-      this.globalVar = app.globalVar;
+      //this.globalVar = app.globalVar;
       this.logmodule = app.logmodule;
 
+      this.fences = app.fences;
+      this.users = app.users;
       this.inGeofence = null;
-      
+
       this.OnInit();
    }
-   
+
    OnInit() {
       this.registerConditions();
    }
-   
+
    registerConditions() {
       const ref = this;
       ref.logmodule.writelog('debug', "registerConditions called");
-   
+
       ref.inGeofence = new ref.Homey.FlowCardCondition('inGeofence');
       ref.inGeofence.register();
       ref.inGeofence.registerRunListener((args, state ) => {
@@ -32,15 +34,17 @@ class conditionOwntracks {
          }
       });
 
-      ref.inGeofence.getArgument('geoFence').registerAutocompleteListener( (query, args ) => { 
-         return Promise.resolve(ref.globalVar.searchFenceAutocomplete(query, false) );
+      ref.inGeofence.getArgument('geoFence').registerAutocompleteListener( (query, args ) => {
+         //return Promise.resolve(ref.globalVar.searchFenceAutocomplete(query, false) );
+         return Promise.resolve(ref.fences.searchFenceAutocomplete(query, false) );
       });
    }
 
 
    checkForPresenceInFence(geoFence) {
       this.logmodule.writelog('info', "checkForPresenceInFence called");
-      if (this.globalVar.searchGeoFence(geoFence) > 0) {
+      //if (this.globalVar.searchGeoFence(geoFence) > 0) {
+      if (this.users.checkForPresenceInFence(geoFence) > 0) {
          return true;
       } else {
          return false;

@@ -10,6 +10,9 @@ class GeoCode {
     this.provider = provider;
     this.options = options;
     this.klasses = {osm: OpenStreet};
+    this.logmodule = require('./logmodule.js');
+
+    this.logmodule.writelog('debug', "GeoCode constructor entered");
   }
 
   /**

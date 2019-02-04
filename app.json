@@ -336,6 +336,14 @@
                   }
                },
                {
+                  "name": "nameDevice",
+                  "type": "autocomplete",
+                  "placeholder": {
+                     "en": "Devicename",
+                     "nl": "Naam aparataat"
+                  }
+               },
+               {
                    "name": "percBattery",
                    "type": "number",
                    "placeholder": {

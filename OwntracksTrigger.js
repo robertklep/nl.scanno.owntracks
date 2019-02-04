@@ -17,7 +17,8 @@ class Trigger {
     app.logmodule.writelog('debug', "Trigger constructor called")
     this.trigger   = trigger;
     this.logmodule = app.logmodule;
-    this.global = app.globalVar;
+    this.users = app.users;
+    this.fences = app.fences;
     this.onInit();
   }
 
@@ -65,9 +66,8 @@ class Trigger {
    * @param  {type} state State of the trigger card
    * @return {type}       true when the card matches, otherwise false.
    */
-  isMatch(args, state) {
-
-    this.logmodule.writelog('debug', "isMatch called");
+  isMatchUser(args, state) {
+    this.logmodule.writelog('debug', "isMatchUser called");
     var matchTopic = false;
     var arrTriggerTopic = state.triggerTopic.split('/');
 
@@ -85,16 +85,34 @@ class Trigger {
     return matchTopic;
   }
 
+  isMatchDevice(args, state) {
+    this.logmodule.writelog('debug', "isMatchDevice called");
+    var matchTopic = false;
+    var arrTriggerTopic = state.triggerTopic.split('/');
+
+    if (args.nameUser !== undefined ) {
+       this.logmodule.writelog('info', "received device "+arrTriggerTopic[2]+"  trigger device: "+args.nameDevice.device);
+       if (arrTriggerTopic[2] === args.nameDevice.device || args.nameDevice.device == '*') {
+          matchTopic = true;
+       } else {
+          matchTopic = false;
+       }
+    } else {
+       this.logmodule.writelog('debug', "no device match");
+       matchTopic = false;
+    }
+    return matchTopic;
+  }
 
   /**
    * processEventMessage - Generic piece of code used for the geofence cards.
    *
-   * @param  {type} args  Arguments of the Triggercard
-   * @param  {type} state State of the trigger card
-   * @return {type}       true when the card matches, otherwise false.
+   * @param  {Object} args  Arguments of the Triggercard
+   * @param  {Object} state State of the trigger card
+   * @return {boolean}       true when the card matches, otherwise false.
    */
   processEventMessage(args,state) {
-    if (this.isMatch(args, state)) {
+    if (this.isMatchUser(args, state)) {
       this.logmodule.writelog ('info', "Received Fence = "+state.triggerFence+"  trigger fence = "+args.nameGeofence.fence)
       if ( state.triggerFence == args.nameGeofence.fence || args.nameGeofence.fence == "*" ) {
          this.logmodule.writelog ('info', "triggerFence = equal")
@@ -147,16 +165,15 @@ class EventTrigger extends Trigger {
     this.logmodule.writelog('debug', "EventTrigger setAutocompleteActions called");
 
     this.getTrigger().getArgument('nameUser').registerAutocompleteListener( (query, args ) => {
-       return Promise.resolve(this.global.searchUsersAutocomplete(query, true) );
+       return Promise.resolve(this.users.searchUsersAutocomplete(query, true) );
     });
 
     this.getTrigger().getArgument('nameGeofence').registerAutocompleteListener( (query, args ) => {
-       return Promise.resolve( this.global.searchFenceAutocomplete(query, true) );
+       return Promise.resolve( this.fences.searchFenceAutocomplete(query, true) );
     });
 
   }
 }
-
 
 /**
  *
@@ -193,11 +210,11 @@ class EnterTrigger extends Trigger {
     this.logmodule.writelog('debug', "EnterTrigger setAutocompleteActions called");
 
     this.getTrigger().getArgument('nameUser').registerAutocompleteListener( (query, args ) => {
-       return Promise.resolve( this.global.searchUsersAutocomplete(query, true) );
+       return Promise.resolve( this.users.searchUsersAutocomplete(query, true) );
     });
 
     this.getTrigger().getArgument('nameGeofence').registerAutocompleteListener( (query, args ) => {
-       return Promise.resolve( this.global.searchFenceAutocomplete(query, true) );
+       return Promise.resolve( this.fences.searchFenceAutocomplete(query, true) );
     });
   }
 }
@@ -239,11 +256,11 @@ class LeaveTrigger extends Trigger {
     this.logmodule.writelog('debug', "LeaveTrigger setAutocompleteActions called");
 
     this.getTrigger().getArgument('nameUser').registerAutocompleteListener( (query, args ) => {
-       return Promise.resolve( this.global.searchUsersAutocomplete(query, true) );
+       return Promise.resolve( this.users.searchUsersAutocomplete(query, true) );
     });
 
     this.getTrigger().getArgument('nameGeofence').registerAutocompleteListener( (query, args ) => {
-       return Promise.resolve( this.global.searchFenceAutocomplete(query, true) );
+       return Promise.resolve( this.fences.searchFenceAutocomplete(query, true) );
     });
   }
 }
@@ -273,15 +290,18 @@ class BatteryTrigger extends Trigger {
    */
   processMessage(args, state) {
     this.logmodule.writelog('debug', "BatteryTrigger processMessage called")
-    if (this.isMatch(args, state)) {
-      var currentUser = this.global.getUser(state.user);
+    this.logmodule.writelog('debug', "args: " + JSON.stringify(args));
+    if (this.isMatchUser(args, state) && this.isMatchDevice(args, state)) {
+      var currentUser = this.users.getUser(state.user);
+      var device = currentUser.getDevice(state.device);
       // Check if the battery percentage is below the trigger percentage
       if ( state.percBattery < args.percBattery ) {
          // Check if the trigger has already fired. If so, do not fire again
-         if (currentUser.battTriggered == false) {
-            this.logmodule.writelog ('info', "battery percentage ("+ state.percBattery +"%) of "+ state.user+" is below trigger percentage of "+ args.percBattery +"%");
-            currentUser.battTriggered = true;
-            this.global.setUser(currentUser, false);
+         //if (currentUser.battTriggered == false) {
+         if (!device.isBattTriggered()) {
+            this.logmodule.writelog ('info', "battery percentage ("+ device.getBattery() +"%) of "+ state.user+" is below trigger percentage of "+ args.percBattery +"%");
+            device.setBattTriggered(true);
+            //this.usrs.setUser(currentUser, false);
             return true;
          } else {
             this.logmodule.writelog ('info', "battery trigger already triggered for "+ state.user);
@@ -290,10 +310,11 @@ class BatteryTrigger extends Trigger {
       }
       // Check if the battery percentage if above the trigger percentage. If this is the case
       // set the state.Triggered to false in case the phone was been charged again
-      if (state.percBattery >= args.percBattery && currentUser.battTriggered !== false) {
+      if (device.getBattery() >= args.percBattery && device.isBattTriggered()) {
          this.logmodule.writelog ('info', "Reset battery triggered state for "+ state.user);
-         currentUser.battTriggered = false;
-         this.global.setUser(currentUser, false);
+         device.setBattTriggered(false);
+         //currentUser.battTriggered = false;
+         //this.users.setUser(currentUser, false);
       }
       return false;
     }
@@ -308,7 +329,22 @@ class BatteryTrigger extends Trigger {
     this.logmodule.writelog('debug', "BatteryTrigger setAutocompleteActions called");
 
     this.getTrigger().getArgument('nameUser').registerAutocompleteListener(( query, args ) => {
-       return Promise.resolve( this.global.searchUsersAutocomplete(query, true) );
+       this.logmodule.writelog('debug', "args for autocomplete: " + JSON.stringify(args));
+       return Promise.resolve( this.users.searchUsersAutocomplete(query, true) );
+    });
+
+    this.getTrigger().getArgument('nameDevice').registerAutocompleteListener(( query, args ) => {
+       this.logmodule.writelog('debug', "args for autocomplete: " + JSON.stringify(args));
+       if (args.nameUser.user !== '*') {
+         this.logmodule.writelog('debug', "Device autocomplete: normal user " + args.nameUser.user);
+         var user = this.users.getUser(args.nameUser.name);
+         if (user !== null) {
+           return Promise.resolve( user.getDeviceArray().searchDevicesAutocomplete(query, true) );
+         }
+       } else {
+         this.logmodule.writelog('debug', "Device autocomplete (*)? " + args.nameUser.user);
+         return Promise.resolve( this.users.searchAllDevicesAutocomplete(query, true) );
+       }
     });
 
   }

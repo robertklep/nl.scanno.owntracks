@@ -7,6 +7,8 @@
     "desc_all_users": "Normal user",
     "ac_all_fences": "All geofences",
     "desc_all_fences": "Normal geofence",
+    "ac_all_devices": "All devices",
+    "desc_all_devices": "Normal device",
 
     "notifications": {
        "user_added": "User __name__ has been added to the user data",

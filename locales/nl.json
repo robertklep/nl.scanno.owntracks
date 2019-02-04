@@ -7,6 +7,8 @@
     "desc_all_users": "Normale gebruiker",
     "ac_all_fences": "Alle geofences",
     "desc_all_fences": "Normale geofence",
+    "ac_all_devices": "Alle apparaten",
+    "desc_all_devices": "Normaal apparaat",
 
     "notifications": {
        "user_added": "De gebruiker __name__ is aan de gebruikers gegevens toegevoegd",
