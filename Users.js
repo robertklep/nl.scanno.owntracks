@@ -34,7 +34,7 @@ class User {
   }
 
   getDevices() {
-    this.logmodule.writelog('debug', "getDevices(): " + JSON.stringify(this.devices));
+    //this.logmodule.writelog('debug', "getDevices(): " + JSON.stringify(this.devices));
     return this.devices.getDevices();
   }
 
@@ -95,12 +95,14 @@ class UserArray {
 
     if (this.getUser(name) == null) {
       let user = new User(name);
-      user.addDevice(device, id);
+      if (device !== undefined) {
+        user.addDevice(device, id);
+      }
       user.generateToken();
       this.users.push(user);
 
-      ref.Homey.ManagerNotifications.registerNotification({
-         excerpt: ref.Homey.__("notifications.user_added", {"name": user.name})
+      Homey.ManagerNotifications.registerNotification({
+         excerpt: Homey.__("notifications.user_added", {"name": user.name})
       }, function( err, notification ) {
          if( err ) return console.error( err );
             console.log( 'Notification added' );
@@ -133,8 +135,9 @@ class UserArray {
     try {
       for (var i=0; i<this.users.length; i++) {
         if (name === this.users[i].getName()) {
-          var deletedUser = ref.userArray.splice(i, 1);
-          this.logmodule.writelog('info', "Deleted user: " + deletedUser.name);
+          var user = this.users[i].getJSON();
+          var deletedUser = this.users.splice(i, 1);
+          this.logmodule.writelog('info', "Deleted user: " + user.name);
           result = true;
           // persist user data
         }
@@ -159,7 +162,7 @@ class UserArray {
   }
 
   searchUsersAutocomplete(key, wildcards) {
-     this.logmodule.writelog('debug', "searchUsers: "+ key);
+     //this.logmodule.writelog('debug', "searchUsers: "+ key);
      var matchUsers = [];
      var temp = [];
 

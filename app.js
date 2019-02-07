@@ -41,15 +41,15 @@ class OwntracksApp extends Homey.App {
    */
    getUserArray() {
       //return this.globalVar.getUserArray();
-      return this.users.getUserArray();
+      //return this.users.getUserArray();
+      return this.users.getJSON();
    }
 
    /*
       getFenceArray: Getter for returning the fence array to settings.
    */
    getFenceArray() {
-      //return this.globalVar.getFenceArray();
-      return this.fences.getFenceArray();
+      return this.fences.getFences();
    }
 
    getLogLines() {
@@ -58,17 +58,12 @@ class OwntracksApp extends Homey.App {
 
    changedSettings(args) {
       this.logmodule.writelog('info', "changedSettings called");
-      this.logmodule.writelog('debug', args.body);
-      //this.logmodule.writelog('info', "topics:" + this.globalVar.getTopicArray())
-      this.logmodule.writelog('info', "topics:" + this.broker.getTopicArray())
+      //this.logmodule.writelog('debug', "Arguments: "+ JSON.stringify(args.body));
+      this.logmodule.writelog('info', "topics:" + JSON.stringify(this.broker.getTopicArray().getTopics()));
 
       try {
-//         if ((this.globalVar.getTopicArray().length > 0) && (this.broker.getConnectedClient() !== null)) {
-//            this.broker.getConnectedClient().unsubscribe("owntracks/#");
-//            this.globalVar.clearTopicArray();
-//         };
 
-         if ((this.broker.getTopicArray().length > 0) && (this.broker.getConnectedClient() !== null)) {
+         if ((this.broker.getTopicArray().getTopics().length > 0) && (this.broker.getConnectedClient() !== null)) {
             this.broker.getConnectedClient().unsubscribe("owntracks/#");
             this.broker.getTopicArray().clearTopicArray();
          };
@@ -78,7 +73,7 @@ class OwntracksApp extends Homey.App {
          }
 
          //this.logmodule.writelog('info', "topics:" + this.globalVar.getTopicArray());
-         this.logmodule.writelog('info', "topics:" + this.broker.getTopicArray()).getTopics();
+         this.logmodule.writelog('info', "topics:" + JSON.stringify(this.broker.getTopicArray().getTopics()));
          this.broker.clearConnectedClient();
          this.broker.connectToBroker();
       } catch (err) {
@@ -90,22 +85,23 @@ class OwntracksApp extends Homey.App {
 
    addNewUser(args) {
       //return this.globalVar.addNewUser(args);
-      return this.users.addUser(args);
+      return this.users.addUser(args.body.userName);
    }
 
    deleteUser(args) {
       //return this.globalVar.deleteUser(args);
-      return this.users.deleteUser(args);
+      return this.users.deleteUser(args.body.userName);
    }
 
    addNewFence(args) {
       //return this.globalVar.addNewFence(args);
-      return this.fences.addFence(args);
+      this.logmodule.writelog('debug', "addNewFence: " + JSON.stringify(args));
+      return this.fences.addFence(0, 0, 0, args.body.fenceName);
    }
 
    deleteFence(args) {
       //return this.globalVar.deleteFence(args);
-      return this.fences.deleteFence(args);
+      return this.fences.deleteFence(args.body.fenceName);
    }
 
    purgeUserData(args) {

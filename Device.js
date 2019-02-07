@@ -15,12 +15,12 @@ class Device {
   }
 
   getLocation() {
-    this.logmodule.writelog('debug', "getLocation(): " + JSON.stringify(this.location));
+    //this.logmodule.writelog('debug', "getLocation(): " + JSON.stringify(this.location));
     return this.location;
   }
 
   getName() {
-    this.logmodule.writelog('debug',"device.getName: "+ this.name);
+    //this.logmodule.writelog('debug',"device.getName: "+ this.name);
     return this.name;
   }
 
@@ -81,7 +81,7 @@ class DeviceArray {
    */
   getDevice(name) {
     for (var i=0; i<this.devices.length; i++) {
-      this.logmodule.writelog('debug',"devices[i]: "+ this.devices[i].getName());
+      //this.logmodule.writelog('debug',"devices[i]: "+ this.devices[i].getName());
       if (name == this.devices[i].getName()) {
         return this.devices[i];
       }

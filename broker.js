@@ -231,7 +231,7 @@ class brokerOwntracks {
    }
 
    getTopicArray() {
-     return topics;
+     return this.topics;
    }
 }
 

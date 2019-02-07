@@ -3,7 +3,6 @@
 class handleOwntracks {
    constructor(app) {
       this.Homey = require('homey');
-//      this.globalVar = app.globalVar;
       this.logmodule = app.logmodule;
       this.triggers  = app.triggers;
 
@@ -55,10 +54,8 @@ class handleOwntracks {
            // user data. If the known device differs from the actual device, update!
 
            if (currentUser.getDevices().length == 0 || currentUser.getDevice(topicArray[2]) == null) {
-//           if (currentUser.userDevice == undefined || currentUser.userDevice !== topicArray[2]) {
-             //currentUser.userDevice = topicArray[2];
              currentUser.addDevice(topicArray[2], jsonMsg.tid);
-             ref.logmodule.writelog('error', "Device changed for user "+currentUser.name+" to " + currentUser.getDevices()[0]);
+             ref.logmodule.writelog('error', "Device changed for user "+currentUser.name+" to " + currentUser.getDevice(topicArray[2]));
            }
            currentDevice = currentUser.getDevice(topicArray[2]);
          }
@@ -73,11 +70,6 @@ class handleOwntracks {
                   // The accuracy of location is lower then the treshold value, so the location change will be trggerd
                   ref.logmodule.writelog('info', "Accuracy is within limits")
 
-                  //currentUser.getDevices()[0].setLocation(jsonMsg.lat, jsonMsg.lon, jsonMsg.desc,jsonMsg.tst);
-                  //currentUser.lon = jsonMsg.lon;
-                  //currentUser.lat = jsonMsg.lat;
-                  //currentUser.timestamp = jsonMsg.tst;
-
                   // Set fenceData. This is done to update or add new
                   // fences so they can be selected in an autocomplete box
                   this.checkAndAddFence(jsonMsg);
@@ -87,7 +79,7 @@ class handleOwntracks {
                         if (ref.Homey.ManagerSettings.get('double_enter') == true) {
                            ref.logmodule.writelog('info', "Double enter event check enabled");
                            //if (currentUser.fence !== jsonMsg.desc)  {
-                           if (currentDevice.getLocation().fence !== jsonMsg.dec) {
+                           if (currentDevice.getLocation().fence !== jsonMsg.desc) {
                               validTransition = true;
                            } else {
                               validTransition = false;
@@ -125,18 +117,17 @@ class handleOwntracks {
                            }
                         }
                         if (validTransition == true) {
-                           //currenDevice.getLocation().fence = "";
-                           currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, "", jsonMsg.tst);
-
                            let tokens = {
                               user: currentUser.name,
-                              fence: "",
+                              fence: jsonMsg.desc,
                               percBattery: currentDevice.getBattery()
                            }
                            let state = {
                               triggerTopic: topic,
                               triggerFence: jsonMsg.desc
                            }
+                           currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, "", jsonMsg.tst);
+
                            ref.triggers.getLeaveGeofenceAC().trigger(tokens,state,null)
 
                            ref.logmodule.writelog('info', "Trigger leave card for " + jsonMsg.desc);
@@ -149,7 +140,7 @@ class handleOwntracks {
                      let tokens = {
                         event: jsonMsg.event,
                         user: currentUser.name,
-                        fence: currentDevice.getLocation().fence,
+                        fence: jsonMsg.desc,
                         percBattery: currentDevice.getBattery()
                      }
                      let state = {
@@ -183,13 +174,6 @@ class handleOwntracks {
                // fences so they can be selected in an autocomplete box
                this.checkAndAddFence(jsonMsg);
 
-//               var fenceData = {}
-//               fenceData.fenceName = jsonMsg.desc;
-//               fenceData.lon = jsonMsg.lon;
-//               fenceData.lat = jsonMsg.lat;
-//               fenceData.rad = jsonMsg.rad;
-//               fenceData.timestamp = jsonMsg.tst;
-//               ref.globalVar.setFence(fenceData);
                break;
             case 'waypoints' :
                // The message type waypoints is send when publish waypoints is selected in the owntracks phone app.
@@ -198,14 +182,6 @@ class handleOwntracks {
                var fenceData = {}
                for (let i=0; i < jsonMsg.waypoints.length; i++) {
                   ref.logmodule.writelog('debug', "Waypoint "+i+": "+JSON.stringify(jsonMsg.waypoints[i]));
-//                  fenceData = {};
-//                  fenceData.fenceName = jsonMsg.waypoints[i].desc;
-//                  fenceData.lon = jsonMsg.waypoints[i].lon;
-//                  fenceData.lat = jsonMsg.waypoints[i].lat;
-//                  fenceData.rad = jsonMsg.waypoints[i].rad;
-//                  fenceData.timestamp = jsonMsg.waypoints[i].tst;
-//                  ref.globalVar.setFence(fenceData);
-
                   this.checkAndAddFence(jsonMsg.waypoints[i]);
                }
             case 'encrypted' :
@@ -238,15 +214,11 @@ class handleOwntracks {
    handleLocationMessage(topic, currentUser, currentDevice, jsonMsg) {
      const ref=this;
      this.logmodule.writelog('info', "We have received a location message");
-//     currentUser.lon = jsonMsg.lon;
-//     currentUser.lat = jsonMsg.lat;
-//     currentUser.timestamp = jsonMsg.tst;
-//     currentUser.tid = jsonMsg.tid;
-     currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, currentDevice.getLocation().fence, jsonMsg.tst);
      if (jsonMsg.batt !== undefined) {
+        // Update battery percentage
         currentDevice.setBattery(jsonMsg.batt);
-        ref.logmodule.writelog('info', "Set battery percentage for "+ currentUser.name +" to "+ currentDevice.getBattery()+ "%");
-        this.logmodule.writelog('debug', "currentDevice: " + JSON.stringify(currentDevice));
+        ref.logmodule.writelog('info', "Set battery percentage for user: "+ currentUser.name +" with device: "+ currentDevice.name+ " to "+ currentDevice.getBattery()+ "%");
+        //this.logmodule.writelog('debug', "currentDevice: " + JSON.stringify(currentDevice));
         let tokens = {
            user: currentUser.name,
            fence: currentDevice.getLocation().fence,
@@ -258,6 +230,7 @@ class handleOwntracks {
            user: currentUser.name,
            device: currentDevice.name
         }
+        currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, currentDevice.getLocation().fence, jsonMsg.tst);
 
         ref.triggers.getEventBattery().trigger(tokens,state, null).catch( function(e) {
           ref.logmodule.writelog('error', "Error occured: " +e);
@@ -276,17 +249,15 @@ class handleOwntracks {
 
          ref.logmodule.writelog('info', "inregions: " + jsonMsg.inregions);
          for (region in jsonMsg.inregions) {
-           ref.logmodule.writelog('info', "region " + jsonMsg.inregions[region]);
-           if (currentDevice.getLocation().fence === jsonMsg.inregions[region]) {
+           //ref.logmodule.writelog('info', "region " + jsonMsg.inregions[region]);
+           if (currentDevice.getLocation().fence === jsonMsg.inregions[region] ) {
              ref.logmodule.writelog('debug', "User "+currentUser.name+ " already is in region " + jsonMsg.inregions[region]);
              bInRegion = true;
            }
          }
-         if (ref.isAccurate(jsonMsg)) {
-           ref.logmodule.writelog('debug', "isAccurate");
-         }
+
          if (ref.isAccurate(jsonMsg) && bInRegion === false) {
-           // if currentUser.fence is set, but the current region is different, then we missed
+           // if currentDevice.location.fence is set, but the current region is different, then we missed
            // a leave event.
            if (currentDevice.getLocation().fence !== "") {
              ref.logmodule.writelog('debug', "User "+currentUser.name+ " is in " + currentDevice.getLocation().fence+ " but should not be.");
@@ -300,7 +271,7 @@ class handleOwntracks {
            if (currentDevice.getLocation().fence === "") {
              ref.logmodule.writelog('debug', "User "+currentUser.name+ " is not in a fence, but should be in: "+jsonMsg.inregions[0]);
              //currentDevice.getLocation().fence = jsonMsg.inregions[0];
-             currentDevice.setLoaction(jsonMsg.lat, jsonMsg.lon, jsonMsg.inregions[0], jsonMsg.tst);
+             currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, jsonMsg.inregions[0], jsonMsg.tst);
              let tokens = {
                 event: "enter",
                 user: currentUser.name,
@@ -318,6 +289,8 @@ class handleOwntracks {
                ref.logmodule.writelog('error', "Error occured: " +e);
              });
            }
+         }  else {
+           ref.logmodule.writelog('info', "Accuracy for "+currentUser.name+ " with device "+ currentDevice.name + " is too low.");
          }
        }
        else {
@@ -346,12 +319,12 @@ class handleOwntracks {
      let tokens = {
         event: "leave",
         user: currentUser.name,
-        fence: "",
+        fence: currentDevice.getLocation().fence,
         percBattery: currentDevice.getBattery()
      }
      let state = {
         triggerTopic: topic,
-        triggerFence: ""
+        triggerFence: currentDevice.getLocation().fence
      }
 
      currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, "", jsonMsg.tst);
@@ -370,22 +343,6 @@ class handleOwntracks {
      }
    }
 
-/*   updateUser(user, device, jsonMsg) {
-     if (device !== null) {
-       var fence = "";
-       if (jsonMsg.desc !== undefined ) {
-         fence = jsonMsg.desc;
-       }
-       this.logmodule.writelog('debug', "Fence: " + fence);
-       device.setLocation(jsonMsg.lat, jsonMsg.lon, fence, jsonMsg.tst);
-
-       if (jsonMsg.batt !== undefined) {
-         device.setBattery(jsonMsg.batt);
-       }
-     }
-     this.logmodule.writelog('debug', "Updated user: " + JSON.stringify(this.users.getUser(user.name)));
-   }
-*/
    /**
     * createCommandMessage - Creates a message that sends a command to a phone.
     * This command contains an array with all the fences that are registered. This way it is
@@ -412,7 +369,6 @@ class handleOwntracks {
                "tst": this.fences.getFences()[i].timestamp
              }
              msgArray.push(waypoint);
-//             this.logmodule.writelog('debug', "waypoint: "+JSON.stringify(waypoint))
            }
            arrayContainer = {
              "_type": "waypoints",

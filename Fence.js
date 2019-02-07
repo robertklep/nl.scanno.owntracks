@@ -39,7 +39,7 @@ class FenceArray {
 
   addFence(lat, lon, radius, name) {
     if (this.getFence(name) === null) {
-      this.fences.add(new Fence(lat, lon, radius, name));
+      this.fences.push(new Fence(lat, lon, radius, name));
     }
   }
 
@@ -54,7 +54,7 @@ class FenceArray {
 
   deleteFence(name) {
      try {
-        ref.logmodule.writelog('debug', "Delete fence called: "+ name);
+        this.logmodule.writelog('debug', "Delete fence called: "+ name);
         var result = false;
         for (var i=0; i < this.fences.length; i++) {
            if (this.fences[i].name === name) {
@@ -66,7 +66,7 @@ class FenceArray {
         // persist fence data
         return result;
      } catch(err) {
-        ref.logmodule.writelog('error', "deleteFence: " +err);
+        this.logmodule.writelog('error', "deleteFence: " +err);
         return err;
      }
   }
@@ -80,7 +80,7 @@ class FenceArray {
   }
 
   searchFenceAutocomplete(key, wildcards) {
-     this.logmodule.writelog('debug', "searchFence: "+ key);
+     //this.logmodule.writelog('debug', "searchFence: "+ key);
      var matchFence = [];
      var temp = [];
 
@@ -91,10 +91,10 @@ class FenceArray {
 
      for (var i=0; i < this.fences.length; i++) {
         try {
-           this.logmodule.writelog('debug', "searchFenceAutocomplete Fence: "+ JSON.stringify(this.fences[i]));
+           //this.logmodule.writelog('debug', "searchFenceAutocomplete Fence: "+ JSON.stringify(this.fences[i]));
            if (String(this.fences[i].name.toLowerCase()).includes(key.toLowerCase())) {
               if (this.fences[i].name !== '') {
-                 this.logmodule.writelog('debug', "key: " + key + "    fenceArray: " + this.fences[i].name);
+                 //this.logmodule.writelog('debug', "key: " + key + "    fenceArray: " + this.fences[i].name);
                  temp.icon = '//';
                  temp.name = this.fences[i].name;
                  matchFence.push({icon: temp.icon, name: temp.name, description: Homey.__("desc_all_fences"), fence: temp.name});

@@ -290,7 +290,7 @@ class BatteryTrigger extends Trigger {
    */
   processMessage(args, state) {
     this.logmodule.writelog('debug', "BatteryTrigger processMessage called")
-    this.logmodule.writelog('debug', "args: " + JSON.stringify(args));
+    //this.logmodule.writelog('debug', "args: " + JSON.stringify(args));
     if (this.isMatchUser(args, state) && this.isMatchDevice(args, state)) {
       var currentUser = this.users.getUser(state.user);
       var device = currentUser.getDevice(state.device);
