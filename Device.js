@@ -1,6 +1,7 @@
 "use strict";
 const Homey = require('homey');
 const Location = require("./location.js");
+const SendQueue = require("./SendQueue.js");
 
 class Device {
   constructor(name, id) {
@@ -8,7 +9,9 @@ class Device {
     this.id = id;
     this.battery = 0;
     this.battTriggered = false;
+    this.usesHttp = false;
     this.location = new Location(0,0,null);
+    this.queue = new SendQueue();
     this.logmodule = require("./logmodule.js");
 
     this.logmodule.writelog('debug', "Device constructor called");
@@ -34,6 +37,14 @@ class Device {
 
   setBattTriggered(triggered) {
       this.battTriggered = triggered;
+  }
+
+  isHttpDevice() {
+    return this.usesHttp;
+  }
+
+  setHttpDevice(usesHttp) {
+    this.usesHttp = true;
   }
 
   getJSON() {

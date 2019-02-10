@@ -18,27 +18,41 @@ class httpOwntracks {
       received from MQTT.
    */
    handleOwntracksEvents(args) {
+      var currentUser = null;
+      var currentDevice = null;
+      var result = null;
+
       this.logmodule.writelog('debug', "handleOwntracksEvents called");
       this.logmodule.writelog('debug', JSON.stringify(args));
       //this.logmodule.writelog('debug', JSON.stringify(args.body));
 
       //var currentUser = this.globalVar.getUserByToken(args.query.token);
-      var currentUser = this.users.getUserByToken(args.query.token);
+      currentUser = this.users.getUserByToken(args.query.token);
       if (currentUser == null) {
          this.logmodule.writelog('info', "Token "+ args.query.token + " is not found");
          return false;
       }
       try {
          if (currentUser.token == args.query.token) {
+           var dummyDevice = "httpendpoint";
            var dummyTopic = null;
             if (args.query.d !== undefined) {
-              dummyTopic = "owntracks/"+currentUser.name+"/"+args.query.d;
-            } else {
-              dummyTopic = "owntracks/"+currentUser.name+"/httpendpoint";
+              dummyDevice = args.query.d;
             }
+            dummyTopic = "owntracks/"+currentUser.name+"/"+dummyDevice;
+            currentDevice = currentUser.getDevice(dummyDevice);
+
             this.handleMessage.receiveMessage(dummyTopic, JSON.stringify(args.body), null, null);
             this.logmodule.writelog('info', "User "+ currentUser.name + " authenticated");
-            var result = this.createOwntracksLocationResponse();
+            if (currentDevice !== null) {
+              this.createOwntracksLocationResponse(currentDevice);
+              currentDevice.setHttpDevice(true);
+              if (!currentDevice.queue.isEmpty()) {
+                //result = currentDevice.queue.removeMessage();
+                result = currentDevice.queue.getMessages();
+                currentDevice.queue.clear();
+              }
+            }
             return result;
           }
        } catch(err) {
@@ -52,7 +66,7 @@ class httpOwntracks {
      can be used to send the locations of other persons known on this Homey so their TID's are
      displayed as friends in the owntracks phone apps, just like when using MQTT.
    */
-   createOwntracksLocationResponse() {
+   createOwntracksLocationResponse(device) {
       var userLocation = {};
       var userLocationArray = [];
 
@@ -64,7 +78,7 @@ class httpOwntracks {
               userLocation.lat = this.users.getUserArray()[i].getDevices()[j].getLocation().lat;
               userLocation.lon = this.users.getUserArray()[i].getDevices()[j].getLocation().lon;
               userLocation.tst = this.users.getUserArray()[i].getDevices()[j].getLocation().timestamp;
-              userLocationArray.push(userLocation);
+              device.queue.addMessage(userLocation);
               userLocation = {};
             }
          }

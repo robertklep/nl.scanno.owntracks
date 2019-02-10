@@ -2,11 +2,12 @@
 const Homey = require('homey');
 
 class Fence {
-  constructor(lat, lon, radius, name) {
+  constructor(lat, lon, radius, name, timestamp) {
     this.lat = lat;
     this.lon = lon;
     this.radius = radius;
     this.name = name;
+    this.timestamp = timestamp;
 
     this.logmodule = require('./logmodule.js');
   }
@@ -24,7 +25,8 @@ class Fence {
       lat: this.lat,
       lon: this.lon,
       radius: this.radius,
-      name: this.name
+      name: this.name,
+      timestamp: this.timestamp
     }
   }
 }
@@ -37,9 +39,9 @@ class FenceArray {
     this.initFencesOld();
   }
 
-  addFence(lat, lon, radius, name) {
+  addFence(lat, lon, radius, name, timestamp) {
     if (this.getFence(name) === null) {
-      this.fences.push(new Fence(lat, lon, radius, name));
+      this.fences.push(new Fence(lat, lon, radius, name, timestamp));
     }
   }
 
@@ -118,7 +120,7 @@ class FenceArray {
           try {
             var fenceArray = JSON.parse(data);
             for (var i=0; i<fenceArray.length; i++) {
-              ref.fences.push(new Fence(fenceArray[i].lat, fenceArray[i].lon, fenceArray[i].rad, fenceArray[i].fenceName));
+              ref.fences.push(new Fence(fenceArray[i].lat, fenceArray[i].lon, fenceArray[i].rad, fenceArray[i].fenceName, fenceArray[i].timestamp));
             }
           } catch(err) {
              ref.logmodule.writelog('error', "Parsing fenceArray failed: "+ err);

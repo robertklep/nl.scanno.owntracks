@@ -94,7 +94,9 @@ class handleOwntracks {
                              }
                              let state = {
                                 triggerTopic: topic,
-                                triggerFence: jsonMsg.desc
+                                triggerFence: jsonMsg.desc,
+                                event: jsonMsg.event,
+                                user: currentUser.name
                              }
                              ref.triggers.getEnterGeofenceAC().trigger(tokens,state,null).catch( function(e) {
                                ref.logmodule.writelog('error', "Error occured: " +e);
@@ -124,7 +126,9 @@ class handleOwntracks {
                            }
                            let state = {
                               triggerTopic: topic,
-                              triggerFence: jsonMsg.desc
+                              triggerFence: jsonMsg.desc,
+                              event: jsonMsg.event,
+                              user: currentUser.name
                            }
                            currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, "", jsonMsg.tst);
 
@@ -145,7 +149,9 @@ class handleOwntracks {
                      }
                      let state = {
                         triggerTopic: topic,
-                        triggerFence: jsonMsg.desc
+                        triggerFence: jsonMsg.desc,
+                        event: jsonMsg.event,
+                        user: currentUser.name
                      }
 
                      //currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, jsonMsg.desc,jsonMsg.tst);
@@ -280,7 +286,9 @@ class handleOwntracks {
              }
              let state = {
                 triggerTopic: topic,
-                triggerFence: jsonMsg.inregions[0]
+                triggerFence: jsonMsg.inregions[0],
+                event: "enter",
+                user: currentUser.name
              }
              ref.triggers.getEnterGeofenceAC().trigger(tokens,state,null).catch( function(e) {
                ref.logmodule.writelog('error', "Error occured: " +e);
@@ -324,7 +332,9 @@ class handleOwntracks {
      }
      let state = {
         triggerTopic: topic,
-        triggerFence: currentDevice.getLocation().fence
+        triggerFence: currentDevice.getLocation().fence,
+        event: "leave",
+        user: currentUser.name
      }
 
      currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, "", jsonMsg.tst);
@@ -339,7 +349,7 @@ class handleOwntracks {
 
    checkAndAddFence(jsonMsg) {
      if (this.fences.getFence(jsonMsg.dec) == null) {
-       this.fences.addFence(jsonMsg.lat, jsonMsg.lon, jsonMsg.rad, jsonMsg.desc);
+       this.fences.addFence(jsonMsg.lat, jsonMsg.lon, jsonMsg.rad, jsonMsg.desc, jsonMsg.tid);
      }
    }
 
@@ -365,7 +375,7 @@ class handleOwntracks {
                "desc": this.fences.getFences()[i].name,
                "lat": this.fences.getFences()[i].lat,
                "lon": this.fences.getFences()[i].lon,
-               "rad": this.fences.getFences()[i].rad,
+               "rad": this.fences.getFences()[i].radius,
                "tst": this.fences.getFences()[i].timestamp
              }
              msgArray.push(waypoint);

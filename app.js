@@ -120,12 +120,30 @@ class OwntracksApp extends Homey.App {
      device of the selected user.
    */
    uploadFenceData(args) {
+     var currentUser = null;
+     var currentDevice = null;
+
      try {
        var topic = "owntracks/"+args.body.userName+"/"+args.body.deviceName+"/cmd";
        this.logmodule.writelog('debug',"Start fence data push on "+topic);
        const message = this.broker.handleMessage.createCommandMessage('setWaypoints');
-       if( message instanceof Error ) return message;
-       this.broker.sendMessageToTopic({"mqttTopic": topic, "mqttMessage": JSON.stringify(message)})
+
+       if (message instanceof Error ) {
+         return message;
+       }
+
+       currentUser = this.users.getUser(args.body.userName);
+       if ( currentUser !== null) {
+         currentDevice = currentUser.getDevice(args.body.deviceName);
+         if (currentDevice !== null) {
+           if (currentDevice.isHttpDevice()) {
+             currentDevice.queue.addMessage(message);
+           }
+           else {
+             this.broker.sendMessageToTopic({"mqttTopic": topic, "mqttMessage": JSON.stringify(message)});
+           }
+         }
+       }
        return true;
      } catch(err) {
        this.logmodule.writelog('info', "uploadFenceData error: "+ err);
