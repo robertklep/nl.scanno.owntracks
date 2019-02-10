@@ -18,6 +18,7 @@
     },
 
     "settings" : {
+        "benefit" : "Get Location and Presence information",
         "app" : {
             "title" : "Owntracks client settings",
 
@@ -25,19 +26,21 @@
                 "server_title" : "MQTT Broker setings",
                 "use_broker" : "Use a MQTT broker as addition to HTTP",
                 "server_details" : "Enter broker details",
+                "server_security" : "Security settings",
                 "server_explanation" : "You need to specify a broker where the Owntracks client can connect to. The servername can either be a local ip adres when using a private broker, or a FQDN. You also need to provide the portnumber. Normally this would be port 1883 and 8883 for secure connections",
-                "url" : "IP adress or DNS",
+                "security_explanation" : "You can disable certificate checking when the broker uses selfsigned certificates",
+                "url" : "Hostname",
                 "port" : "Port number",
-                "tls" : "Secure connection (TLS)",
+                "tls" : "Use a secure connection to the broker",
                 "selfsigned" : "Disable certificate checking",
-                "keepalive" : "Keepalive (seconds)",
+                "keepalive" : "Keepalive (sec)",
                 "username" : "Username",
                 "password" : "Password"
             },
 
             "client" : {
-                "client_settings" : "Tweaks",
-                "accuracy" : "GPS accuracy (meters)",
+                "client_settings" : "Client Settings",
+                "accuracy" : "Enter accuracy in meters",
                 "accuracy_explanation" : "Sometimes the location accuracy can be very low (i.e. accuracy > 50 meters). This could result in an unwanted event regarding enterin / leaving a geofence. If the location accuracy is below the set value, that event is ignored.",
                 "double_enter" : "Check for double enter events",
                 "double_leave" : "Check for double leave events",

@@ -18,6 +18,7 @@
     },
 
     "settings" : {
+        "benefit" : "Gebruik locatie een aanwezigheids informatie",
         "app" : {
             "title" : "Owntracks client instellingen",
 
@@ -25,12 +26,14 @@
                 "server_title" : "MQTT Broker instellingen",
                 "use_broker" : "Gebruik MQTT broker naast HTTP",
                 "server_details" : "Voer broker gegevens in",
+                "server_security" : "Beveiligings instellingen",
                 "server_explanation" : "Er moet een broker opgegeven worden, waarmee de Owntracks client kan verbinden. De servernaam kan een IP adres bevatten, of een DNS naam. Er moet ook een poortnummer worden opgegeven. Normaal gesproken is dat poort 1883 voor een normale verbinding en poortnummer 8883 voor een beveiligde verbinding.",
+                "security_explanation" : "You can disable certificate checking by using selfsigned certificates",
                 "url" : "IP adres of DNS",
                 "port" : "Poortnummer",
                 "tls" : "Beveiligde verbinding (TLS)",
                 "selfsigned" : "Certificaat controle uitgeschakelen)",
-                "keepalive" : "Keepalive (seconden)",
+                "keepalive" : "Keepalive (sec)",
                 "username" : "Gebruikersnaam",
                 "password" : "Wachtwoord"
             },
