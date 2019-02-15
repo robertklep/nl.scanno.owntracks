@@ -44,7 +44,6 @@ class handleOwntracks {
       // for more information see http://owntracks.org/booklet/tech/json/
       if (validJSON && jsonMsg._type !== undefined) {
          // get the user this message is from. This can be found in the topic the message is published in
-         //currentUser = ref.globalVar.getUser(topicArray[1]);
          currentUser = ref.users.getUser(topicArray[1]);
          if (currentUser === null) {
             currentUser = ref.users.addUser(topicArray[1], topicArray[2], jsonMsg.tid);
@@ -78,31 +77,16 @@ class handleOwntracks {
                      case 'enter':
                         if (ref.Homey.ManagerSettings.get('double_enter') == true) {
                            ref.logmodule.writelog('info', "Double enter event check enabled");
-                           //if (currentUser.fence !== jsonMsg.desc)  {
-                           if (currentDevice.getLocation().fence !== jsonMsg.desc) {
+                           if (!currentDevice.getLocation().inFence(jsonMsg.desc)) {
                               validTransition = true;
                            } else {
                               validTransition = false;
                            }
                         }
                         if (validTransition == true) {
-                             //currentUser.fence = jsonMsg.desc;
-                             let tokens = {
-                                user: currentUser.name,
-                                fence: jsonMsg.desc,
-                                percBattery: currentDevice.getBattery()
-                             }
-                             let state = {
-                                triggerTopic: topic,
-                                triggerFence: jsonMsg.desc,
-                                event: jsonMsg.event,
-                                user: currentUser.name
-                             }
-                             ref.triggers.getEnterGeofenceAC().trigger(tokens,state,null).catch( function(e) {
-                               ref.logmodule.writelog('error', "Error occured: " +e);
-                             })
-
-                             currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, jsonMsg.desc, jsonMsg.tst);
+                             this.generateEnterEvent(topic, currentUser, currentDevice, jsonMsg.desc)
+                             currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, jsonMsg.tst);
+                             currentDevice.getLocation().enterFence(jsonMsg.desc);
 
                              ref.logmodule.writelog('info', "Trigger enter card for " + jsonMsg.desc);
                         } else {
@@ -112,56 +96,22 @@ class handleOwntracks {
                      case 'leave':
                         if (ref.Homey.ManagerSettings.get('double_leave') == true) {
                            ref.logmodule.writelog('info', "Double leave event check enabled");
-                           if (currentDevice.getLocation().fence !== "")  {
+                           if (currentDevice.getLocation().inFence(jsonMsg.desc))  {
                               validTransition = true;
                            } else {
                               validTransition = false;
                            }
                         }
                         if (validTransition == true) {
-                           let tokens = {
-                              user: currentUser.name,
-                              fence: jsonMsg.desc,
-                              percBattery: currentDevice.getBattery()
-                           }
-                           let state = {
-                              triggerTopic: topic,
-                              triggerFence: jsonMsg.desc,
-                              event: jsonMsg.event,
-                              user: currentUser.name
-                           }
-                           currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, "", jsonMsg.tst);
-
-                           ref.triggers.getLeaveGeofenceAC().trigger(tokens,state,null)
+                           this.generateLeaveEvent(topic, currentUser, currentDevice, jsonMsg.desc);
+                           currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, jsonMsg.tst);
+                           currentDevice.getLocation().leaveFence(jsonMsg.desc);
 
                            ref.logmodule.writelog('info', "Trigger leave card for " + jsonMsg.desc);
                         } else {
                            ref.logmodule.writelog('info', "The user is already outside the fence. No need to trigger again");
                         }
                         break;
-                  }
-                  if (validTransition === true) {
-                     let tokens = {
-                        event: jsonMsg.event,
-                        user: currentUser.name,
-                        fence: jsonMsg.desc,
-                        percBattery: currentDevice.getBattery()
-                     }
-                     let state = {
-                        triggerTopic: topic,
-                        triggerFence: jsonMsg.desc,
-                        event: jsonMsg.event,
-                        user: currentUser.name
-                     }
-
-                     //currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, jsonMsg.desc,jsonMsg.tst);
-                     this.logmodule.writelog('debug', "Transition user: " + JSON.stringify(this.users.getUser(currentUser.name)));
-                     //this.updateUser(currentUser, currentDevice, jsonMsg);
-
-                     ref.triggers.getEventOwntracksAC().trigger(tokens,state,null)
-                     ref.logmodule.writelog('info', "Trigger generic card for " + jsonMsg.desc);
-                  } else {
-                     ref.logmodule.writelog('info', "This trigger is not needed because the transition is not valid");
                   }
                } else {
                   ref.logmodule.writelog ('info', "Accuracy is "+ jsonMsg.acc + " and needs to be below " + parseInt(ref.Homey.ManagerSettings.get('accuracy')))
@@ -219,15 +169,15 @@ class handleOwntracks {
     */
    handleLocationMessage(topic, currentUser, currentDevice, jsonMsg) {
      const ref=this;
+     var staleFences = [];
      this.logmodule.writelog('info', "We have received a location message");
      if (jsonMsg.batt !== undefined) {
         // Update battery percentage
         currentDevice.setBattery(jsonMsg.batt);
         ref.logmodule.writelog('info', "Set battery percentage for user: "+ currentUser.name +" with device: "+ currentDevice.name+ " to "+ currentDevice.getBattery()+ "%");
-        //this.logmodule.writelog('debug', "currentDevice: " + JSON.stringify(currentDevice));
         let tokens = {
            user: currentUser.name,
-           fence: currentDevice.getLocation().fence,
+           fence: currentDevice.getLocation().fence[0],
            percBattery: jsonMsg.batt
         }
         let state = {
@@ -236,7 +186,8 @@ class handleOwntracks {
            user: currentUser.name,
            device: currentDevice.name
         }
-        currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, currentDevice.getLocation().fence, jsonMsg.tst);
+        //currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, currentDevice.getLocation().fence, jsonMsg.tst);
+        currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, jsonMsg.tst);
 
         ref.triggers.getEventBattery().trigger(tokens,state, null).catch( function(e) {
           ref.logmodule.writelog('error', "Error occured: " +e);
@@ -246,69 +197,46 @@ class handleOwntracks {
        // There is a field inregions that contains the region(s) the user is in.
        // If this field is available, check if the region reported, is the same as
        // the current region stored.
-       if (jsonMsg.inregions !== undefined) {
-         var bInRegion = false;
-         var isCurrentRegionSet = false;
-         var region = 0;
+       if (jsonMsg.inregions !== undefined && ref.isAccurate(jsonMsg)) {
          // The client supports inregions, so for future calls, lets remember that.
          currentUser.inregions = true;
 
          ref.logmodule.writelog('info', "inregions: " + jsonMsg.inregions);
-         for (region in jsonMsg.inregions) {
-           //ref.logmodule.writelog('info', "region " + jsonMsg.inregions[region]);
-           if (currentDevice.getLocation().fence === jsonMsg.inregions[region] ) {
+         for (var region in jsonMsg.inregions) {
+           if (currentDevice.getLocation().inFence(jsonMsg.inregions[region])) {
              ref.logmodule.writelog('debug', "User "+currentUser.name+ " already is in region " + jsonMsg.inregions[region]);
-             bInRegion = true;
+           } else {
+             ref.logmodule.writelog('debug', "User "+currentUser.name+ " is NOT in region " + jsonMsg.inregions[region]);
+             // add fence to array
+             // generate enter event
+             currentDevice.getLocation().enterFence(jsonMsg.inregions[region]);
+             currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, jsonMsg.tst);
+             this.generateEnterEvent(topic, currentUser, currentDevice, jsonMsg.inregions[region]);
            }
          }
+         // Check for fences that are registered, but not received in the location message
+         for (var fence in currentDevice.getLocation().fence) {
+            var stale = true;
+            for (var region in jsonMsg.inregions) {
+              if (currentDevice.getLocation().fence[fence] === jsonMsg.inregions[region]) {
+                // stale fence found
+                ref.logmodule.writelog('debug', currentDevice.getLocation().fence[fence]+" found in inRegions");
+                stale = false;
+              }
+            }
+            if (stale) {
+              // Fence is stale, add it to the array with stale fences
+              staleFences.push(currentDevice.getLocation().fence[fence]);
+            }
+          }
 
-         if (ref.isAccurate(jsonMsg) && bInRegion === false) {
-           // if currentDevice.location.fence is set, but the current region is different, then we missed
-           // a leave event.
-           if (currentDevice.getLocation().fence !== "") {
-             ref.logmodule.writelog('debug', "User "+currentUser.name+ " is in " + currentDevice.getLocation().fence+ " but should not be.");
-             isCurrentRegionSet = true;
-             ref.generateLeaveEvent(topic, currentUser, currentDevice, jsonMsg);
-           }
-
-           // If bInRegion is true, then at least one of the received regions is already set
-           // If bInRegion is false, we must have missed a trigger event.
-           ref.logmodule.writelog('debug', "LocationRequest Fence: "+currentDevice.getLocation().fence);
-           if (currentDevice.getLocation().fence === "") {
-             ref.logmodule.writelog('debug', "User "+currentUser.name+ " is not in a fence, but should be in: "+jsonMsg.inregions[0]);
-             //currentDevice.getLocation().fence = jsonMsg.inregions[0];
-             currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, jsonMsg.inregions[0], jsonMsg.tst);
-             let tokens = {
-                event: "enter",
-                user: currentUser.name,
-                fence: jsonMsg.inregions[0],
-                percBattery: currentDevice.getBattery()
-             }
-             let state = {
-                triggerTopic: topic,
-                triggerFence: jsonMsg.inregions[0],
-                event: "enter",
-                user: currentUser.name
-             }
-             ref.triggers.getEnterGeofenceAC().trigger(tokens,state,null).catch( function(e) {
-               ref.logmodule.writelog('error', "Error occured: " +e);
-             });
-             ref.triggers.getEventOwntracksAC().trigger(tokens,state,null).catch( function(e) {
-               ref.logmodule.writelog('error', "Error occured: " +e);
-             });
-           }
-         }  else {
-           ref.logmodule.writelog('info', "Accuracy for "+currentUser.name+ " with device "+ currentDevice.name + " is too low.");
-         }
-       }
-       else {
-         // When there is no inregions field, but the inregions field IS supported,
-         // then the phone is NOT inside any region. If the userdata shows a fence name,
-         // we might have missed a leave event, so we can send one now.
-         if (currentUser.inregions === true && currentDevice.getLocation().fence !== "" && ref.isAccurate(jsonMsg)) {
-           ref.logmodule.writelog('debug', "handleLocationMessage - no inregions field, fence = "+currentDevice.getLocation().fence);
-           ref.generateLeaveEvent(topic, currentUser, currentDevice, jsonMsg);
-         }
+          // For all stale fences, generate a leave event and remove from devices fence list
+          for (var stale in staleFences) {
+            ref.logmodule.writelog('debug', staleFences[stale]+ " is stale, leave it..");
+            this.generateLeaveEvent(topic, currentUser, currentDevice, staleFences[stale]);
+            currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, jsonMsg.tst);
+            currentDevice.getLocation().leaveFence(staleFences[stale]);
+          }
        }
      }
    }
@@ -321,13 +249,13 @@ class handleOwntracks {
     * @param  {type} jsonMsg     description
     * @return {type}             description
     */
-   generateLeaveEvent(topic, currentUser, currentDevice, jsonMsg) {
+   generateLeaveEvent(topic, currentUser, currentDevice, fence) {
      const ref = this;
      ref.logmodule.writelog('debug', "generateLeaveEvent - for " + currentUser.name);
      let tokens = {
         event: "leave",
         user: currentUser.name,
-        fence: currentDevice.getLocation().fence,
+        fence: fence,
         percBattery: currentDevice.getBattery()
      }
      let state = {
@@ -337,9 +265,31 @@ class handleOwntracks {
         user: currentUser.name
      }
 
-     currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, "", jsonMsg.tst);
-
      ref.triggers.getLeaveGeofenceAC().trigger(tokens,state,null).catch( function(e) {
+       ref.logmodule.writelog('error', "Error occured: " +e);
+     });
+     ref.triggers.getEventOwntracksAC().trigger(tokens,state,null).catch( function(e) {
+       ref.logmodule.writelog('error', "Error occured: " +e);
+     });
+   }
+
+   generateEnterEvent(topic, currentUser, currentDevice, fence) {
+     const ref = this;
+     ref.logmodule.writelog('debug', "generateLeaveEvent - for " + currentUser.name);
+     let tokens = {
+        event: "enter",
+        user: currentUser.name,
+        fence: fence,
+        percBattery: currentDevice.getBattery()
+     }
+     let state = {
+        triggerTopic: topic,
+        triggerFence: fence,
+        event: "enter",
+        user: currentUser.name
+     }
+
+     ref.triggers.getEnterGeofenceAC().trigger(tokens,state,null).catch( function(e) {
        ref.logmodule.writelog('error', "Error occured: " +e);
      });
      ref.triggers.getEventOwntracksAC().trigger(tokens,state,null).catch( function(e) {

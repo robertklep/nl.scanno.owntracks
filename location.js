@@ -6,7 +6,7 @@ class Location {
   constructor(lat, lon, fence, timestamp) {
     this.lat = lat;
     this.lon = lon;
-    this.fence = fence;
+    this.fence = [];
     this.timestamp = timestamp;
     this.logmodule = require("./logmodule.js");
     this.adress = null;
@@ -20,11 +20,12 @@ class Location {
     this.updateAdress();
   }
 
-  setLocation(lat, lon, fence, timestamp) {
+  //setLocation(lat, lon, fence, timestamp) {
+  setLocation(lat, lon, timestamp) {
     this.logmodule.writelog('debug', "setLocation() entered");
     this.lat = lat;
     this.lon = lon;
-    this.fence = fence;
+    //this.fence = fence;
     this.timestamp = timestamp;
   }
 
@@ -68,6 +69,37 @@ class Location {
     } catch(err) {
       // parsing of object failed
     }
+  }
+
+  enterFence(fence) {
+    for (var i = 0; i < this.fence.length; i++) {
+      if (this.fence[i] === fence) {
+        return false;
+      }
+    }
+    this.fence.push(fence);
+    this.logmodule.writelog('debug', "Current fences: " + this.fence);
+    return true;
+  }
+
+  leaveFence(fence) {
+    for (var i = 0; i < this.fence.length; i++) {
+      if (this.fence[i] === fence) {
+        var leftfence = this.fence.splice(i, 1);
+        this.logmodule.writelog('debug', "Current fences: " + this.fence);
+        return leftfence;
+      }
+    }
+    return null;
+  }
+
+  inFence(fence) {
+    for (var i = 0; i < this.fence.length; i++) {
+      if (this.fence[i] === fence) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 
