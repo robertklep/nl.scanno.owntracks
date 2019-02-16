@@ -10,6 +10,7 @@ class Device {
     this.battery = 0;
     this.battTriggered = false;
     this.usesHttp = false;
+    this.inregions = false;
     this.location = new Location(0,0,null);
     this.queue = new SendQueue();
     this.logmodule = require("./logmodule.js");
@@ -68,6 +69,14 @@ class Device {
 
   setBattery(battery) {
     this.battery = battery;
+  }
+
+  supportsInregions() {
+    return this.inregions;
+  }
+
+  setInregionsSupport(inregions) {
+    this.inregions = inregions;
   }
 }
 

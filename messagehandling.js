@@ -162,9 +162,10 @@ class handleOwntracks {
     * The inregions field can be used to fix missed enter / leave events due to GPS or network
     * problems.
     *
-    * @param  {type} topic       The topic the message was received on.
-    * @param  {type} currentUser Reference to the currentUser array so fields can be accessed.
-    * @param  {type} jsonMsg     The parsed MQTT message payload into JSON format.
+    * @param  {string} topic       The topic the message was received on.
+    * @param  {object} currentUser Reference to the currentUser array so fields can be accessed.
+    * @param  {object} currentDevice Reference to the current device (from the users device array)
+    * @param  {object} jsonMsg     The parsed MQTT message payload into JSON format.
     * @return {type}             none.
     */
    handleLocationMessage(topic, currentUser, currentDevice, jsonMsg) {
@@ -174,17 +175,17 @@ class handleOwntracks {
      if (jsonMsg.batt !== undefined) {
         // Update battery percentage
         currentDevice.setBattery(jsonMsg.batt);
-        ref.logmodule.writelog('info', "Set battery percentage for user: "+ currentUser.name +" with device: "+ currentDevice.name+ " to "+ currentDevice.getBattery()+ "%");
+        ref.logmodule.writelog('info', "Set battery percentage for user: "+ currentUser.getName() +" with device: "+ currentDevice.getName()+ " to "+ currentDevice.getBattery()+ "%");
         let tokens = {
-           user: currentUser.name,
+           user: currentUser.getName(),
            fence: currentDevice.getLocation().fence[0],
            percBattery: jsonMsg.batt
         }
         let state = {
            triggerTopic: topic,
            percBattery: jsonMsg.batt,
-           user: currentUser.name,
-           device: currentDevice.name
+           user: currentUser.getName(),
+           device: currentDevice.getName()
         }
         //currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, currentDevice.getLocation().fence, jsonMsg.tst);
         currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, jsonMsg.tst);
@@ -199,7 +200,7 @@ class handleOwntracks {
        // the current region stored.
        if (jsonMsg.inregions !== undefined && ref.isAccurate(jsonMsg)) {
          // The client supports inregions, so for future calls, lets remember that.
-         currentUser.inregions = true;
+         currentDevice.setInregionsSupport(true);
 
          ref.logmodule.writelog('info', "inregions: " + jsonMsg.inregions);
          for (var region in jsonMsg.inregions) {
@@ -237,6 +238,18 @@ class handleOwntracks {
             currentDevice.setLocation(jsonMsg.lat, jsonMsg.lon, jsonMsg.tst);
             currentDevice.getLocation().leaveFence(staleFences[stale]);
           }
+       } else {
+          if (currentDevice.supportsInregions() && ref.isAccurate(jsonMsg)) {
+             // current device uses inregions,but its not in the location message
+             // this means that the device is not in any fence
+             ref.logmodule.writelog('debug', "No inRegions found, but device supports it, so not inside any fence.");
+             if (currentDevice.getLocation().fence.length > 0) {
+                for (var stale in currentDevice.getLocation().fence) {
+                   this.generateLeaveEvent(topic, currentUser, currentDevice, currentDevice.getLocation().fence[stale]);
+                }
+                currentDevice.getLocation().fence = [];
+             }
+          }
        }
      }
    }
@@ -244,25 +257,26 @@ class handleOwntracks {
    /**
     * generateLeaveEvent - description
     *
-    * @param  {type} topic       description
-    * @param  {type} currentUser description
-    * @param  {type} jsonMsg     description
-    * @return {type}             description
+    * @param  {type} topic         description
+    * @param  {type} currentUser   description
+    * @param  {type} currentDevice description
+    * @param  {type} fence         description
+    * @return {type}               description
     */
    generateLeaveEvent(topic, currentUser, currentDevice, fence) {
      const ref = this;
-     ref.logmodule.writelog('debug', "generateLeaveEvent - for " + currentUser.name);
+     ref.logmodule.writelog('debug', "generateLeaveEvent "+fence+" - for " + currentUser.getName()+", "+currentDevice.getName());
      let tokens = {
         event: "leave",
-        user: currentUser.name,
+        user: currentUser.getName(),
         fence: fence,
         percBattery: currentDevice.getBattery()
      }
      let state = {
         triggerTopic: topic,
-        triggerFence: currentDevice.getLocation().fence,
+        triggerFence: fence,
         event: "leave",
-        user: currentUser.name
+        user: currentUser.getName()
      }
 
      ref.triggers.getLeaveGeofenceAC().trigger(tokens,state,null).catch( function(e) {
@@ -273,12 +287,21 @@ class handleOwntracks {
      });
    }
 
+   /**
+    * generateEnterEvent - description
+    *
+    * @param  {type} topic         description
+    * @param  {type} currentUser   description
+    * @param  {type} currentDevice description
+    * @param  {type} fence         description
+    * @return {type}               description
+    */
    generateEnterEvent(topic, currentUser, currentDevice, fence) {
      const ref = this;
-     ref.logmodule.writelog('debug', "generateLeaveEvent - for " + currentUser.name);
+     ref.logmodule.writelog('debug', "generateEnterEvent "+fence+" - for " + currentUser.getName()+", "+currentDevice.getName());
      let tokens = {
         event: "enter",
-        user: currentUser.name,
+        user: currentUser.getName(),
         fence: fence,
         percBattery: currentDevice.getBattery()
      }
@@ -286,7 +309,7 @@ class handleOwntracks {
         triggerTopic: topic,
         triggerFence: fence,
         event: "enter",
-        user: currentUser.name
+        user: currentUser.getName()
      }
 
      ref.triggers.getEnterGeofenceAC().trigger(tokens,state,null).catch( function(e) {
@@ -297,6 +320,13 @@ class handleOwntracks {
      });
    }
 
+
+   /**
+    * checkAndAddFence - description
+    *
+    * @param  {type} jsonMsg description
+    * @return {type}         description
+    */
    checkAndAddFence(jsonMsg) {
      if (this.fences.getFence(jsonMsg.dec) == null) {
        this.fences.addFence(jsonMsg.lat, jsonMsg.lon, jsonMsg.rad, jsonMsg.desc, jsonMsg.tid);
