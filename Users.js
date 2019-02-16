@@ -80,7 +80,7 @@ class UserArray {
 
     if (this.getUser(name) == null) {
       let user = new User(name);
-      if (device !== undefined) {
+      if (device !== undefined && device !== null) {
         user.addDevice(device, id);
       }
       user.generateToken();
