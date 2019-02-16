@@ -3,7 +3,7 @@ const AdressRetreiver = require("./adressretreiver.js");
 const FenceArray = require("./Fence.js");
 
 class Location {
-  constructor(lat, lon, fence, timestamp) {
+  constructor(lat, lon, timestamp) {
     this.lat = lat;
     this.lon = lon;
     this.fence = [];
@@ -22,10 +22,8 @@ class Location {
 
   //setLocation(lat, lon, fence, timestamp) {
   setLocation(lat, lon, timestamp) {
-    this.logmodule.writelog('debug', "setLocation() entered");
     this.lat = lat;
     this.lon = lon;
-    //this.fence = fence;
     this.timestamp = timestamp;
   }
 
@@ -60,14 +58,11 @@ class Location {
              adress: this.adress }
   }
 
-  parseJSON(object) {
-    try {
-      this.lat = object.lat;
-      this.lon = object.lon;
-      this.fence = object.fence;
-      this.adress = object.adress;
-    } catch(err) {
-      // parsing of object failed
+  parseJSON(location) {
+    this.logmodule.writelog('debug', "JSON Location " + JSON.stringify(location));
+    if (location !== undefined && location !== null) {
+      this.setLocation(location.lat, location.lon, location.timestamp);
+      this.fence = location.fence;
     }
   }
 

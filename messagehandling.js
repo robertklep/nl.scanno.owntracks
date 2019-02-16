@@ -285,6 +285,8 @@ class handleOwntracks {
      ref.triggers.getEventOwntracksAC().trigger(tokens,state,null).catch( function(e) {
        ref.logmodule.writelog('error', "Error occured: " +e);
      });
+     // persist users
+     this.users.writeUserData();
    }
 
    /**
@@ -318,6 +320,8 @@ class handleOwntracks {
      ref.triggers.getEventOwntracksAC().trigger(tokens,state,null).catch( function(e) {
        ref.logmodule.writelog('error', "Error occured: " +e);
      });
+     // persist users
+     this.users.writeUserData();
    }
 
 

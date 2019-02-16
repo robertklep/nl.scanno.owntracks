@@ -4,14 +4,21 @@ const Location = require("./location.js");
 const SendQueue = require("./SendQueue.js");
 
 class Device {
-  constructor(name, id) {
+  constructor(name, id, location) {
     this.name = name;
     this.id = id;
     this.battery = 0;
     this.battTriggered = false;
     this.usesHttp = false;
     this.inregions = false;
-    this.location = new Location(0,0,null);
+    this.primary = false;
+
+    if (location !== undefined && location !== null) {
+      this.location = new Location(location.lat, location.lon, location.timestamp, location.fence);
+    } else {
+      this.location = new Location(0,0,null);
+    }
+
     this.queue = new SendQueue();
     this.logmodule = require("./logmodule.js");
 
@@ -19,12 +26,10 @@ class Device {
   }
 
   getLocation() {
-    //this.logmodule.writelog('debug', "getLocation(): " + JSON.stringify(this.location));
     return this.location;
   }
 
   getName() {
-    //this.logmodule.writelog('debug',"device.getName: "+ this.name);
     return this.name;
   }
 
@@ -54,13 +59,26 @@ class Device {
       id: this.id,
       battery: this.battery,
       battTriggered: this.battTriggered,
+      usesHttp: this.usesHttp,
+      primary: this.primary,
       location: this.location.getJSON()
+    }
+  }
+
+  parseJSON(device) {
+    this.logmodule.writelog('debug', "device.parseJSON = " + JSON.stringify(device));
+    if (device !== undefined && device !== null) {
+      this.battery = device.battery;
+      this.battTriggered = device.battTriggered;
+      this.usesHttp = device.usesHttp;
+      this.primary = device.primary;
+      this.location.parseJSON(device.location);
     }
   }
 
   setLocation(lat, lon, fence, timestamp) {
     this.logmodule.writelog('debug', "device setLocation called");
-    this.location.setLocation(lat, lon, fence, timestamp);
+    this.location.setLocation(lat, lon, timestamp, fence);
   }
 
   getBattery() {
@@ -77,6 +95,14 @@ class Device {
 
   setInregionsSupport(inregions) {
     this.inregions = inregions;
+  }
+
+  setPrimary(primary) {
+    this.primary = primary;
+  }
+
+  isPrimary() {
+    return this.primary;
   }
 }
 
@@ -136,6 +162,18 @@ class DeviceArray {
     return JSON.parse(JSON.stringify(values));
   }
 
+  parseJSON(devices) {
+    this.logmodule.writelog('debug', "JSON Devices entered");
+    if (devices !== undefined && devices !== null) {
+      this.logmodule.writelog('debug', "JSON Devices " + JSON.stringify(devices));
+      for (var i = 0; i < devices.length; i++) {
+        var device = this.addDevice(devices[i].name, devices[i].id, devices[i].location);
+        this.logmodule.writelog('debug', "JSON Device " + JSON.stringify(device));
+        device.parseJSON(devices[i]);
+      }
+    }
+  }
+
   /**
    * addDevice - description
    *
@@ -144,11 +182,11 @@ class DeviceArray {
    * @param  {type} location description
    * @return {type}          description
    */
-  addDevice(name, id) {
+  addDevice(name, id, location) {
     this.logmodule.writelog('debug', "devices.addDevice called");
     if (this.getDevice(name) === null) {
       this.logmodule.writelog('debug', "New device: " + name);
-      var device = new Device(name, id)
+      var device = new Device(name, id, location)
       this.devices.push(device);
       return device;
     }

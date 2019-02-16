@@ -7,9 +7,6 @@ class User {
     this.name = name;
     this.token = undefined;
     this.devices = new DeviceArray();
-    this.inregions = false;
-    this.httpuser = false;
-    this.pushrequest = false;
     this.logmodule = require('./logmodule.js');
   }
 
@@ -26,13 +23,18 @@ class User {
       name: this.name,
       token: this.token,
       devices: this.devices.getJSON(),
-      battTriggered: this.battTriggered,
-      inregions: this.inregions,
-      httpuser: this.httpuser,
-      pushrequest: this.pushrequest
     }
   }
 
+  parseJSON(user) {
+    try {
+      this.token = user.token;
+      this.devices.parseJSON(user.devices);
+    } catch(err) {
+      // parsing of object failed
+    }
+
+  }
   getDevices() {
     //this.logmodule.writelog('debug', "getDevices(): " + JSON.stringify(this.devices));
     return this.devices.getDevices();
@@ -44,14 +46,6 @@ class User {
 
   getDeviceArray() {
     return this.devices;
-  }
-
-  isHTTPUser() {
-    return this.httpuser;
-  }
-
-  setUser() {
-
   }
 
   addDevice(name, id) {
@@ -70,16 +64,6 @@ class User {
     }
     return false;
   }
-
-  parseJSON(object) {
-    try {
-      this.name = object.name;
-      this.location.parseJSON(object.location);
-    } catch(err) {
-      // parsing of object failed
-    }
-
-  }
 }
 
 class UserArray {
@@ -87,10 +71,11 @@ class UserArray {
     this.users = [];
     this.logmodule = require('./logmodule.js');
 
-    this.initUserDataOld();
+//    this.initUserDataOld();
+    this.readUserData();
   }
 
-  addUser(name, device, id) {
+  addUser(name, device, id, init) {
     const ref = this;
 
     if (this.getUser(name) == null) {
@@ -101,14 +86,18 @@ class UserArray {
       user.generateToken();
       this.users.push(user);
 
-      Homey.ManagerNotifications.registerNotification({
-         excerpt: Homey.__("notifications.user_added", {"name": user.name})
-      }, function( err, notification ) {
-         if( err ) return console.error( err );
-            console.log( 'Notification added' );
-      });
+      if (!init) {
+        Homey.ManagerNotifications.registerNotification({
+           excerpt: Homey.__("notifications.user_added", {"name": user.name})
+        }, function( err, notification ) {
+           if( err ) return console.error( err );
+              console.log( 'Notification added' );
+        });
+      }
+      this.logmodule.writelog('debug', "Added user: " + JSON.stringify(user));
       return user;
     }
+    this.logmodule.writelog('debug', "No user added");
     return null;
   }
 
@@ -155,10 +144,6 @@ class UserArray {
       values.push(this.users[i].getJSON());
     }
     return JSON.parse(JSON.stringify(values));
-  }
-
-  parseJSON(object) {
-
   }
 
   searchUsersAutocomplete(key, wildcards) {
@@ -214,6 +199,40 @@ class UserArray {
     return presence;
   }
 
+  readUserData() {
+    const ref = this;
+    require('fs').readFile('/userdata/owntracks_userdata.json', 'utf8', function (err, data) {
+      if (err) {
+        ref.logmodule.writelog('debug', "Retreiving userArray failed: "+ err);
+      } else {
+        try {
+          var users = JSON.parse(data);
+          ref.logmodule.writelog('debug', "Read UserData: " + JSON.stringify(users));
+          for (var i=0; i < users.length; i++) {
+            var user = ref.addUser(users[i].name, null, null, true);
+            if (user !== null) {
+              user.parseJSON(users[i]);
+            }
+          }
+        } catch (err){
+          ref.logmodule.writelog('error', "Reading userdata failed: "+ err);
+        }
+      }
+    });
+  }
+
+  writeUserData() {
+    const ref = this;
+    this.logmodule.writelog('info', "saveUserData called");
+    this.logmodule.writelog('debug', "UserData: " + JSON.stringify(ref.getJSON()));
+    //fs = require('fs');
+    require('fs').writeFile('/userdata/owntracks_userdata.json',  JSON.stringify(ref.getJSON()), function (err) {
+      if (err) {
+        ref.logmodule.writelog('error', "Persisting userArray failed: "+ err);
+      }
+    });
+  }
+
   initUserDataOld() {
     const ref = this;
     require('fs').readFile('/userdata/owntracks.json', 'utf8', function (err, data) {
@@ -225,13 +244,11 @@ class UserArray {
               for (var i=0; i<userArray.length; i++) {
                 var user = new User(userArray[i].userName);
                 user.token = userArray[i].userToken;
-                user.inregions = userArray[i].inregionsSupported;
-//                user.battery = userArray[i].battery;
-                //user.battTriggered = userArray[i].battTriggered;
                 user.addDevice(userArray[i].userDevice, userArray[i].tid);
                 var device = user.getDevice(userArray[i].userDevice);
                 if (device !== null) {
-                  device.setLocation(userArray[i].lat, userArray[i].lon, userArray[i].fence)
+                  device.setLocation(userArray[i].lat, userArray[i].lon);
+                  device.getLocation().enterFence(userArray[i].fence);
                   device.setBattery(userArray[i].battery);
                 } else {
                   ref.logmodule.writelog('debug', "Device NOT found");
