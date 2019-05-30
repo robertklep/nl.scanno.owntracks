@@ -184,9 +184,10 @@ class UserArray {
         this.logmodule.writelog('info', "No users found");
         return null;
      } else {
-        this.logmodule.writelog(this.users[userIndex].name);
+        this.logmodule.writelog('info', "User found: "+this.users[userIndex].name);
         return this.users[userIndex];
      }
+     return null;
   }
 
   checkForPresenceInFence(fence) {

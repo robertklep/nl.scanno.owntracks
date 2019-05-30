@@ -87,8 +87,8 @@ class actionOwntracks {
          //var foundUser = ref.globalVar.getUserFromString(speech.transcript);
          var foundUser = ref.users.getUserFromString(speech.transcript);
          if (foundUser !== null) {
-            ref.logmodule.writelog('debug', "Found user: " + foundUser.userName + "   Fence: " + foundUser.fence);
-            return ref.getLocationString(foundUser.userName).then(function(speechline) {
+            ref.logmodule.writelog('debug', "Found user: " + foundUser.name + "   Fence: " + foundUser.getDevices()[0].getLocation().fence);
+            return ref.getLocationString(foundUser.name).then(function(speechline) {
                ref.logmodule.writelog('info', "Speech output: " + speechline);
                speech.say( speechline );
             });
@@ -120,7 +120,7 @@ class actionOwntracks {
                //if (ref.globalVar.getUser(userName).fence !== "" ) {
                if (ref.users.getUser(userName).fence !== "" ) {
                   //locationString = ref.Homey.__("location_known", {"name": userName, "location": ref.globalVar.getUser(userName).fence});
-                  locationString = ref.Homey.__("location_known", {"name": userName, "location": ref.users.getUser(userName).fence});
+                  locationString = ref.Homey.__("location_known", {"name": userName, "location": ref.users.getUser(userName).getDevices()[0].getLocation().fence});
                   // We have found a user and the user is inside a known geoFence, so fulfill te request
                   fulfill(locationString);
                } else {

@@ -76,7 +76,7 @@ class Device {
     }
   }
 
-  setLocation(lat, lon, fence, timestamp) {
+  setLocation(lat, lon, timestamp, fence) {
     this.logmodule.writelog('debug', "device setLocation called");
     this.location.setLocation(lat, lon, timestamp, fence);
   }
